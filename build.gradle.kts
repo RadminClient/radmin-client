@@ -132,7 +132,7 @@ listOf("api", "implementation", "include").forEach { configName ->
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/meteor-client.classtweaker")
+    accessWidenerPath = file("src/main/resources/radmin-client.classtweaker")
 }
 
 fun toMinecraftCompat(version: String): String {
@@ -182,7 +182,7 @@ tasks {
         from(sourceSets["launcher"].output)
 
         manifest {
-            attributes["Main-Class"] = "meteordevelopment.meteorclient.Main"
+            attributes["Main-Class"] = "radmin.client.Main"
         }
     }
 
@@ -214,7 +214,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifactId = "meteor-client"
+            artifactId = "radmin-client"
 
             version = "${libs.versions.minecraft.get()}-SNAPSHOT"
         }
