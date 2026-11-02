@@ -13,4 +13,4 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-rootProject.name = "radmin-client"
+rootProject.name = "meteor-client"
