@@ -1,0 +1,15 @@
+{
+  "required": false,
+  "package": "radmin.client.mixin.metallum",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "radmin.client.MixinPlugin",
+  "client": [
+    "MetalDeviceMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixinextras": {
+    "minVersion": "0.5.0"
+  }
+}

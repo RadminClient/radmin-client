@@ -1,0 +1,13 @@
+{
+  "required": false,
+  "package": "radmin.client.mixin.lithium",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "radmin.client.MixinPlugin",
+  "client": [
+    "ChunkAwareBlockCollisionSweeperMixin",
+    "LithiumEntityCollisionsMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

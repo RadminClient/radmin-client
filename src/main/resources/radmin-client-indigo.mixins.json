@@ -1,0 +1,12 @@
+{
+  "required": false,
+  "package": "radmin.client.mixin.indigo",
+  "compatibilityLevel": "JAVA_21",
+  "plugin": "radmin.client.MixinPlugin",
+  "client": [
+    "AltModelBlockRendererImplMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

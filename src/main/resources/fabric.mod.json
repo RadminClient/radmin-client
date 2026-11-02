@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
-  "name": "Meteor Client",
-  "id": "meteor-client",
+  "name": "RadminVPN Client",
+  "id": "radmin-client",
   "version": "${version}",
-  "description": "Based utility mod.",
+  "description": "Based utility mod for RadminVPN and Aternos servers.",
   "authors": [
     "MineGame159",
     "squidoodly",
@@ -11,41 +11,41 @@
   ],
   "contact": {
     "homepage": "https://meteorclient.com",
-    "issues": "https://github.com/MeteorDevelopment/meteor-client/issues",
-    "sources": "https://github.com/MeteorDevelopment/meteor-client",
+    "issues": "https://github.com/RadminClient/radmin-client/issues",
+    "sources": "https://github.com/RadminClient/radmin-client",
     "discord": "https://meteorclient.com/discord"
   },
   "license": "GPL-3.0",
-  "icon": "assets/meteor-client/icon.png",
+  "icon": "assets/radmin-client/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "meteordevelopment.meteorclient.MeteorClient"
+      "radmin.client.MeteorClient"
     ],
     "modmenu": [
-      "meteordevelopment.meteorclient.modintegration.ModMenuIntegration"
+      "radmin.client.modintegration.ModMenuIntegration"
     ]
   },
   "mixins": [
-    "meteor-client.mixins.json",
-    "meteor-client-baritone.mixins.json",
-    "meteor-client-indigo.mixins.json",
-    "meteor-client-sodium.mixins.json",
-    "meteor-client-lithium.mixins.json",
-    "meteor-client-metallum.mixins.json"
+    "radmin-client.mixins.json",
+    "radmin-client-baritone.mixins.json",
+    "radmin-client-indigo.mixins.json",
+    "radmin-client-sodium.mixins.json",
+    "radmin-client-lithium.mixins.json",
+    "radmin-client-metallum.mixins.json"
   ],
-  "accessWidener": "meteor-client.classtweaker",
+  "accessWidener": "radmin-client.classtweaker",
   "custom": {
-    "meteor-client:build_number": "${build_number}",
-    "meteor-client:color": "145,61,226",
-    "meteor-client:commit": "${commit}",
+    "radmin-client:build_number": "${build_number}",
+    "radmin-client:color": "145,61,226",
+    "radmin-client:commit": "${commit}",
     "modmenu": {
       "links": {
         "modmenu.discord": "https://meteorclient.com/discord"
       }
     },
     "badoptimizations:cache_hooks": {
-      "lightmap": "meteordevelopment.meteorclient.modintegration.BadOptimizationsHook"
+      "lightmap": "radmin.client.modintegration.BadOptimizationsHook"
     }
   },
   "depends": {

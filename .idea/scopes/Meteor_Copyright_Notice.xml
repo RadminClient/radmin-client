@@ -1,3 +1,3 @@
 <component name="DependencyValidationManager">
-  <scope name="Meteor Copyright Notice" pattern="src[meteor-client.main]:meteordevelopment.meteorclient..*||src[meteor-client.launch.main]:meteordevelopment.meteorclient..*" />
+  <scope name="Meteor Copyright Notice" pattern="src[radmin-client.main]:radmin.client..*||src[radmin-client.launch.main]:radmin.client..*" />
 </component>

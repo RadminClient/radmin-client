@@ -140,7 +140,7 @@ listOf("api", "implementation", "include").forEach { configName ->
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/meteor-client.classtweaker")
+    accessWidenerPath = file("src/main/resources/radmin-client.classtweaker")
 }
 
 fun toMinecraftCompat(version: String): String {
@@ -207,7 +207,7 @@ tasks {
         from(launcher.output)
 
         manifest {
-            attributes["Main-Class"] = "meteordevelopment.meteorclient.Main"
+            attributes["Main-Class"] = "radmin.client.Main"
         }
     }
 
@@ -224,7 +224,7 @@ tasks {
         if (runErrorProne) {
             options.errorprone {
                 check("NullAway", net.ltgt.gradle.errorprone.CheckSeverity.ERROR)
-                option("NullAway:AnnotatedPackages", "meteordevelopment.meteorclient")
+                option("NullAway:AnnotatedPackages", "radmin.client")
                 option("NullAway:JSpecifyMode", "true")
                 // Event handlers are discovered reflectively by Orbit.
                 option("UnusedMethod:ExcludedAnnotations", "meteordevelopment.orbit.EventHandler")
@@ -251,7 +251,7 @@ publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
-            artifactId = "meteor-client"
+            artifactId = "radmin-client"
 
             version = "${libs.versions.minecraft.get()}-SNAPSHOT"
         }
