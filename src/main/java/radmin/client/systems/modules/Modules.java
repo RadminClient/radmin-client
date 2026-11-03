@@ -506,6 +506,7 @@ public class Modules extends System<Modules> {
     }
 
     private void initRender() {
+        add(new Arrows());
         add(new BetterTab());
         add(new BetterTooltips());
         add(new BlockESP());
@@ -519,20 +520,27 @@ public class Modules extends System<Modules> {
         add(new CityESP());
         add(new EntityOwner());
         add(new ESP());
+        add(new FireworkESP());
         add(new Freecam());
         add(new FreeLook());
         add(new Fullbright());
         add(new HandView());
+        add(new HitBubbles());
+        add(new HitMarker());
         add(new HoleESP());
         add(new ItemPhysics());
         add(new ItemHighlight());
+        add(new JumpCircle());
+        add(new KillEffect());
         add(new LightOverlay());
         add(new LogoutSpots());
         add(new Marker());
         add(new Nametags());
         add(new NoRender());
         add(new PopChams());
+        add(new SeeInvisibles());
         add(new StorageESP());
+        add(new TargetESP());
         add(new TimeChanger());
         add(new Tracers());
         add(new Trail());

@@ -7,7 +7,7 @@ package radmin.client.gui;
 
 import radmin.client.gui.renderer.packer.GuiTexture;
 import radmin.client.gui.screens.ModuleScreen;
-import radmin.client.gui.screens.ModulesScreen;
+import radmin.client.gui.screens.RiseClickGuiScreen;
 import radmin.client.gui.screens.NotebotSongsScreen;
 import radmin.client.gui.screens.ProxiesScreen;
 import radmin.client.gui.screens.accounts.AccountsScreen;
@@ -256,11 +256,11 @@ public abstract class GuiTheme implements ISerializable<GuiTheme> {
     // Screens
 
     public TabScreen modulesScreen() {
-        return new ModulesScreen(this);
+        return new RiseClickGuiScreen(this);
     }
 
     public boolean isModulesScreen(Screen screen) {
-        return screen instanceof ModulesScreen;
+        return screen instanceof RiseClickGuiScreen;
     }
 
     public WidgetScreen moduleScreen(Module module) {
