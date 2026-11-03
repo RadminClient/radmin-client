@@ -1,0 +1,77 @@
+--- upstream261/gui/screens/settings/PacketBoolSettingScreen.java
++++ v1decompiled/gui/screens/settings/PacketBoolSettingScreen.java
+@@ -1,45 +1,52 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.network.protocol.Packet
++ *  net.minecraft.network.protocol.PacketType
++ *  org.jetbrains.annotations.NotNull
+  */
++package radmin.client.gui.screens.settings;
+ 
+-package meteordevelopment.meteorclient.gui.screens.settings;
+-
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.screens.settings.base.CollectionListSettingScreen;
+-import meteordevelopment.meteorclient.gui.widgets.WWidget;
+-import meteordevelopment.meteorclient.settings.PacketListSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.utils.network.PacketUtils;
++import java.util.Collection;
++import java.util.Set;
++import java.util.function.Predicate;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.PacketType;
+ import org.jetbrains.annotations.NotNull;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.screens.settings.base.CollectionListSettingScreen;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.settings.PacketListSetting;
++import radmin.client.settings.Setting;
++import radmin.client.utils.network.PacketUtils;
+ 
+-import java.util.Set;
+-import java.util.function.Predicate;
+-
+-public class PacketBoolSettingScreen extends CollectionListSettingScreen<PacketType<? extends @NotNull Packet<?>>> {
++public class PacketBoolSettingScreen
++extends CollectionListSettingScreen<PacketType<? extends Packet<?>>> {
+     public PacketBoolSettingScreen(GuiTheme theme, Setting<Set<PacketType<? extends @NotNull Packet<?>>>> setting) {
+-        super(theme, "Select Packets", setting, setting.get(), PacketUtils.getPackets());
++        super(theme, "Select Packets", setting, (Collection)setting.get(), PacketUtils.getPackets());
+     }
+ 
++    /*
++     * Issues handling annotations - annotations may be inaccurate
++     */
+     @Override
+     protected boolean includeValue(PacketType<? extends @NotNull Packet<?>> value) {
+-        Predicate<PacketType<? extends @NotNull Packet<?>>> filter = ((PacketListSetting) setting).filter;
+-
+-        if (filter == null) return true;
++        Predicate<PacketType<@NotNull Packet<?>>> filter = ((PacketListSetting)this.setting).filter;
++        if (filter == null) {
++            return true;
++        }
+         return filter.test(value);
+     }
+ 
+     @Override
+     protected WWidget getValueWidget(PacketType<? extends @NotNull Packet<?>> value) {
+-        return theme.label(value.toString());
++        return this.theme.label(value.toString());
+     }
+ 
+     @Override
+     protected String[] getValueNames(PacketType<? extends @NotNull Packet<?>> value) {
+-        return new String[]{
+-            value.toString()
+-        };
++        return new String[]{value.toString()};
+     }
+ }
++

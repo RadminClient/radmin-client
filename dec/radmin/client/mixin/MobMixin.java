@@ -1,0 +1,26 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.llamalad7.mixinextras.injector.ModifyReturnValue
+ *  net.minecraft.world.entity.Mob
+ *  org.spongepowered.asm.mixin.Mixin
+ *  org.spongepowered.asm.mixin.injection.At
+ */
+package radmin.client.mixin;
+
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import net.minecraft.world.entity.Mob;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import radmin.client.systems.modules.Modules;
+import radmin.client.systems.modules.movement.EntityControl;
+
+@Mixin(value={Mob.class})
+public abstract class MobMixin {
+    @ModifyReturnValue(method={"isSaddled"}, at={@At(value="RETURN")})
+    private boolean isSaddled(boolean original) {
+        return Modules.get().get(EntityControl.class).spoofSaddle() || original;
+    }
+}
+

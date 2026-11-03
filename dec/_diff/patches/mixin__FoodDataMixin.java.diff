@@ -1,0 +1,41 @@
+--- upstream261/mixin/FoodDataMixin.java
++++ v1decompiled/mixin/FoodDataMixin.java
+@@ -1,22 +1,29 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.llamalad7.mixinextras.injector.ModifyExpressionValue
++ *  net.minecraft.world.food.FoodData
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.injection.At
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.movement.NoSlow;
+ import net.minecraft.world.food.FoodData;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.injection.At;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.movement.NoSlow;
+ 
+-@Mixin(FoodData.class)
++@Mixin(value={FoodData.class})
+ public abstract class FoodDataMixin {
+-    @ModifyExpressionValue(method = "hasEnoughFood()Z", at = @At(value = "CONSTANT", args = "floatValue=6.0f"))
++    @ModifyExpressionValue(method={"hasEnoughFood()Z"}, at={@At(value="CONSTANT", args={"floatValue=6.0f"})})
+     private float onHunger(float constant) {
+-        if (Modules.get().get(NoSlow.class).hunger()) return -1;
++        if (Modules.get().get(NoSlow.class).hunger()) {
++            return -1.0f;
++        }
+         return constant;
+     }
+ }
++

@@ -1,0 +1,406 @@
+--- upstream261/systems/modules/render/Blur.java
++++ v1decompiled/systems/modules/render/Blur.java
+@@ -1,9 +1,24 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.buffers.GpuBufferSlice
++ *  com.mojang.blaze3d.buffers.Std140Builder
++ *  com.mojang.blaze3d.buffers.Std140SizeCalculator
++ *  com.mojang.blaze3d.pipeline.RenderPipeline
++ *  com.mojang.blaze3d.systems.RenderSystem
++ *  com.mojang.blaze3d.textures.FilterMode
++ *  com.mojang.blaze3d.textures.GpuTextureView
++ *  com.mojang.blaze3d.textures.TextureFormat
++ *  it.unimi.dsi.fastutil.ints.IntFloatImmutablePair
++ *  meteordevelopment.orbit.listeners.ConsumerListener
++ *  meteordevelopment.orbit.listeners.IListener
++ *  net.minecraft.client.gui.screens.ChatScreen
++ *  net.minecraft.client.gui.screens.Screen
++ *  net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
++ *  net.minecraft.client.renderer.DynamicUniformStorage$DynamicUniform
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules.render;
++package radmin.client.systems.modules.render;
+ 
+ import com.mojang.blaze3d.buffers.GpuBufferSlice;
+ import com.mojang.blaze3d.buffers.Std140Builder;
+@@ -14,265 +29,164 @@
+ import com.mojang.blaze3d.textures.GpuTextureView;
+ import com.mojang.blaze3d.textures.TextureFormat;
+ import it.unimi.dsi.fastutil.ints.IntFloatImmutablePair;
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.events.game.ResolutionChangedEvent;
+-import meteordevelopment.meteorclient.events.render.RenderAfterWorldEvent;
+-import meteordevelopment.meteorclient.gui.WidgetScreen;
+-import meteordevelopment.meteorclient.renderer.FixedUniformStorage;
+-import meteordevelopment.meteorclient.renderer.MeshRenderer;
+-import meteordevelopment.meteorclient.renderer.MeteorRenderPipelines;
+-import meteordevelopment.meteorclient.settings.BoolSetting;
+-import meteordevelopment.meteorclient.settings.IntSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
++import java.nio.ByteBuffer;
+ import meteordevelopment.orbit.listeners.ConsumerListener;
++import meteordevelopment.orbit.listeners.IListener;
+ import net.minecraft.client.gui.screens.ChatScreen;
+ import net.minecraft.client.gui.screens.Screen;
+ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+ import net.minecraft.client.renderer.DynamicUniformStorage;
++import radmin.client.MeteorClient;
++import radmin.client.events.game.ResolutionChangedEvent;
++import radmin.client.events.render.RenderAfterWorldEvent;
++import radmin.client.gui.WidgetScreen;
++import radmin.client.renderer.FixedUniformStorage;
++import radmin.client.renderer.MeshRenderer;
++import radmin.client.renderer.MeteorRenderPipelines;
++import radmin.client.settings.BoolSetting;
++import radmin.client.settings.IntSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
+ 
+-import java.nio.ByteBuffer;
+-
+-public class Blur extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-    private final SettingGroup sgScreens = settings.createGroup("Screens");
+-
+-    // Strength-Levels from https://github.com/jonaburg/picom/blob/a8445684fe18946604848efb73ace9457b29bf80/src/backend/backend_common.c#L372
+-    private final IntFloatImmutablePair[] strengths = new IntFloatImmutablePair[]{
+-        IntFloatImmutablePair.of(1, 1.25f), // LVL 1
+-        IntFloatImmutablePair.of(1, 2.25f), // LVL 2
+-        IntFloatImmutablePair.of(2, 2.0f),  // LVL 3
+-        IntFloatImmutablePair.of(2, 3.0f),  // LVL 4
+-        IntFloatImmutablePair.of(2, 4.25f), // LVL 5
+-        IntFloatImmutablePair.of(3, 2.5f),  // LVL 6
+-        IntFloatImmutablePair.of(3, 3.25f), // LVL 7
+-        IntFloatImmutablePair.of(3, 4.25f), // LVL 8
+-        IntFloatImmutablePair.of(3, 5.5f),  // LVL 9
+-        IntFloatImmutablePair.of(4, 3.25f), // LVL 10
+-        IntFloatImmutablePair.of(4, 4.0f),  // LVL 11
+-        IntFloatImmutablePair.of(4, 5.0f),  // LVL 12
+-        IntFloatImmutablePair.of(4, 6.0f),  // LVL 13
+-        IntFloatImmutablePair.of(4, 7.25f), // LVL 14
+-        IntFloatImmutablePair.of(4, 8.25f), // LVL 15
+-        IntFloatImmutablePair.of(5, 4.5f),  // LVL 16
+-        IntFloatImmutablePair.of(5, 5.25f), // LVL 17
+-        IntFloatImmutablePair.of(5, 6.25f), // LVL 18
+-        IntFloatImmutablePair.of(5, 7.25f), // LVL 19
+-        IntFloatImmutablePair.of(5, 8.5f)   // LVL 20
+-    };
+-
+-    // General
+-    private final Setting<Integer> strength = sgGeneral.add(new IntSetting.Builder()
+-        .name("strength")
+-        .description("How strong the blur should be.")
+-        .defaultValue(5)
+-        .min(1)
+-        .max(20)
+-        .sliderRange(1, 20)
+-        .build()
+-    );
+-
+-    private final Setting<Integer> fadeTime = sgGeneral.add(new IntSetting.Builder()
+-        .name("fade-time")
+-        .description("How long the fade will last in milliseconds.")
+-        .defaultValue(100)
+-        .min(0)
+-        .sliderMax(500)
+-        .build()
+-    );
+-
+-    // Screens
+-
+-    private final Setting<Boolean> meteor = sgScreens.add(new BoolSetting.Builder()
+-        .name("meteor")
+-        .description("Applies blur to Meteor screens.")
+-        .defaultValue(true)
+-        .build());
+-
+-    private final Setting<Boolean> inventories = sgScreens.add(new BoolSetting.Builder()
+-        .name("inventories")
+-        .description("Applies blur to inventory screens.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> chat = sgScreens.add(new BoolSetting.Builder()
+-        .name("chat")
+-        .description("Applies blur when in chat.")
+-        .defaultValue(false)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> other = sgScreens.add(new BoolSetting.Builder()
+-        .name("other")
+-        .description("Applies blur to all other screen types.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private final GpuTextureView[] fbos = new GpuTextureView[6];
++public class Blur
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final SettingGroup sgScreens;
++    private final IntFloatImmutablePair[] strengths;
++    private final Setting<Integer> strength;
++    private final Setting<Integer> fadeTime;
++    private final Setting<Boolean> meteor;
++    private final Setting<Boolean> inventories;
++    private final Setting<Boolean> chat;
++    private final Setting<Boolean> other;
++    private final GpuTextureView[] fbos;
+     private GpuBufferSlice[] ubos;
+-
+     private boolean enabled;
+     private long fadeEndAt;
+-    private float previousOffset = -1;
++    private float previousOffset;
++    private static final int UNIFORM_SIZE = new Std140SizeCalculator().putVec2().putFloat().get();
++    private static final FixedUniformStorage<BlurUniformData> UNIFORM_STORAGE = new FixedUniformStorage("Meteor - Blur UBO", UNIFORM_SIZE, 6);
+ 
+     public Blur() {
+         super(Categories.Render, "blur", "Blurs background when in GUI screens.");
+-
+-        // Initialize fbos for the first time
+-        for (int i = 0; i < fbos.length; i++) {
+-            fbos[i] = createFbo(i);
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.sgScreens = this.settings.createGroup("Screens");
++        this.strengths = new IntFloatImmutablePair[]{IntFloatImmutablePair.of((int)1, (float)1.25f), IntFloatImmutablePair.of((int)1, (float)2.25f), IntFloatImmutablePair.of((int)2, (float)2.0f), IntFloatImmutablePair.of((int)2, (float)3.0f), IntFloatImmutablePair.of((int)2, (float)4.25f), IntFloatImmutablePair.of((int)3, (float)2.5f), IntFloatImmutablePair.of((int)3, (float)3.25f), IntFloatImmutablePair.of((int)3, (float)4.25f), IntFloatImmutablePair.of((int)3, (float)5.5f), IntFloatImmutablePair.of((int)4, (float)3.25f), IntFloatImmutablePair.of((int)4, (float)4.0f), IntFloatImmutablePair.of((int)4, (float)5.0f), IntFloatImmutablePair.of((int)4, (float)6.0f), IntFloatImmutablePair.of((int)4, (float)7.25f), IntFloatImmutablePair.of((int)4, (float)8.25f), IntFloatImmutablePair.of((int)5, (float)4.5f), IntFloatImmutablePair.of((int)5, (float)5.25f), IntFloatImmutablePair.of((int)5, (float)6.25f), IntFloatImmutablePair.of((int)5, (float)7.25f), IntFloatImmutablePair.of((int)5, (float)8.5f)};
++        this.strength = this.sgGeneral.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("strength")).description("How strong the blur should be.")).defaultValue(5)).min(1).max(20).sliderRange(1, 20).build());
++        this.fadeTime = this.sgGeneral.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("fade-time")).description("How long the fade will last in milliseconds.")).defaultValue(100)).min(0).sliderMax(500).build());
++        this.meteor = this.sgScreens.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("meteor")).description("Applies blur to Meteor screens.")).defaultValue(true)).build());
++        this.inventories = this.sgScreens.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("inventories")).description("Applies blur to inventory screens.")).defaultValue(true)).build());
++        this.chat = this.sgScreens.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("chat")).description("Applies blur when in chat.")).defaultValue(false)).build());
++        this.other = this.sgScreens.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("other")).description("Applies blur to all other screen types.")).defaultValue(true)).build());
++        this.fbos = new GpuTextureView[6];
++        this.previousOffset = -1.0f;
++        for (int i = 0; i < this.fbos.length; ++i) {
++            this.fbos[i] = this.createFbo(i);
+         }
+-
+-        // The listeners need to run even when the module is not enabled
+-        MeteorClient.EVENT_BUS.subscribe(new ConsumerListener<>(ResolutionChangedEvent.class, event -> {
+-            // Resize all fbos
+-            for (int i = 0; i < fbos.length; i++) {
+-                if (fbos[i] != null) {
+-                    fbos[i].close();
++        MeteorClient.EVENT_BUS.subscribe((IListener)new ConsumerListener(ResolutionChangedEvent.class, event -> {
++            for (int i = 0; i < this.fbos.length; ++i) {
++                if (this.fbos[i] != null) {
++                    this.fbos[i].close();
+                 }
+-
+-                fbos[i] = createFbo(i);
++                this.fbos[i] = this.createFbo(i);
+             }
+-
+-            // Invalidate ubos
+-            previousOffset = -1;
++            this.previousOffset = -1.0f;
+         }));
+-
+-        MeteorClient.EVENT_BUS.subscribe(new ConsumerListener<>(RenderAfterWorldEvent.class, event -> onRenderAfterWorld()));
++        MeteorClient.EVENT_BUS.subscribe((IListener)new ConsumerListener(RenderAfterWorldEvent.class, event -> this.onRenderAfterWorld()));
+     }
+ 
+     private GpuTextureView createFbo(int i) {
+-        double scale = 1 / Math.pow(2, i);
+-
+-        int width = (int) (mc.getWindow().getWidth() * scale);
+-        int height = (int) (mc.getWindow().getHeight() * scale);
+-
++        double scale = 1.0 / Math.pow(2.0, i);
++        int width = (int)((double)this.mc.getWindow().getWidth() * scale);
++        int height = (int)((double)this.mc.getWindow().getHeight() * scale);
+         return RenderSystem.getDevice().createTextureView(RenderSystem.getDevice().createTexture("Blur - " + i, 15, TextureFormat.RGBA8, width, height, 1, 1));
+     }
+ 
+     private void onRenderAfterWorld() {
+-        // Enable / disable with fading
+-        boolean shouldRender = shouldRender();
++        int i;
++        boolean shouldRender = this.shouldRender();
+         long time = System.currentTimeMillis();
+-
+-        if (enabled) {
++        if (this.enabled) {
+             if (!shouldRender) {
+-                if (fadeEndAt == -1) fadeEndAt = System.currentTimeMillis() + fadeTime.get();
+-
+-                if (time >= fadeEndAt) {
+-                    enabled = false;
+-                    fadeEndAt = -1;
++                if (this.fadeEndAt == -1L) {
++                    this.fadeEndAt = System.currentTimeMillis() + (long)this.fadeTime.get().intValue();
++                }
++                if (time >= this.fadeEndAt) {
++                    this.enabled = false;
++                    this.fadeEndAt = -1L;
+                 }
+             }
++        } else if (shouldRender) {
++            this.enabled = true;
++            this.fadeEndAt = System.currentTimeMillis() + (long)this.fadeTime.get().intValue();
++        }
++        if (!this.enabled) {
++            return;
++        }
++        double progress = 1.0;
++        if (time < this.fadeEndAt) {
++            progress = shouldRender ? 1.0 - (double)(this.fadeEndAt - time) / this.fadeTime.get().doubleValue() : (double)(this.fadeEndAt - time) / this.fadeTime.get().doubleValue();
+         } else {
+-            if (shouldRender) {
+-                enabled = true;
+-                fadeEndAt = System.currentTimeMillis() + fadeTime.get();
+-            }
++            this.fadeEndAt = -1L;
+         }
+-
+-        if (!enabled) return;
+-
+-        // Update progress
+-        double progress = 1;
+-
+-        if (time < fadeEndAt) {
+-            if (shouldRender) progress = 1 - (fadeEndAt - time) / fadeTime.get().doubleValue();
+-            else progress = (fadeEndAt - time) / fadeTime.get().doubleValue();
+-        } else {
+-            fadeEndAt = -1;
+-        }
+-
+-        // Update strength
+-        IntFloatImmutablePair strength = strengths[(int) ((this.strength.get() - 1) * progress)];
++        IntFloatImmutablePair strength = this.strengths[(int)((double)(this.strength.get() - 1) * progress)];
+         int iterations = strength.leftInt();
+         float offset = strength.rightFloat();
+-
+-        // Update uniforms
+-        if (previousOffset != offset) {
+-            updateUniforms(offset);
+-            previousOffset = offset;
++        if (this.previousOffset != offset) {
++            this.updateUniforms(offset);
++            this.previousOffset = offset;
+         }
+-
+-        // Initial downsample
+-        renderToFbo(fbos[0], mc.getMainRenderTarget().getColorTextureView(), MeteorRenderPipelines.BLUR_DOWN, ubos[0]);
+-
+-        // Downsample
+-        for (int i = 0; i < iterations; i++) {
+-            renderToFbo(fbos[i + 1], fbos[i], MeteorRenderPipelines.BLUR_DOWN, ubos[i + 1]);
++        this.renderToFbo(this.fbos[0], this.mc.getMainRenderTarget().getColorTextureView(), MeteorRenderPipelines.BLUR_DOWN, this.ubos[0]);
++        for (i = 0; i < iterations; ++i) {
++            this.renderToFbo(this.fbos[i + 1], this.fbos[i], MeteorRenderPipelines.BLUR_DOWN, this.ubos[i + 1]);
+         }
+-
+-        // Upsample
+-        for (int i = iterations; i >= 1; i--) {
+-            renderToFbo(fbos[i - 1], fbos[i], MeteorRenderPipelines.BLUR_UP, ubos[i - 1]);
++        for (i = iterations; i >= 1; --i) {
++            this.renderToFbo(this.fbos[i - 1], this.fbos[i], MeteorRenderPipelines.BLUR_UP, this.ubos[i - 1]);
+         }
+-
+-        // Render output
+-        MeshRenderer.begin()
+-            .attachments(mc.getMainRenderTarget())
+-            .pipeline(MeteorRenderPipelines.BLUR_PASSTHROUGH)
+-            .fullscreen()
+-            .sampler("u_Texture", fbos[0], RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR)) // todo ???
+-            .end();
++        MeshRenderer.begin().attachments(this.mc.getMainRenderTarget()).pipeline(MeteorRenderPipelines.BLUR_PASSTHROUGH).fullscreen().sampler("u_Texture", this.fbos[0], RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR)).end();
+     }
+ 
+     private void renderToFbo(GpuTextureView targetFbo, GpuTextureView sourceTexture, RenderPipeline pipeline, GpuBufferSlice ubo) {
+-        MeshRenderer.begin()
+-            .attachments(targetFbo, null)
+-            .pipeline(pipeline)
+-            .fullscreen()
+-            .uniform("BlurData", ubo)
+-            .sampler("u_Texture", sourceTexture, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR))
+-            .end();
++        MeshRenderer.begin().attachments(targetFbo, null).pipeline(pipeline).fullscreen().uniform("BlurData", ubo).sampler("u_Texture", sourceTexture, RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR)).end();
+     }
+ 
+     private boolean shouldRender() {
+-        if (!isActive()) return false;
+-        Screen screen = mc.screen;
+-
+-        if (screen instanceof WidgetScreen) return meteor.get();
+-        if (screen instanceof AbstractContainerScreen) return inventories.get();
+-        if (screen instanceof ChatScreen) return chat.get();
+-        if (screen != null) return other.get();
+-
++        if (!this.isActive()) {
++            return false;
++        }
++        Screen screen = this.mc.screen;
++        if (screen instanceof WidgetScreen) {
++            return this.meteor.get();
++        }
++        if (screen instanceof AbstractContainerScreen) {
++            return this.inventories.get();
++        }
++        if (screen instanceof ChatScreen) {
++            return this.chat.get();
++        }
++        if (screen != null) {
++            return this.other.get();
++        }
+         return false;
+     }
+ 
+-    // Uniforms
+-
+     private void updateUniforms(float offset) {
+         UNIFORM_STORAGE.clear();
+-
+-        BlurUniformData[] uboData = new BlurUniformData[6];
+-        for (int i = 0; i < uboData.length; i++) {
+-            GpuTextureView fbo = fbos[i];
+-            uboData[i] = new BlurUniformData(
+-                0.5f / fbo.getWidth(0), 0.5f / fbo.getHeight(0),
+-                offset
+-            );
++        DynamicUniformStorage.DynamicUniform[] uboData = new BlurUniformData[6];
++        for (int i = 0; i < uboData.length; ++i) {
++            GpuTextureView fbo = this.fbos[i];
++            uboData[i] = new BlurUniformData(0.5f / (float)fbo.getWidth(0), 0.5f / (float)fbo.getHeight(0), offset);
+         }
+-
+-        ubos = UNIFORM_STORAGE.writeAll(uboData);
++        this.ubos = UNIFORM_STORAGE.writeAll(uboData);
+     }
+ 
+-    private static final int UNIFORM_SIZE = new Std140SizeCalculator()
+-        .putVec2()
+-        .putFloat()
+-        .get();
+-
+-    private static final FixedUniformStorage<BlurUniformData> UNIFORM_STORAGE = new FixedUniformStorage<>("Meteor - Blur UBO", UNIFORM_SIZE, 6);
+-
+-    private record BlurUniformData(float halfTexelSizeX, float halfTexelSizeY,
+-                                   float offset) implements DynamicUniformStorage.DynamicUniform {
+-        @Override
++    private record BlurUniformData(float halfTexelSizeX, float halfTexelSizeY, float offset) implements DynamicUniformStorage.DynamicUniform
++    {
+         public void write(ByteBuffer buffer) {
+-            Std140Builder.intoBuffer(buffer)
+-                .putVec2(halfTexelSizeX, halfTexelSizeY)
+-                .putFloat(offset);
++            Std140Builder.intoBuffer((ByteBuffer)buffer).putVec2(this.halfTexelSizeX, this.halfTexelSizeY).putFloat(this.offset);
+         }
+     }
+ }
++

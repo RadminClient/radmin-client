@@ -1,0 +1,32 @@
+--- upstream261/mixin/MinecraftServerAccessor.java
++++ v1decompiled/mixin/MinecraftServerAccessor.java
+@@ -1,17 +1,22 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.server.MinecraftServer
++ *  net.minecraft.world.level.storage.LevelStorageSource$LevelStorageAccess
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.server.MinecraftServer;
+ import net.minecraft.world.level.storage.LevelStorageSource;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(MinecraftServer.class)
++@Mixin(value={MinecraftServer.class})
+ public interface MinecraftServerAccessor {
+-    @Accessor("storageSource")
+-    LevelStorageSource.LevelStorageAccess meteor$getStorageSource();
++    @Accessor(value="storageSource")
++    public LevelStorageSource.LevelStorageAccess meteor$getStorageSource();
+ }
++

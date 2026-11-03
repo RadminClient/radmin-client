@@ -1,0 +1,144 @@
+--- upstream261/settings/StatusEffectAmplifierMapSetting.java
++++ v1decompiled/settings/StatusEffectAmplifierMapSetting.java
+@@ -1,22 +1,33 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  it.unimi.dsi.fastutil.objects.Reference2IntArrayMap
++ *  it.unimi.dsi.fastutil.objects.Reference2IntMap
++ *  it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap
++ *  net.minecraft.core.registries.BuiltInRegistries
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.Tag
++ *  net.minecraft.resources.Identifier
++ *  net.minecraft.world.effect.MobEffect
+  */
+-
+-package meteordevelopment.meteorclient.settings;
++package radmin.client.settings;
+ 
+ import it.unimi.dsi.fastutil.objects.Reference2IntArrayMap;
+ import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+ import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
++import java.util.function.Consumer;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.Tag;
+ import net.minecraft.resources.Identifier;
+ import net.minecraft.world.effect.MobEffect;
++import radmin.client.settings.IVisible;
++import radmin.client.settings.Setting;
+ 
+-import java.util.function.Consumer;
+-
+-public class StatusEffectAmplifierMapSetting extends Setting<Reference2IntMap<MobEffect>> {
+-    public static final Reference2IntMap<MobEffect> EMPTY_STATUS_EFFECT_MAP = createStatusEffectMap();
++public class StatusEffectAmplifierMapSetting
++extends Setting<Reference2IntMap<MobEffect>> {
++    public static final Reference2IntMap<MobEffect> EMPTY_STATUS_EFFECT_MAP = StatusEffectAmplifierMapSetting.createStatusEffectMap();
+ 
+     public StatusEffectAmplifierMapSetting(String name, String description, Reference2IntMap<MobEffect> defaultValue, Consumer<Reference2IntMap<MobEffect>> onChanged, Consumer<Setting<Reference2IntMap<MobEffect>>> onModuleActivated, IVisible visible) {
+         super(name, description, defaultValue, onChanged, onModuleActivated, visible);
+@@ -24,26 +35,24 @@
+ 
+     @Override
+     public void resetImpl() {
+-        value = new Reference2IntOpenHashMap<>(defaultValue);
++        this.value = new Reference2IntOpenHashMap((Reference2IntMap)this.defaultValue);
+     }
+ 
+     @Override
+     protected Reference2IntMap<MobEffect> parseImpl(String str) {
+         String[] values = str.split(",");
+-        Reference2IntMap<MobEffect> effects = new Reference2IntOpenHashMap<>(EMPTY_STATUS_EFFECT_MAP);
+-
++        Reference2IntOpenHashMap effects = new Reference2IntOpenHashMap(EMPTY_STATUS_EFFECT_MAP);
+         try {
+             for (String value : values) {
+                 String[] split = value.split(" ");
+-
+-                MobEffect effect = parseId(BuiltInRegistries.MOB_EFFECT, split[0]);
++                MobEffect effect = (MobEffect)StatusEffectAmplifierMapSetting.parseId(BuiltInRegistries.MOB_EFFECT, split[0]);
+                 int level = Integer.parseInt(split[1]);
+-
+-                effects.put(effect, level);
++                effects.put((Object)effect, level);
+             }
+-        } catch (Exception _) {
+         }
+-
++        catch (Exception exception) {
++            // empty catch block
++        }
+         return effects;
+     }
+ 
+@@ -55,44 +64,47 @@
+     @Override
+     public CompoundTag save(CompoundTag tag) {
+         CompoundTag valueTag = new CompoundTag();
+-        for (MobEffect statusEffect : get().keySet()) {
+-            Identifier id = BuiltInRegistries.MOB_EFFECT.getKey(statusEffect);
+-            if (id != null) valueTag.putInt(id.toString(), get().getInt(statusEffect));
++        for (MobEffect statusEffect : ((Reference2IntMap)this.get()).keySet()) {
++            Identifier id = BuiltInRegistries.MOB_EFFECT.getKey((Object)statusEffect);
++            if (id == null) continue;
++            valueTag.putInt(id.toString(), ((Reference2IntMap)this.get()).getInt((Object)statusEffect));
+         }
+-        tag.put("value", valueTag);
+-
++        tag.put("value", (Tag)valueTag);
+         return tag;
+     }
+ 
+     private static Reference2IntMap<MobEffect> createStatusEffectMap() {
+-        Reference2IntMap<MobEffect> map = new Reference2IntArrayMap<>(BuiltInRegistries.MOB_EFFECT.keySet().size());
+-
+-        BuiltInRegistries.MOB_EFFECT.forEach(potion -> map.put(potion, 0));
+-
++        Reference2IntArrayMap map = new Reference2IntArrayMap(BuiltInRegistries.MOB_EFFECT.keySet().size());
++        BuiltInRegistries.MOB_EFFECT.forEach(arg_0 -> StatusEffectAmplifierMapSetting.lambda$createStatusEffectMap$0((Reference2IntMap)map, arg_0));
+         return map;
+     }
+ 
+     @Override
+     public Reference2IntMap<MobEffect> load(CompoundTag tag) {
+-        get().clear();
+-
++        ((Reference2IntMap)this.get()).clear();
+         CompoundTag valueTag = tag.getCompoundOrEmpty("value");
+         for (String key : valueTag.keySet()) {
+-            MobEffect statusEffect = BuiltInRegistries.MOB_EFFECT.getValue(Identifier.parse(key));
+-            if (statusEffect != null) get().put(statusEffect, valueTag.getIntOr(key, 0));
++            MobEffect statusEffect = (MobEffect)BuiltInRegistries.MOB_EFFECT.getValue(Identifier.parse((String)key));
++            if (statusEffect == null) continue;
++            ((Reference2IntMap)this.get()).put((Object)statusEffect, valueTag.getIntOr(key, 0));
+         }
+-
+-        return get();
++        return (Reference2IntMap)this.get();
+     }
+ 
+-    public static class Builder extends SettingBuilder<Builder, Reference2IntMap<MobEffect>, StatusEffectAmplifierMapSetting> {
++    private static /* synthetic */ void lambda$createStatusEffectMap$0(Reference2IntMap map, MobEffect potion) {
++        map.put((Object)potion, 0);
++    }
++
++    public static class Builder
++    extends Setting.SettingBuilder<Builder, Reference2IntMap<MobEffect>, StatusEffectAmplifierMapSetting> {
+         public Builder() {
+-            super(new Reference2IntOpenHashMap<>(0));
++            super(new Reference2IntOpenHashMap(0));
+         }
+ 
+         @Override
+         public StatusEffectAmplifierMapSetting build() {
+-            return new StatusEffectAmplifierMapSetting(name, description, defaultValue, onChanged, onModuleActivated, visible);
++            return new StatusEffectAmplifierMapSetting(this.name, this.description, (Reference2IntMap<MobEffect>)((Reference2IntMap)this.defaultValue), this.onChanged, this.onModuleActivated, this.visible);
+         }
+     }
+ }
++

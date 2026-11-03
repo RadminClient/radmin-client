@@ -1,0 +1,28 @@
+--- upstream261/systems/accounts/TexturesJson.java
++++ v1decompiled/systems/accounts/TexturesJson.java
+@@ -1,18 +1,17 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.accounts;
++package radmin.client.systems.accounts;
+ 
+ public class TexturesJson {
+     public Textures textures;
+ 
++    public static class Texture {
++        public String url;
++    }
++
+     public static class Textures {
+         public Texture SKIN;
+     }
++}
+ 
+-    public static class Texture {
+-        public String url;
+-    }
+-}

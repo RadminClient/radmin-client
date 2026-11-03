@@ -1,0 +1,161 @@
+--- upstream261/utils/OutlineRenderCommandQueue.java
++++ v1decompiled/utils/OutlineRenderCommandQueue.java
+@@ -1,16 +1,45 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.vertex.PoseStack
++ *  net.minecraft.client.gui.Font$DisplayMode
++ *  net.minecraft.client.model.Model
++ *  net.minecraft.client.model.geom.ModelPart
++ *  net.minecraft.client.renderer.SubmitNodeCollection
++ *  net.minecraft.client.renderer.SubmitNodeCollector$CustomGeometryRenderer
++ *  net.minecraft.client.renderer.SubmitNodeCollector$ParticleGroupRenderer
++ *  net.minecraft.client.renderer.SubmitNodeStorage
++ *  net.minecraft.client.renderer.block.MovingBlockRenderState
++ *  net.minecraft.client.renderer.block.dispatch.BlockStateModel
++ *  net.minecraft.client.renderer.block.dispatch.BlockStateModelPart
++ *  net.minecraft.client.renderer.entity.state.EntityRenderState
++ *  net.minecraft.client.renderer.entity.state.EntityRenderState$LeashState
++ *  net.minecraft.client.renderer.entity.state.EntityRenderState$ShadowPiece
++ *  net.minecraft.client.renderer.feature.ModelFeatureRenderer$CrumblingOverlay
++ *  net.minecraft.client.renderer.item.ItemStackRenderState$FoilType
++ *  net.minecraft.client.renderer.rendertype.RenderType
++ *  net.minecraft.client.renderer.state.level.CameraRenderState
++ *  net.minecraft.client.renderer.texture.TextureAtlasSprite
++ *  net.minecraft.client.resources.model.geometry.BakedQuad
++ *  net.minecraft.network.chat.Component
++ *  net.minecraft.util.FormattedCharSequence
++ *  net.minecraft.world.item.ItemDisplayContext
++ *  net.minecraft.world.phys.Vec3
++ *  org.jetbrains.annotations.Nullable
++ *  org.joml.Quaternionf
+  */
+-
+-package meteordevelopment.meteorclient.utils;
++package radmin.client.utils;
+ 
+ import com.mojang.blaze3d.vertex.PoseStack;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
++import java.util.Arrays;
++import java.util.List;
++import java.util.Objects;
+ import net.minecraft.client.gui.Font;
+ import net.minecraft.client.model.Model;
+ import net.minecraft.client.model.geom.ModelPart;
+ import net.minecraft.client.renderer.SubmitNodeCollection;
++import net.minecraft.client.renderer.SubmitNodeCollector;
+ import net.minecraft.client.renderer.SubmitNodeStorage;
+ import net.minecraft.client.renderer.block.MovingBlockRenderState;
+ import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+@@ -28,11 +57,10 @@
+ import net.minecraft.world.phys.Vec3;
+ import org.jetbrains.annotations.Nullable;
+ import org.joml.Quaternionf;
++import radmin.client.utils.render.color.Color;
+ 
+-import java.util.Arrays;
+-import java.util.List;
+-
+-public class OutlineRenderCommandQueue extends SubmitNodeStorage {
++public class OutlineRenderCommandQueue
++extends SubmitNodeStorage {
+     private int color;
+     private int[] tints;
+ 
+@@ -40,75 +68,67 @@
+         this.color = color.getPacked();
+     }
+ 
+-    @Override
+     public SubmitNodeCollection order(int i) {
+-        return submitsPerOrder.computeIfAbsent(i, _ -> new OutlineBatchingRenderCommandQueue(this));
++        return (SubmitNodeCollection)this.submitsPerOrder.computeIfAbsent(i, n -> new OutlineBatchingRenderCommandQueue(this, this));
+     }
+ 
+-    private class OutlineBatchingRenderCommandQueue extends SubmitNodeCollection {
+-        public OutlineBatchingRenderCommandQueue(SubmitNodeStorage orderedQueueImpl) {
++    private class OutlineBatchingRenderCommandQueue
++    extends SubmitNodeCollection {
++        final /* synthetic */ OutlineRenderCommandQueue this$0;
++
++        public OutlineBatchingRenderCommandQueue(OutlineRenderCommandQueue outlineRenderCommandQueue, SubmitNodeStorage orderedQueueImpl) {
++            OutlineRenderCommandQueue outlineRenderCommandQueue2 = outlineRenderCommandQueue;
++            Objects.requireNonNull(outlineRenderCommandQueue2);
++            this.this$0 = outlineRenderCommandQueue2;
+             super(orderedQueueImpl);
+         }
+ 
+-        @Override
+         public void submitShadow(PoseStack poseStack, float shadowRadius, List<EntityRenderState.ShadowPiece> shadowPieces) {
+         }
+ 
+-        @Override
+         public void submitNameTag(PoseStack poseStack, @Nullable Vec3 vec3, int i, Component component, boolean bl, int j, double d, CameraRenderState cameraRenderState) {
+         }
+ 
+-        @Override
+         public void submitText(PoseStack poseStack, float x, float y, FormattedCharSequence text, boolean dropShadow, Font.DisplayMode layerType, int light, int color, int backgroundColor, int outlineColor) {
+         }
+ 
+-        @Override
+         public void submitFlame(PoseStack poseStack, EntityRenderState entityRenderState, Quaternionf quaternionf) {
+         }
+ 
+-        @Override
+         public void submitLeash(PoseStack poseStack, EntityRenderState.LeashState leashState) {
+         }
+ 
+-        @Override
+         public <S> void submitModel(Model<? super S> model, S state, PoseStack matrices, RenderType renderLayer, int light, int overlay, int tintedColor, @Nullable TextureAtlasSprite sprite, int outlineColor, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+-            super.submitModel(model, state, matrices, renderLayer, light, overlay, color, sprite, 0, crumblingOverlay);
++            super.submitModel(model, state, matrices, renderLayer, light, overlay, this.this$0.color, sprite, 0, crumblingOverlay);
+         }
+ 
+-        @Override
+         public void submitModelPart(ModelPart part, PoseStack matrices, RenderType renderLayer, int light, int overlay, @Nullable TextureAtlasSprite sprite, boolean sheeted, boolean hasGlint, int tintedColor, @Nullable ModelFeatureRenderer.CrumblingOverlay crumblingOverlay, int i) {
+-            super.submitModelPart(part, matrices, renderLayer, light, overlay, sprite, sheeted, hasGlint, color, crumblingOverlay, i);
++            super.submitModelPart(part, matrices, renderLayer, light, overlay, sprite, sheeted, hasGlint, this.this$0.color, crumblingOverlay, i);
+         }
+ 
+-        @Override
+         public void submitMovingBlock(PoseStack matrices, MovingBlockRenderState state) {
+         }
+ 
+-        @Override
+         public void submitBlockModel(PoseStack poseStack, RenderType renderType, List<BlockStateModelPart> modelParts, int[] tintLayers, int lightCoords, int overlayCoords, int outlineColor) {
+-            Arrays.fill(tintLayers, color);
++            Arrays.fill(tintLayers, this.this$0.color);
+             super.submitBlockModel(poseStack, renderType, modelParts, tintLayers, lightCoords, overlayCoords, outlineColor);
+         }
+ 
+-        @Override
+         public void submitBreakingBlockModel(PoseStack poseStack, BlockStateModel model, long seed, int progress) {
+         }
+ 
+-        @Override
+         public void submitItem(PoseStack poseStack, ItemDisplayContext displayContext, int lightCoords, int overlayCoords, int outlineColor, int[] tintLayers, List<BakedQuad> quads, ItemStackRenderState.FoilType foilType) {
+-            if (tints == null || tints[0] != color) {
+-                tints = new int[]{color, color, color, color};
++            if (this.this$0.tints == null || this.this$0.tints[0] != this.this$0.color) {
++                this.this$0.tints = new int[]{this.this$0.color, this.this$0.color, this.this$0.color, this.this$0.color};
+             }
+-
+             super.submitItem(poseStack, displayContext, lightCoords, overlayCoords, outlineColor, tintLayers, quads, foilType);
+         }
+ 
+-        @Override
+-        public void submitCustomGeometry(PoseStack poseStack, RenderType renderType, CustomGeometryRenderer customGeometryRenderer) {
++        public void submitCustomGeometry(PoseStack poseStack, RenderType renderType, SubmitNodeCollector.CustomGeometryRenderer customGeometryRenderer) {
+         }
+ 
+-        @Override
+-        public void submitParticleGroup(ParticleGroupRenderer particleGroupRenderer) {
++        public void submitParticleGroup(SubmitNodeCollector.ParticleGroupRenderer particleGroupRenderer) {
+         }
+     }
+ }
++

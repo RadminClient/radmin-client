@@ -1,0 +1,44 @@
+--- upstream261/commands/commands/GamemodeCommand.java
++++ v1decompiled/commands/commands/GamemodeCommand.java
+@@ -1,16 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.builder.LiteralArgumentBuilder
++ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
++ *  net.minecraft.world.level.GameType
+  */
+-
+-package meteordevelopment.meteorclient.commands.commands;
++package radmin.client.commands.commands;
+ 
+ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+-import meteordevelopment.meteorclient.commands.Command;
+ import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+ import net.minecraft.world.level.GameType;
++import radmin.client.commands.Command;
+ 
+-public class GamemodeCommand extends Command {
++public class GamemodeCommand
++extends Command {
+     public GamemodeCommand() {
+         super("gamemode", "Changes your gamemode client-side.", "gm");
+     }
+@@ -18,10 +22,11 @@
+     @Override
+     public void build(LiteralArgumentBuilder<ClientSuggestionProvider> builder) {
+         for (GameType gameMode : GameType.values()) {
+-            builder.then(literal(gameMode.getName()).executes(_ -> {
+-                mc.gameMode.setLocalMode(gameMode);
+-                return SINGLE_SUCCESS;
++            builder.then(GamemodeCommand.literal(gameMode.getName()).executes(commandContext -> {
++                GamemodeCommand.mc.gameMode.setLocalMode(gameMode);
++                return 1;
+             }));
+         }
+     }
+ }
++

@@ -1,0 +1,143 @@
+--- upstream261/settings/DoubleSetting.java
++++ v1decompiled/settings/DoubleSetting.java
+@@ -1,24 +1,28 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.nbt.CompoundTag
+  */
+-
+-package meteordevelopment.meteorclient.settings;
+-
+-import net.minecraft.nbt.CompoundTag;
++package radmin.client.settings;
+ 
+ import java.util.function.Consumer;
++import net.minecraft.nbt.CompoundTag;
++import radmin.client.settings.IVisible;
++import radmin.client.settings.Setting;
+ 
+-public class DoubleSetting extends Setting<Double> {
+-    public final double min, max;
+-    public final double sliderMin, sliderMax;
++public class DoubleSetting
++extends Setting<Double> {
++    public final double min;
++    public final double max;
++    public final double sliderMin;
++    public final double sliderMax;
+     public final boolean onSliderRelease;
+     public final int decimalPlaces;
+     public final boolean noSlider;
+ 
+     private DoubleSetting(String name, String description, double defaultValue, Consumer<Double> onChanged, Consumer<Setting<Double>> onModuleActivated, IVisible visible, double min, double max, double sliderMin, double sliderMax, boolean onSliderRelease, int decimalPlaces, boolean noSlider) {
+         super(name, description, defaultValue, onChanged, onModuleActivated, visible);
+-
+         this.min = min;
+         this.max = max;
+         this.sliderMin = sliderMin;
+@@ -32,41 +36,44 @@
+     protected Double parseImpl(String str) {
+         try {
+             return Double.parseDouble(str.trim());
+-        } catch (NumberFormatException _) {
++        }
++        catch (NumberFormatException numberFormatException) {
+             return null;
+         }
+     }
+ 
+     @Override
+     protected boolean isValueValid(Double value) {
+-        return value >= min && value <= max;
++        return value >= this.min && value <= this.max;
+     }
+ 
+     @Override
+     protected CompoundTag save(CompoundTag tag) {
+-        tag.putDouble("value", get());
+-
++        tag.putDouble("value", ((Double)this.get()).doubleValue());
+         return tag;
+     }
+ 
+     @Override
+     public Double load(CompoundTag tag) {
+-        set(tag.getDoubleOr("value", 0.0));
+-
+-        return get();
++        this.set(tag.getDoubleOr("value", 0.0));
++        return (Double)this.get();
+     }
+ 
+-    public static class Builder extends SettingBuilder<Builder, Double, DoubleSetting> {
+-        public double min = Double.NEGATIVE_INFINITY, max = Double.POSITIVE_INFINITY;
+-        public double sliderMin = 0, sliderMax = 10;
++    public static class Builder
++    extends Setting.SettingBuilder<Builder, Double, DoubleSetting> {
++        public double min = Double.NEGATIVE_INFINITY;
++        public double max = Double.POSITIVE_INFINITY;
++        public double sliderMin = 0.0;
++        public double sliderMax = 10.0;
+         public boolean onSliderRelease = false;
+         public int decimalPlaces = 3;
+         public boolean noSlider = false;
+ 
+         public Builder() {
+-            super(0D);
++            super(0.0);
+         }
+ 
++        @Override
+         public Builder defaultValue(double defaultValue) {
+             this.defaultValue = defaultValue;
+             return this;
+@@ -89,23 +96,23 @@
+         }
+ 
+         public Builder sliderMin(double min) {
+-            sliderMin = min;
++            this.sliderMin = min;
+             return this;
+         }
+ 
+         public Builder sliderMax(double max) {
+-            sliderMax = max;
++            this.sliderMax = max;
+             return this;
+         }
+ 
+         public Builder sliderRange(double min, double max) {
+-            sliderMin = min;
+-            sliderMax = max;
++            this.sliderMin = min;
++            this.sliderMax = max;
+             return this;
+         }
+ 
+         public Builder onSliderRelease() {
+-            onSliderRelease = true;
++            this.onSliderRelease = true;
+             return this;
+         }
+ 
+@@ -115,12 +122,14 @@
+         }
+ 
+         public Builder noSlider() {
+-            noSlider = true;
++            this.noSlider = true;
+             return this;
+         }
+ 
++        @Override
+         public DoubleSetting build() {
+-            return new DoubleSetting(name, description, defaultValue, onChanged, onModuleActivated, visible, min, max, Math.max(sliderMin, min), Math.min(sliderMax, max), onSliderRelease, decimalPlaces, noSlider);
++            return new DoubleSetting(this.name, this.description, (Double)this.defaultValue, this.onChanged, this.onModuleActivated, this.visible, this.min, this.max, Math.max(this.sliderMin, this.min), Math.min(this.sliderMax, this.max), this.onSliderRelease, this.decimalPlaces, this.noSlider);
+         }
+     }
+ }
++

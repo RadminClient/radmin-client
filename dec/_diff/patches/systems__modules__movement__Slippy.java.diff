@@ -1,0 +1,88 @@
+--- upstream261/systems/modules/movement/Slippy.java
++++ v1decompiled/systems/modules/movement/Slippy.java
+@@ -1,56 +1,42 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.level.block.Block
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules.movement;
+-
+-import meteordevelopment.meteorclient.settings.*;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import net.minecraft.world.level.block.Block;
++package radmin.client.systems.modules.movement;
+ 
+ import java.util.List;
++import net.minecraft.world.level.block.Block;
++import radmin.client.settings.BlockListSetting;
++import radmin.client.settings.DoubleSetting;
++import radmin.client.settings.EnumSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
+ 
+-public class Slippy extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    public final Setting<Double> friction = sgGeneral.add(new DoubleSetting.Builder()
+-        .name("friction")
+-        .description("The base friction level.")
+-        .range(0.01, 1.10)
+-        .sliderRange(0.01, 1.10)
+-        .defaultValue(1)
+-        .build()
+-    );
+-
+-    public final Setting<ListMode> listMode = sgGeneral.add(new EnumSetting.Builder<ListMode>()
+-        .name("list-mode")
+-        .description("The mode to select blocks.")
+-        .defaultValue(ListMode.Blacklist)
+-        .build()
+-    );
+-
+-    public final Setting<List<Block>> ignoredBlocks = sgGeneral.add(new BlockListSetting.Builder()
+-        .name("ignored-blocks")
+-        .description("Decide which blocks not to slip on")
+-        .visible(() -> listMode.get() == ListMode.Blacklist)
+-        .build()
+-    );
+-
+-    public final Setting<List<Block>> allowedBlocks = sgGeneral.add(new BlockListSetting.Builder()
+-        .name("allowed-blocks")
+-        .description("Decide which blocks to slip on")
+-        .visible(() -> listMode.get() == ListMode.Whitelist)
+-        .build()
+-    );
++public class Slippy
++extends Module {
++    private final SettingGroup sgGeneral;
++    public final Setting<Double> friction;
++    public final Setting<ListMode> listMode;
++    public final Setting<List<Block>> ignoredBlocks;
++    public final Setting<List<Block>> allowedBlocks;
+ 
+     public Slippy() {
+         super(Categories.Movement, "slippy", "Changes the base friction level of blocks.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.friction = this.sgGeneral.add(((DoubleSetting.Builder)((DoubleSetting.Builder)new DoubleSetting.Builder().name("friction")).description("The base friction level.")).range(0.01, 1.1).sliderRange(0.01, 1.1).defaultValue(1.0).build());
++        this.listMode = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("list-mode")).description("The mode to select blocks.")).defaultValue(ListMode.Blacklist)).build());
++        this.ignoredBlocks = this.sgGeneral.add(((BlockListSetting.Builder)((BlockListSetting.Builder)((BlockListSetting.Builder)new BlockListSetting.Builder().name("ignored-blocks")).description("Decide which blocks not to slip on")).visible(() -> this.listMode.get() == ListMode.Blacklist)).build());
++        this.allowedBlocks = this.sgGeneral.add(((BlockListSetting.Builder)((BlockListSetting.Builder)((BlockListSetting.Builder)new BlockListSetting.Builder().name("allowed-blocks")).description("Decide which blocks to slip on")).visible(() -> this.listMode.get() == ListMode.Whitelist)).build());
+     }
+ 
+-    public enum ListMode {
++    public static enum ListMode {
+         Whitelist,
+-        Blacklist
++        Blacklist;
++
+     }
+ }
++

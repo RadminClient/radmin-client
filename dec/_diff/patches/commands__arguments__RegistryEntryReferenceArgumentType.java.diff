@@ -1,0 +1,151 @@
+--- upstream261/commands/arguments/RegistryEntryReferenceArgumentType.java
++++ v1decompiled/commands/arguments/RegistryEntryReferenceArgumentType.java
+@@ -1,10 +1,33 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.ImmutableStringReader
++ *  com.mojang.brigadier.StringReader
++ *  com.mojang.brigadier.arguments.ArgumentType
++ *  com.mojang.brigadier.context.CommandContext
++ *  com.mojang.brigadier.exceptions.CommandSyntaxException
++ *  com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType
++ *  com.mojang.brigadier.exceptions.Dynamic3CommandExceptionType
++ *  com.mojang.brigadier.suggestion.Suggestions
++ *  com.mojang.brigadier.suggestion.SuggestionsBuilder
++ *  net.minecraft.client.Minecraft
++ *  net.minecraft.commands.SharedSuggestionProvider
++ *  net.minecraft.core.Holder$Reference
++ *  net.minecraft.core.Registry
++ *  net.minecraft.core.registries.Registries
++ *  net.minecraft.network.chat.Component
++ *  net.minecraft.resources.Identifier
++ *  net.minecraft.resources.ResourceKey
++ *  net.minecraft.world.effect.MobEffect
++ *  net.minecraft.world.entity.EntityType
++ *  net.minecraft.world.entity.ai.attributes.Attribute
++ *  net.minecraft.world.item.enchantment.Enchantment
++ *  net.minecraft.world.level.levelgen.structure.Structure
+  */
++package radmin.client.commands.arguments;
+ 
+-package meteordevelopment.meteorclient.commands.arguments;
+-
++import com.mojang.brigadier.ImmutableStringReader;
+ import com.mojang.brigadier.StringReader;
+ import com.mojang.brigadier.arguments.ArgumentType;
+ import com.mojang.brigadier.context.CommandContext;
+@@ -13,6 +36,9 @@
+ import com.mojang.brigadier.exceptions.Dynamic3CommandExceptionType;
+ import com.mojang.brigadier.suggestion.Suggestions;
+ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
++import java.util.Arrays;
++import java.util.Collection;
++import java.util.concurrent.CompletableFuture;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.commands.SharedSuggestionProvider;
+ import net.minecraft.core.Holder;
+@@ -27,24 +53,16 @@
+ import net.minecraft.world.item.enchantment.Enchantment;
+ import net.minecraft.world.level.levelgen.structure.Structure;
+ 
+-import java.util.Arrays;
+-import java.util.Collection;
+-import java.util.concurrent.CompletableFuture;
+-
+-public class RegistryEntryReferenceArgumentType<T> implements ArgumentType<Holder.Reference<T>> {
+-    private static final RegistryEntryReferenceArgumentType<Enchantment> ENCHANTMENT = new RegistryEntryReferenceArgumentType<>(Registries.ENCHANTMENT);
+-    private static final RegistryEntryReferenceArgumentType<Attribute> ENTITY_ATTRIBUTE = new RegistryEntryReferenceArgumentType<>(Registries.ATTRIBUTE);
+-    private static final RegistryEntryReferenceArgumentType<Structure> STRUCTURE = new RegistryEntryReferenceArgumentType<>(Registries.STRUCTURE);
+-    private static final RegistryEntryReferenceArgumentType<EntityType<?>> ENTITY_TYPE = new RegistryEntryReferenceArgumentType<>(Registries.ENTITY_TYPE);
+-    private static final RegistryEntryReferenceArgumentType<MobEffect> MOB_EFFECT = new RegistryEntryReferenceArgumentType<>(Registries.MOB_EFFECT);
+-
++public class RegistryEntryReferenceArgumentType<T>
++implements ArgumentType<Holder.Reference<T>> {
++    private static final RegistryEntryReferenceArgumentType<Enchantment> ENCHANTMENT = new RegistryEntryReferenceArgumentType(Registries.ENCHANTMENT);
++    private static final RegistryEntryReferenceArgumentType<Attribute> ENTITY_ATTRIBUTE = new RegistryEntryReferenceArgumentType(Registries.ATTRIBUTE);
++    private static final RegistryEntryReferenceArgumentType<Structure> STRUCTURE = new RegistryEntryReferenceArgumentType(Registries.STRUCTURE);
++    private static final RegistryEntryReferenceArgumentType<EntityType<?>> ENTITY_TYPE = new RegistryEntryReferenceArgumentType(Registries.ENTITY_TYPE);
++    private static final RegistryEntryReferenceArgumentType<MobEffect> MOB_EFFECT = new RegistryEntryReferenceArgumentType(Registries.MOB_EFFECT);
+     private static final Collection<String> EXAMPLES = Arrays.asList("foo", "foo:bar", "012");
+-    public static final Dynamic2CommandExceptionType NOT_FOUND_EXCEPTION = new Dynamic2CommandExceptionType(
+-        (element, type) -> Component.translatableEscape("argument.resource.not_found", element, type)
+-    );
+-    public static final Dynamic3CommandExceptionType INVALID_TYPE_EXCEPTION = new Dynamic3CommandExceptionType(
+-        (element, type, expectedType) -> Component.translatableEscape("argument.resource.invalid_type", element, type, expectedType)
+-    );
++    public static final Dynamic2CommandExceptionType NOT_FOUND_EXCEPTION = new Dynamic2CommandExceptionType((element, type) -> Component.translatableEscape((String)"argument.resource.not_found", (Object[])new Object[]{element, type}));
++    public static final Dynamic3CommandExceptionType INVALID_TYPE_EXCEPTION = new Dynamic3CommandExceptionType((element, type, expectedType) -> Component.translatableEscape((String)"argument.resource.invalid_type", (Object[])new Object[]{element, type, expectedType}));
+     private final ResourceKey<? extends Registry<T>> registryRef;
+ 
+     private RegistryEntryReferenceArgumentType(ResourceKey<? extends Registry<T>> registryRef) {
+@@ -72,53 +90,46 @@
+     }
+ 
+     public static Holder.Reference<Enchantment> getEnchantment(CommandContext<?> context, String name) throws CommandSyntaxException {
+-        return getRegistryEntry(context, name, Registries.ENCHANTMENT);
++        return RegistryEntryReferenceArgumentType.getRegistryEntry(context, name, Registries.ENCHANTMENT);
+     }
+ 
+     public static Holder.Reference<Attribute> getEntityAttribute(CommandContext<?> context, String name) throws CommandSyntaxException {
+-        return getRegistryEntry(context, name, Registries.ATTRIBUTE);
++        return RegistryEntryReferenceArgumentType.getRegistryEntry(context, name, Registries.ATTRIBUTE);
+     }
+ 
+     public static Holder.Reference<Structure> getStructure(CommandContext<?> context, String name) throws CommandSyntaxException {
+-        return getRegistryEntry(context, name, Registries.STRUCTURE);
++        return RegistryEntryReferenceArgumentType.getRegistryEntry(context, name, Registries.STRUCTURE);
+     }
+ 
+     public static Holder.Reference<EntityType<?>> getEntityType(CommandContext<?> context, String name) throws CommandSyntaxException {
+-        return getRegistryEntry(context, name, Registries.ENTITY_TYPE);
++        return RegistryEntryReferenceArgumentType.getRegistryEntry(context, name, Registries.ENTITY_TYPE);
+     }
+ 
+     public static Holder.Reference<MobEffect> getStatusEffect(CommandContext<?> context, String name) throws CommandSyntaxException {
+-        return getRegistryEntry(context, name, Registries.MOB_EFFECT);
++        return RegistryEntryReferenceArgumentType.getRegistryEntry(context, name, Registries.MOB_EFFECT);
+     }
+ 
+-    @SuppressWarnings("unchecked")
+     private static <T> Holder.Reference<T> getRegistryEntry(CommandContext<?> context, String name, ResourceKey<Registry<T>> registryRef) throws CommandSyntaxException {
+-        Holder.Reference<T> reference = context.getArgument(name, Holder.Reference.class);
+-        ResourceKey<?> registryKey = reference.key();
++        Holder.Reference reference = (Holder.Reference)context.getArgument(name, Holder.Reference.class);
++        ResourceKey registryKey = reference.key();
+         if (registryKey.isFor(registryRef)) {
+             return reference;
+-        } else {
+-            throw INVALID_TYPE_EXCEPTION.create(registryKey.identifier(), registryKey.registry(), registryRef.identifier());
+         }
++        throw INVALID_TYPE_EXCEPTION.create((Object)registryKey.identifier(), (Object)registryKey.registry(), (Object)registryRef.identifier());
+     }
+ 
+-    @Override
+     public Holder.Reference<T> parse(StringReader reader) throws CommandSyntaxException {
+-        Identifier identifier = Identifier.read(reader);
+-        ResourceKey<T> registryKey = ResourceKey.create(this.registryRef, identifier);
+-        return Minecraft.getInstance().getConnection().registryAccess()
+-            .lookupOrThrow(this.registryRef)
+-            .get(registryKey)
+-            .orElseThrow(() -> NOT_FOUND_EXCEPTION.createWithContext(reader, identifier, this.registryRef.identifier()));
++        Identifier identifier = Identifier.read((StringReader)reader);
++        ResourceKey registryKey = ResourceKey.create(this.registryRef, (Identifier)identifier);
++        return (Holder.Reference)Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(this.registryRef).get(registryKey).orElseThrow(() -> NOT_FOUND_EXCEPTION.createWithContext((ImmutableStringReader)reader, (Object)identifier, (Object)this.registryRef.identifier()));
+     }
+ 
+-    @Override
+     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+-        return SharedSuggestionProvider.suggestResource(Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(this.registryRef).listElementIds().map(ResourceKey::identifier), builder);
++        return SharedSuggestionProvider.suggestResource(Minecraft.getInstance().getConnection().registryAccess().lookupOrThrow(this.registryRef).listElementIds().map(ResourceKey::identifier), (SuggestionsBuilder)builder);
+     }
+ 
+-    @Override
+     public Collection<String> getExamples() {
+         return EXAMPLES;
+     }
+ }
++

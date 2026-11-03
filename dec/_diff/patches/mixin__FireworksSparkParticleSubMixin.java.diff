@@ -1,0 +1,47 @@
+--- upstream261/mixin/FireworksSparkParticleSubMixin.java
++++ v1decompiled/mixin/FireworksSparkParticleSubMixin.java
+@@ -1,12 +1,18 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.Camera
++ *  net.minecraft.client.particle.FireworkParticles$OverlayParticle
++ *  net.minecraft.client.particle.FireworkParticles$SparkParticle
++ *  net.minecraft.client.renderer.state.level.QuadParticleRenderState
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.injection.At
++ *  org.spongepowered.asm.mixin.injection.Inject
++ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.render.NoRender;
+ import net.minecraft.client.Camera;
+ import net.minecraft.client.particle.FireworkParticles;
+ import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
+@@ -14,11 +20,16 @@
+ import org.spongepowered.asm.mixin.injection.At;
+ import org.spongepowered.asm.mixin.injection.Inject;
+ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.render.NoRender;
+ 
+-@Mixin(value = {FireworkParticles.SparkParticle.class, FireworkParticles.OverlayParticle.class})
++@Mixin(value={FireworkParticles.SparkParticle.class, FireworkParticles.OverlayParticle.class})
+ public abstract class FireworksSparkParticleSubMixin {
+-    @Inject(method = "extract", at = @At("HEAD"), cancellable = true)
++    @Inject(method={"extract"}, at={@At(value="HEAD")}, cancellable=true)
+     private void buildExplosionGeometry(QuadParticleRenderState particleTypeRenderState, Camera camera, float partialTickTime, CallbackInfo ci) {
+-        if (Modules.get().get(NoRender.class).noFireworkExplosions()) ci.cancel();
++        if (Modules.get().get(NoRender.class).noFireworkExplosions()) {
++            ci.cancel();
++        }
+     }
+ }
++

@@ -1,0 +1,23 @@
+--- upstream261/events/entity/player/PlayerTickMovementEvent.java
++++ v1decompiled/events/entity/player/PlayerTickMovementEvent.java
+@@ -1,13 +1,8 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.events.entity.player;
+ 
+-package meteordevelopment.meteorclient.events.entity.player;
+-
+-/**
+- * @see net.minecraft.client.entity.ClientAvatarState#updateBob(float)
+- */
+ public class PlayerTickMovementEvent {
+     private static final PlayerTickMovementEvent INSTANCE = new PlayerTickMovementEvent();
+ 
+@@ -15,3 +10,4 @@
+         return INSTANCE;
+     }
+ }
++

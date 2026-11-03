@@ -1,0 +1,46 @@
+--- upstream261/events/entity/player/ClipAtLedgeEvent.java
++++ v1decompiled/events/entity/player/ClipAtLedgeEvent.java
+@@ -1,29 +1,28 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.events.entity.player;
++package radmin.client.events.entity.player;
+ 
+ public class ClipAtLedgeEvent {
+     private static final ClipAtLedgeEvent INSTANCE = new ClipAtLedgeEvent();
+-
+-    private boolean set, clip;
++    private boolean set;
++    private boolean clip;
+ 
+     public void reset() {
+-        set = false;
++        this.set = false;
+     }
+ 
+     public void setClip(boolean clip) {
+-        set = true;
++        this.set = true;
+         this.clip = clip;
+     }
+ 
+     public boolean isSet() {
+-        return set;
++        return this.set;
+     }
++
+     public boolean isClip() {
+-        return clip;
++        return this.clip;
+     }
+ 
+     public static ClipAtLedgeEvent get() {
+@@ -31,3 +30,4 @@
+         return INSTANCE;
+     }
+ }
++

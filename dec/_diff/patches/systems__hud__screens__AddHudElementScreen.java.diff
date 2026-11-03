@@ -1,0 +1,205 @@
+--- upstream261/systems/hud/screens/AddHudElementScreen.java
++++ v1decompiled/systems/hud/screens/AddHudElementScreen.java
+@@ -1,122 +1,114 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.screens.Screen
+  */
+-
+-package meteordevelopment.meteorclient.systems.hud.screens;
+-
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WindowScreen;
+-import meteordevelopment.meteorclient.gui.widgets.WLabel;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WSection;
+-import meteordevelopment.meteorclient.gui.widgets.input.WTextBox;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WPlus;
+-import meteordevelopment.meteorclient.systems.hud.Hud;
+-import meteordevelopment.meteorclient.systems.hud.HudElementInfo;
+-import meteordevelopment.meteorclient.systems.hud.HudGroup;
+-import meteordevelopment.meteorclient.utils.Utils;
++package radmin.client.systems.hud.screens;
+ 
+ import java.util.ArrayList;
+ import java.util.HashMap;
+ import java.util.List;
+-import java.util.Map;
++import net.minecraft.client.gui.screens.Screen;
++import radmin.client.MeteorClient;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WindowScreen;
++import radmin.client.gui.widgets.WLabel;
++import radmin.client.gui.widgets.containers.WHorizontalList;
++import radmin.client.gui.widgets.containers.WSection;
++import radmin.client.gui.widgets.input.WTextBox;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.gui.widgets.pressable.WPlus;
++import radmin.client.systems.hud.Hud;
++import radmin.client.systems.hud.HudElementInfo;
++import radmin.client.systems.hud.HudGroup;
++import radmin.client.systems.hud.screens.HudElementPresetsScreen;
++import radmin.client.utils.Utils;
+ 
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class AddHudElementScreen extends WindowScreen {
+-    private final int x, y;
++public class AddHudElementScreen
++extends WindowScreen {
++    private final int x;
++    private final int y;
+     private final WTextBox searchBar;
+-
+     private Object firstObject;
+ 
+     public AddHudElementScreen(GuiTheme theme, int x, int y) {
+         super(theme, "Add Hud element");
+-
+         this.x = x;
+         this.y = y;
+-
+-        searchBar = theme.textBox("");
+-        searchBar.action = () -> {
+-            clear();
+-            initWidgets();
++        this.searchBar = theme.textBox("");
++        this.searchBar.action = () -> {
++            this.clear();
++            this.initWidgets();
+         };
+-
+-        enterAction = () -> runObject(firstObject);
++        this.enterAction = () -> this.runObject(this.firstObject);
+     }
+ 
+     @Override
+     public void initWidgets() {
+-        firstObject = null;
+-
+-        // Search bar
+-        add(searchBar).expandX();
+-        searchBar.setFocused(true);
+-
+-        // Group infos
++        this.firstObject = null;
++        this.add(this.searchBar).expandX();
++        this.searchBar.setFocused(true);
+         Hud hud = Hud.get();
+-        Map<HudGroup, List<Item>> grouped = new HashMap<>();
+-
++        HashMap<HudGroup, List> grouped = new HashMap<HudGroup, List>();
+         for (HudElementInfo<?> info : hud.infos.values()) {
+-            if (info.hasPresets() && !searchBar.get().isEmpty()) {
+-                for (HudElementInfo<?>.Preset preset : info.presets) {
++            if (info.hasPresets() && !this.searchBar.get().isEmpty()) {
++                for (HudElementInfo.Preset preset : info.presets) {
+                     String title = info.title + "  -  " + preset.title;
+-                    if (Utils.searchTextDefault(title, searchBar.get(), false))
+-                        grouped.computeIfAbsent(info.group, _ -> new ArrayList<>()).add(new Item(title, info.description, preset));
++                    if (!Utils.searchTextDefault(title, this.searchBar.get(), false)) continue;
++                    grouped.computeIfAbsent(info.group, hudGroup -> new ArrayList()).add(new Item(title, info.description, preset));
+                 }
+-            } else if (Utils.searchTextDefault(info.title, searchBar.get(), false))
+-                grouped.computeIfAbsent(info.group, _ -> new ArrayList<>()).add(new Item(info.title, info.description, info));
++                continue;
++            }
++            if (!Utils.searchTextDefault(info.title, this.searchBar.get(), false)) continue;
++            grouped.computeIfAbsent(info.group, hudGroup -> new ArrayList()).add(new Item(info.title, info.description, info));
+         }
+-
+-        // Create widgets
+         for (HudGroup group : grouped.keySet()) {
+-            WSection section = add(theme.section(group.title())).expandX().widget();
+-
+-            for (Item item : grouped.get(group)) {
+-                WHorizontalList l = section.add(theme.horizontalList()).expandX().widget();
+-
+-                WLabel title = l.add(theme.label(item.title)).widget();
++            WSection section = this.add(this.theme.section(group.title())).expandX().widget();
++            for (Item item : (List)grouped.get(group)) {
++                WHorizontalList l = section.add(this.theme.horizontalList()).expandX().widget();
++                WLabel title = l.add(this.theme.label(item.title)).widget();
+                 title.tooltip = item.description;
+-
+-                if (item.object instanceof HudElementInfo<?>.Preset preset) {
+-                    WPlus add = l.add(theme.plus()).expandCellX().right().widget();
+-                    add.action = () -> runObject(preset);
+-
+-                    if (firstObject == null) firstObject = preset;
++                Object object = item.object;
++                if (object instanceof HudElementInfo.Preset) {
++                    HudElementInfo.Preset preset = (HudElementInfo.Preset)object;
++                    WPlus add = l.add(this.theme.plus()).expandCellX().right().widget();
++                    add.action = () -> this.runObject(preset);
++                    if (this.firstObject != null) continue;
++                    this.firstObject = preset;
++                    continue;
++                }
++                HudElementInfo info = (HudElementInfo)item.object;
++                if (info.hasPresets()) {
++                    WButton open = l.add(this.theme.button(" > ")).expandCellX().right().widget();
++                    open.action = () -> this.runObject(info);
+                 } else {
+-                    HudElementInfo<?> info = (HudElementInfo<?>) item.object;
+-
+-                    if (info.hasPresets()) {
+-                        WButton open = l.add(theme.button(" > ")).expandCellX().right().widget();
+-                        open.action = () -> runObject(info);
+-                    } else {
+-                        WPlus add = l.add(theme.plus()).expandCellX().right().widget();
+-                        add.action = () -> runObject(info);
+-                    }
+-
+-                    if (firstObject == null) firstObject = info;
++                    WPlus add = l.add(this.theme.plus()).expandCellX().right().widget();
++                    add.action = () -> this.runObject(info);
+                 }
++                if (this.firstObject != null) continue;
++                this.firstObject = info;
+             }
+         }
+     }
+ 
+     private void runObject(Object object) {
+-        if (object == null) return;
+-        if (object instanceof HudElementInfo<?>.Preset preset) {
+-            Hud.get().add(preset, x, y);
+-            onClose();
++        if (object == null) {
++            return;
++        }
++        if (object instanceof HudElementInfo.Preset) {
++            HudElementInfo.Preset preset = (HudElementInfo.Preset)object;
++            Hud.get().add(preset, this.x, this.y);
++            this.onClose();
+         } else {
+-            HudElementInfo<?> info = (HudElementInfo<?>) object;
+-
++            HudElementInfo info = (HudElementInfo)object;
+             if (info.hasPresets()) {
+-                HudElementPresetsScreen screen = new HudElementPresetsScreen(theme, info, x, y);
+-                screen.parent = parent;
+-
+-                mc.setScreen(screen);
++                HudElementPresetsScreen screen = new HudElementPresetsScreen(this.theme, info, this.x, this.y);
++                screen.parent = this.parent;
++                MeteorClient.mc.setScreen((Screen)screen);
+             } else {
+-                Hud.get().add(info, x, y);
+-                onClose();
++                Hud.get().add(info, this.x, this.y);
++                this.onClose();
+             }
+         }
+     }
+@@ -124,3 +116,4 @@
+     private record Item(String title, String description, Object object) {
+     }
+ }
++

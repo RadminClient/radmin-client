@@ -1,0 +1,37 @@
+--- upstream261/gui/tabs/builtin/ModulesTab.java
++++ v1decompiled/gui/tabs/builtin/ModulesTab.java
+@@ -1,17 +1,19 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.screens.Screen
+  */
++package radmin.client.gui.tabs.builtin;
+ 
+-package meteordevelopment.meteorclient.gui.tabs.builtin;
++import net.minecraft.client.gui.screens.Screen;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.GuiThemes;
++import radmin.client.gui.tabs.Tab;
++import radmin.client.gui.tabs.TabScreen;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.GuiThemes;
+-import meteordevelopment.meteorclient.gui.tabs.Tab;
+-import meteordevelopment.meteorclient.gui.tabs.TabScreen;
+-import net.minecraft.client.gui.screens.Screen;
+-
+-public class ModulesTab extends Tab {
++public class ModulesTab
++extends Tab {
+     public ModulesTab() {
+         super("Modules");
+     }
+@@ -26,3 +28,4 @@
+         return GuiThemes.get().isModulesScreen(screen);
+     }
+ }
++

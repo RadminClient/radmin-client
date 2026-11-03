@@ -1,0 +1,34 @@
+--- upstream261/events/entity/EntityMoveEvent.java
++++ v1decompiled/events/entity/EntityMoveEvent.java
+@@ -1,22 +1,24 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.entity.Entity
++ *  net.minecraft.world.phys.Vec3
+  */
+-
+-package meteordevelopment.meteorclient.events.entity;
++package radmin.client.events.entity;
+ 
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.phys.Vec3;
+ 
+ public class EntityMoveEvent {
+     private static final EntityMoveEvent INSTANCE = new EntityMoveEvent();
+-
+     public Entity entity;
+     public Vec3 movement;
+ 
+     public static EntityMoveEvent get(Entity entity, Vec3 movement) {
+-        INSTANCE.entity = entity;
+-        INSTANCE.movement = movement;
++        EntityMoveEvent.INSTANCE.entity = entity;
++        EntityMoveEvent.INSTANCE.movement = movement;
+         return INSTANCE;
+     }
+ }
++

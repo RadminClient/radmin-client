@@ -1,0 +1,26 @@
+--- upstream261/events/world/ChunkOcclusionEvent.java
++++ v1decompiled/events/world/ChunkOcclusionEvent.java
+@@ -1,13 +1,12 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.events.world;
+ 
+-package meteordevelopment.meteorclient.events.world;
++import radmin.client.events.Cancellable;
+ 
+-import meteordevelopment.meteorclient.events.Cancellable;
+-
+-public class ChunkOcclusionEvent extends Cancellable {
++public class ChunkOcclusionEvent
++extends Cancellable {
+     private static final ChunkOcclusionEvent INSTANCE = new ChunkOcclusionEvent();
+ 
+     public static ChunkOcclusionEvent get() {
+@@ -15,3 +14,4 @@
+         return INSTANCE;
+     }
+ }
++

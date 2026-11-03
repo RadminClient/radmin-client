@@ -1,0 +1,94 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.buffers.Std140Builder
+ *  com.mojang.blaze3d.buffers.Std140SizeCalculator
+ *  com.mojang.blaze3d.pipeline.RenderPipeline
+ *  com.mojang.blaze3d.pipeline.RenderTarget
+ *  com.mojang.blaze3d.pipeline.TextureTarget
+ *  com.mojang.blaze3d.systems.RenderSystem
+ *  com.mojang.blaze3d.textures.FilterMode
+ *  net.minecraft.client.renderer.DynamicUniformStorage
+ *  net.minecraft.client.renderer.DynamicUniformStorage$DynamicUniform
+ *  org.lwjgl.glfw.GLFW
+ */
+package radmin.client.utils.render.postprocess;
+
+import com.mojang.blaze3d.buffers.Std140Builder;
+import com.mojang.blaze3d.buffers.Std140SizeCalculator;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.pipeline.TextureTarget;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.FilterMode;
+import java.nio.ByteBuffer;
+import net.minecraft.client.renderer.DynamicUniformStorage;
+import org.lwjgl.glfw.GLFW;
+import radmin.client.MeteorClient;
+import radmin.client.renderer.MeshRenderer;
+
+public abstract class PostProcessShader {
+    protected final RenderPipeline pipeline;
+    public final RenderTarget framebuffer;
+    private static final int UNIFORM_SIZE = new Std140SizeCalculator().putVec2().putFloat().get();
+    private static final DynamicUniformStorage<UniformData> UNIFORM_STORAGE = new DynamicUniformStorage("Meteor - Post UBO", UNIFORM_SIZE, 16);
+
+    protected PostProcessShader(RenderPipeline pipeline) {
+        this.pipeline = pipeline;
+        this.framebuffer = new TextureTarget(MeteorClient.NAME + " PostProcessShader " + this.getClass().getSimpleName(), MeteorClient.mc.getWindow().getWidth(), MeteorClient.mc.getWindow().getHeight(), true);
+    }
+
+    protected abstract boolean shouldDraw();
+
+    protected void preDraw() {
+    }
+
+    protected void postDraw() {
+    }
+
+    protected abstract void setupPass(MeshRenderer var1);
+
+    public void clearTexture() {
+        if (this.shouldDraw()) {
+            RenderSystem.getDevice().createCommandEncoder().clearColorTexture(this.framebuffer.getColorTexture(), 0);
+        }
+    }
+
+    public void submitVertices(Runnable draw) {
+        if (!this.shouldDraw()) {
+            return;
+        }
+        this.preDraw();
+        draw.run();
+        this.postDraw();
+    }
+
+    public void render() {
+        if (!this.shouldDraw()) {
+            return;
+        }
+        MeshRenderer renderer = MeshRenderer.begin().attachments(MeteorClient.mc.getMainRenderTarget()).pipeline(this.pipeline).fullscreen().uniform("PostData", UNIFORM_STORAGE.writeUniform((DynamicUniformStorage.DynamicUniform)new UniformData(MeteorClient.mc.getWindow().getWidth(), MeteorClient.mc.getWindow().getHeight(), (float)GLFW.glfwGetTime()))).sampler("u_Texture", this.framebuffer.getColorTextureView(), RenderSystem.getSamplerCache().getClampToEdge(FilterMode.NEAREST));
+        this.setupPass(renderer);
+        renderer.end();
+    }
+
+    public void onResized(int width, int height) {
+        if (this.framebuffer == null) {
+            return;
+        }
+        this.framebuffer.resize(width, height);
+    }
+
+    public static void flipFrame() {
+        UNIFORM_STORAGE.endFrame();
+    }
+
+    private record UniformData(float sizeX, float sizeY, float time) implements DynamicUniformStorage.DynamicUniform
+    {
+        public void write(ByteBuffer buffer) {
+            Std140Builder.intoBuffer((ByteBuffer)buffer).putVec2(this.sizeX, this.sizeY).putFloat(this.time);
+        }
+    }
+}
+

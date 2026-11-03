@@ -1,0 +1,28 @@
+--- upstream261/utils/misc/text/RunnableClickEvent.java
++++ v1decompiled/utils/misc/text/RunnableClickEvent.java
+@@ -1,18 +1,17 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.utils.misc.text;
+ 
+-package meteordevelopment.meteorclient.utils.misc.text;
++import radmin.client.utils.misc.text.MeteorClickEvent;
+ 
+-/**
+- * Allows arbitrary code execution in a click event
+- */
+-public class RunnableClickEvent extends MeteorClickEvent {
++public class RunnableClickEvent
++extends MeteorClickEvent {
+     public final Runnable runnable;
+ 
+     public RunnableClickEvent(Runnable runnable) {
+-        super(null); // Should ensure no vanilla code is triggered, and only we handle it
++        super(null);
+         this.runnable = runnable;
+     }
+ }
++

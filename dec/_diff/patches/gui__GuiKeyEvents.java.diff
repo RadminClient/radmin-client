@@ -1,0 +1,19 @@
+--- upstream261/gui/GuiKeyEvents.java
++++ v1decompiled/gui/GuiKeyEvents.java
+@@ -1,9 +1,7 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.gui;
++package radmin.client.gui;
+ 
+ public class GuiKeyEvents {
+     public static boolean canUseKeys = true;
+@@ -11,3 +9,4 @@
+     private GuiKeyEvents() {
+     }
+ }
++

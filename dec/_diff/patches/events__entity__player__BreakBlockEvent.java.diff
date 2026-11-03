@@ -1,0 +1,35 @@
+--- upstream261/events/entity/player/BreakBlockEvent.java
++++ v1decompiled/events/entity/player/BreakBlockEvent.java
+@@ -1,21 +1,23 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.BlockPos
+  */
++package radmin.client.events.entity.player;
+ 
+-package meteordevelopment.meteorclient.events.entity.player;
++import net.minecraft.core.BlockPos;
++import radmin.client.events.Cancellable;
+ 
+-import meteordevelopment.meteorclient.events.Cancellable;
+-import net.minecraft.core.BlockPos;
+-
+-public class BreakBlockEvent extends Cancellable {
++public class BreakBlockEvent
++extends Cancellable {
+     private static final BreakBlockEvent INSTANCE = new BreakBlockEvent();
+-
+     public BlockPos blockPos;
+ 
+     public static BreakBlockEvent get(BlockPos blockPos) {
+         INSTANCE.setCancelled(false);
+-        INSTANCE.blockPos = blockPos;
++        BreakBlockEvent.INSTANCE.blockPos = blockPos;
+         return INSTANCE;
+     }
+ }
++

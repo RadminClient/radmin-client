@@ -1,0 +1,83 @@
+--- upstream261/utils/entity/fakeplayer/FakePlayerManager.java
++++ v1decompiled/utils/entity/fakeplayer/FakePlayerManager.java
+@@ -1,21 +1,22 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.entity.player.Player
+  */
+-
+-package meteordevelopment.meteorclient.utils.entity.fakeplayer;
+-
+-import meteordevelopment.meteorclient.utils.Utils;
++package radmin.client.utils.entity.fakeplayer;
+ 
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.function.Consumer;
+ import java.util.stream.Stream;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
++import net.minecraft.world.entity.player.Player;
++import radmin.client.MeteorClient;
++import radmin.client.utils.Utils;
++import radmin.client.utils.entity.fakeplayer.FakePlayerEntity;
+ 
+ public class FakePlayerManager {
+-    private static final List<FakePlayerEntity> ENTITIES = new ArrayList<>();
++    private static final List<FakePlayerEntity> ENTITIES = new ArrayList<FakePlayerEntity>();
+ 
+     private FakePlayerManager() {
+     }
+@@ -26,16 +27,17 @@
+ 
+     public static FakePlayerEntity get(String name) {
+         for (FakePlayerEntity fp : ENTITIES) {
+-            if (fp.getName().getString().equals(name)) return fp;
++            if (!fp.getName().getString().equals(name)) continue;
++            return fp;
+         }
+-
+         return null;
+     }
+ 
+     public static void add(String name, float health, boolean copyInv) {
+-        if (!Utils.canUpdate()) return;
+-
+-        FakePlayerEntity fakePlayer = new FakePlayerEntity(mc.player, name, health, copyInv);
++        if (!Utils.canUpdate()) {
++            return;
++        }
++        FakePlayerEntity fakePlayer = new FakePlayerEntity((Player)MeteorClient.mc.player, name, health, copyInv);
+         fakePlayer.spawn();
+         ENTITIES.add(fakePlayer);
+     }
+@@ -46,13 +48,14 @@
+                 fp1.despawn();
+                 return true;
+             }
+-
+             return false;
+         });
+     }
+ 
+     public static void clear() {
+-        if (ENTITIES.isEmpty()) return;
++        if (ENTITIES.isEmpty()) {
++            return;
++        }
+         ENTITIES.forEach(FakePlayerEntity::despawn);
+         ENTITIES.clear();
+     }
+@@ -72,6 +75,7 @@
+     }
+ 
+     public static boolean contains(FakePlayerEntity fp) {
+-        return ENTITIES.contains(fp);
++        return ENTITIES.contains((Object)fp);
+     }
+ }
++

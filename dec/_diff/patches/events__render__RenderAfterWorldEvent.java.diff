@@ -1,0 +1,19 @@
+--- upstream261/events/render/RenderAfterWorldEvent.java
++++ v1decompiled/events/render/RenderAfterWorldEvent.java
+@@ -1,9 +1,7 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.events.render;
++package radmin.client.events.render;
+ 
+ public class RenderAfterWorldEvent {
+     private static final RenderAfterWorldEvent INSTANCE = new RenderAfterWorldEvent();
+@@ -12,3 +10,4 @@
+         return INSTANCE;
+     }
+ }
++

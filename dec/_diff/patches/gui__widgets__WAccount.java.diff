@@ -1,0 +1,121 @@
+--- upstream261/gui/widgets/WAccount.java
++++ v1decompiled/gui/widgets/WAccount.java
+@@ -1,24 +1,27 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.screens.Screen
+  */
++package radmin.client.gui.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.widgets;
++import net.minecraft.client.gui.screens.Screen;
++import radmin.client.MeteorClient;
++import radmin.client.gui.WidgetScreen;
++import radmin.client.gui.screens.accounts.AccountInfoScreen;
++import radmin.client.gui.widgets.WLabel;
++import radmin.client.gui.widgets.containers.WHorizontalList;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.gui.widgets.pressable.WConfirmedMinus;
++import radmin.client.systems.accounts.Account;
++import radmin.client.systems.accounts.Accounts;
++import radmin.client.systems.accounts.TokenAccount;
++import radmin.client.utils.network.MeteorExecutor;
++import radmin.client.utils.render.color.Color;
+ 
+-import meteordevelopment.meteorclient.gui.WidgetScreen;
+-import meteordevelopment.meteorclient.gui.screens.accounts.AccountInfoScreen;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WConfirmedMinus;
+-import meteordevelopment.meteorclient.systems.accounts.Account;
+-import meteordevelopment.meteorclient.systems.accounts.Accounts;
+-import meteordevelopment.meteorclient.systems.accounts.TokenAccount;
+-import meteordevelopment.meteorclient.utils.network.MeteorExecutor;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public abstract class WAccount extends WHorizontalList {
++public abstract class WAccount
++extends WHorizontalList {
+     public Runnable refreshScreenAction;
+     private final WidgetScreen screen;
+     private final Account<?> account;
+@@ -34,50 +37,40 @@
+ 
+     @Override
+     public void init() {
+-        // Head
+-        add(theme.texture(32, 32, account.getCache().getHeadTexture().needsRotate() ? 90 : 0, account.getCache().getHeadTexture()));
+-
+-        // Name
+-        WLabel name = add(theme.label(account.getUsername())).widget();
+-        if (mc.getUser().getName().equalsIgnoreCase(account.getUsername())) name.color = loggedInColor();
+-
+-        // Type
+-        WLabel label = add(theme.label("(" + account.getType() + ")")).expandCellX().right().widget();
+-        label.color = accountTypeColor();
+-
+-        // Info
+-        if (account instanceof TokenAccount) {
+-            WButton info = add(theme.button("Info")).widget();
+-            info.action = () -> mc.setScreen(new AccountInfoScreen(theme, account));
++        this.add(this.theme.texture(32.0, 32.0, this.account.getCache().getHeadTexture().needsRotate() ? 90.0 : 0.0, this.account.getCache().getHeadTexture()));
++        WLabel name = this.add(this.theme.label(this.account.getUsername())).widget();
++        if (MeteorClient.mc.getUser().getName().equalsIgnoreCase(this.account.getUsername())) {
++            name.color = this.loggedInColor();
+         }
+-
+-        // Login
+-        WButton login = add(theme.button("Login")).widget();
++        WLabel label = this.add(this.theme.label("(" + String.valueOf((Object)this.account.getType()) + ")")).expandCellX().right().widget();
++        label.color = this.accountTypeColor();
++        if (this.account instanceof TokenAccount) {
++            WButton info = this.add(this.theme.button("Info")).widget();
++            info.action = () -> MeteorClient.mc.setScreen((Screen)new AccountInfoScreen(this.theme, this.account));
++        }
++        WButton login = this.add(this.theme.button("Login")).widget();
+         login.action = () -> {
+             login.minWidth = login.width;
+             login.set("...");
+-            screen.locked = true;
+-
++            this.screen.locked = true;
+             MeteorExecutor.execute(() -> {
+-                if (account.fetchInfo() && account.login()) {
+-                    name.set(account.getUsername());
+-
++                if (this.account.fetchInfo() && this.account.login()) {
++                    name.set(this.account.getUsername());
+                     Accounts.get().save();
+-
+-                    screen.taskAfterRender = refreshScreenAction;
++                    this.screen.taskAfterRender = this.refreshScreenAction;
+                 }
+-
+-                login.minWidth = 0;
++                login.minWidth = 0.0;
+                 login.set("Login");
+-                screen.locked = false;
++                this.screen.locked = false;
+             });
+         };
+-
+-        // Remove
+-        WConfirmedMinus remove = add(theme.confirmedMinus()).widget();
++        WConfirmedMinus remove = this.add(this.theme.confirmedMinus()).widget();
+         remove.action = () -> {
+-            Accounts.get().remove(account);
+-            if (refreshScreenAction != null) refreshScreenAction.run();
++            Accounts.get().remove(this.account);
++            if (this.refreshScreenAction != null) {
++                this.refreshScreenAction.run();
++            }
+         };
+     }
+ }
++

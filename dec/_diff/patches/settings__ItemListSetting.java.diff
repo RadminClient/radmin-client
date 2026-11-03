@@ -1,0 +1,151 @@
+--- upstream261/settings/ItemListSetting.java
++++ v1decompiled/settings/ItemListSetting.java
+@@ -1,10 +1,23 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.registries.BuiltInRegistries
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.ListTag
++ *  net.minecraft.nbt.StringTag
++ *  net.minecraft.nbt.Tag
++ *  net.minecraft.resources.Identifier
++ *  net.minecraft.world.item.Item
+  */
++package radmin.client.settings;
+ 
+-package meteordevelopment.meteorclient.settings;
+-
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.Collection;
++import java.util.List;
++import java.util.function.Consumer;
++import java.util.function.Predicate;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.nbt.ListTag;
+@@ -12,20 +25,16 @@
+ import net.minecraft.nbt.Tag;
+ import net.minecraft.resources.Identifier;
+ import net.minecraft.world.item.Item;
++import radmin.client.settings.IVisible;
++import radmin.client.settings.Setting;
+ 
+-import java.util.ArrayList;
+-import java.util.Arrays;
+-import java.util.List;
+-import java.util.function.Consumer;
+-import java.util.function.Predicate;
+-
+-public class ItemListSetting extends Setting<List<Item>> {
++public class ItemListSetting
++extends Setting<List<Item>> {
+     public final Predicate<Item> filter;
+     private final boolean bypassFilterWhenSavingAndLoading;
+ 
+     public ItemListSetting(String name, String description, List<Item> defaultValue, Consumer<List<Item>> onChanged, Consumer<Setting<List<Item>>> onModuleActivated, IVisible visible, Predicate<Item> filter, boolean bypassFilterWhenSavingAndLoading) {
+         super(name, description, defaultValue, onChanged, onModuleActivated, visible);
+-
+         this.filter = filter;
+         this.bypassFilterWhenSavingAndLoading = bypassFilterWhenSavingAndLoading;
+     }
+@@ -33,22 +42,23 @@
+     @Override
+     protected List<Item> parseImpl(String str) {
+         String[] values = str.split(",");
+-        List<Item> items = new ArrayList<>(values.length);
+-
++        ArrayList<Item> items = new ArrayList<Item>(values.length);
+         try {
+             for (String value : values) {
+-                Item item = parseId(BuiltInRegistries.ITEM, value);
+-                if (item != null && (filter == null || filter.test(item))) items.add(item);
++                Item item = (Item)ItemListSetting.parseId(BuiltInRegistries.ITEM, value);
++                if (item == null || this.filter != null && !this.filter.test(item)) continue;
++                items.add(item);
+             }
+-        } catch (Exception _) {
+         }
+-
++        catch (Exception exception) {
++            // empty catch block
++        }
+         return items;
+     }
+ 
+     @Override
+     public void resetImpl() {
+-        value = new ArrayList<>(defaultValue);
++        this.value = new ArrayList((Collection)this.defaultValue);
+     }
+ 
+     @Override
+@@ -64,39 +74,38 @@
+     @Override
+     public CompoundTag save(CompoundTag tag) {
+         ListTag valueTag = new ListTag();
+-        for (Item item : get()) {
+-            if (bypassFilterWhenSavingAndLoading || (filter == null || filter.test(item)))
+-                valueTag.add(StringTag.valueOf(BuiltInRegistries.ITEM.getKey(item).toString()));
++        for (Item item : (List)this.get()) {
++            if (!this.bypassFilterWhenSavingAndLoading && this.filter != null && !this.filter.test(item)) continue;
++            valueTag.add((Object)StringTag.valueOf((String)BuiltInRegistries.ITEM.getKey((Object)item).toString()));
+         }
+-        tag.put("value", valueTag);
+-
++        tag.put("value", (Tag)valueTag);
+         return tag;
+     }
+ 
+     @Override
+     public List<Item> load(CompoundTag tag) {
+-        get().clear();
+-
++        ((List)this.get()).clear();
+         ListTag valueTag = tag.getListOrEmpty("value");
+         for (Tag tagI : valueTag) {
+-            Item item = BuiltInRegistries.ITEM.getValue(Identifier.parse(tagI.asString().orElse("")));
+-
+-            if (bypassFilterWhenSavingAndLoading || (filter == null || filter.test(item))) get().add(item);
++            Item item = (Item)BuiltInRegistries.ITEM.getValue(Identifier.parse((String)tagI.asString().orElse("")));
++            if (!this.bypassFilterWhenSavingAndLoading && this.filter != null && !this.filter.test(item)) continue;
++            ((List)this.get()).add(item);
+         }
+-
+-        return get();
++        return (List)this.get();
+     }
+ 
+-    public static class Builder extends SettingBuilder<Builder, List<Item>, ItemListSetting> {
++    public static class Builder
++    extends Setting.SettingBuilder<Builder, List<Item>, ItemListSetting> {
+         private Predicate<Item> filter;
+         private boolean bypassFilterWhenSavingAndLoading;
+ 
+         public Builder() {
+-            super(new ArrayList<>(0));
++            super(new ArrayList(0));
+         }
+ 
+-        public Builder defaultValue(Item... defaults) {
+-            return defaultValue(defaults != null ? Arrays.asList(defaults) : new ArrayList<>());
++        @Override
++        public Builder defaultValue(Item ... defaults) {
++            return (Builder)this.defaultValue(defaults != null ? Arrays.asList(defaults) : new ArrayList());
+         }
+ 
+         public Builder filter(Predicate<Item> filter) {
+@@ -111,7 +120,8 @@
+ 
+         @Override
+         public ItemListSetting build() {
+-            return new ItemListSetting(name, description, defaultValue, onChanged, onModuleActivated, visible, filter, bypassFilterWhenSavingAndLoading);
++            return new ItemListSetting(this.name, this.description, (List)this.defaultValue, this.onChanged, this.onModuleActivated, this.visible, this.filter, this.bypassFilterWhenSavingAndLoading);
+         }
+     }
+ }
++

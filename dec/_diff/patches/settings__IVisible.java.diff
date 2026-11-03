@@ -1,0 +1,17 @@
+--- upstream261/settings/IVisible.java
++++ v1decompiled/settings/IVisible.java
+@@ -1,10 +1,9 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.settings;
++package radmin.client.settings;
+ 
+ public interface IVisible {
+-    boolean isVisible();
++    public boolean isVisible();
+ }
++

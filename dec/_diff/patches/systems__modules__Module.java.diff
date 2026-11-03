@@ -1,0 +1,312 @@
+--- upstream261/systems/modules/Module.java
++++ v1decompiled/systems/modules/Module.java
+@@ -1,75 +1,76 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.ChatFormatting
++ *  net.minecraft.client.Minecraft
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.Tag
++ *  net.minecraft.network.chat.Component
++ *  org.jetbrains.annotations.NotNull
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules;
+-
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.addons.AddonManager;
+-import meteordevelopment.meteorclient.addons.MeteorAddon;
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.widgets.WWidget;
+-import meteordevelopment.meteorclient.settings.Settings;
+-import meteordevelopment.meteorclient.systems.config.Config;
+-import meteordevelopment.meteorclient.utils.Utils;
+-import meteordevelopment.meteorclient.utils.misc.ISerializable;
+-import meteordevelopment.meteorclient.utils.misc.Keybind;
+-import meteordevelopment.meteorclient.utils.player.ChatUtils;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
++package radmin.client.systems.modules;
++
++import java.util.Objects;
+ import net.minecraft.ChatFormatting;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.nbt.Tag;
+ import net.minecraft.network.chat.Component;
+ import org.jetbrains.annotations.NotNull;
+-
+-import java.util.Objects;
+-
+-public abstract class Module implements ISerializable<Module>, Comparable<Module> {
++import radmin.client.MeteorClient;
++import radmin.client.addons.AddonManager;
++import radmin.client.addons.MeteorAddon;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.settings.Settings;
++import radmin.client.systems.config.Config;
++import radmin.client.systems.modules.Category;
++import radmin.client.systems.modules.Modules;
++import radmin.client.utils.Utils;
++import radmin.client.utils.misc.ISerializable;
++import radmin.client.utils.misc.Keybind;
++import radmin.client.utils.player.ChatUtils;
++import radmin.client.utils.render.color.Color;
++
++public abstract class Module
++implements ISerializable<Module>,
++Comparable<Module> {
+     protected final Minecraft mc;
+-
+     public final Category category;
+     public final String name;
+     public final String title;
+     public final String description;
+     public final String[] aliases;
+     public final Color color;
+-
+     public final MeteorAddon addon;
+     public final Settings settings = new Settings();
+-
+     private boolean active;
+-
+     public boolean serialize = true;
+     public boolean runInMainMenu = false;
+     public boolean autoSubscribe = true;
+-
+     public final Keybind keybind = Keybind.none();
+     public boolean toggleOnBindRelease = false;
+     public boolean chatFeedback = true;
+     public boolean favorite = false;
+ 
+-    public Module(Category category, String name, String description, String... aliases) {
+-        if (name.contains(" "))
+-            MeteorClient.LOG.warn("Module '{}' contains invalid characters in its name making it incompatible with Meteor Client commands.", name);
+-
++    public Module(Category category, String name, String description, String ... aliases) {
++        if (name.contains(" ")) {
++            MeteorClient.LOG.warn("Module '{}' contains invalid characters in its name making it incompatible with RadminVPN Client commands.", (Object)name);
++        }
+         this.mc = Minecraft.getInstance();
+         this.category = category;
+         this.name = name;
+         this.title = Utils.nameToTitle(name);
+         this.description = description;
+         this.aliases = aliases;
+-        this.color = Color.fromHsv(Utils.random(0.0, 360.0), 0.35, 1);
+-
++        this.color = Color.fromHsv(Utils.random(0.0, 360.0), 0.35, 1.0);
+         String classname = this.getClass().getName();
+         for (MeteorAddon addon : AddonManager.ADDONS) {
+-            if (classname.startsWith(addon.getPackage())) {
+-                this.addon = addon;
+-                return;
+-            }
+-        }
+-
++            if (!classname.startsWith(addon.getPackage())) continue;
++            this.addon = addon;
++            return;
++        }
+         this.addon = null;
+     }
+ 
+@@ -88,64 +89,69 @@
+     }
+ 
+     public void toggle() {
+-        if (!active) {
+-            active = true;
++        if (!this.active) {
++            this.active = true;
+             Modules.get().addActive(this);
+-
+-            settings.onActivated();
+-
+-            if (runInMainMenu || Utils.canUpdate()) {
+-                if (autoSubscribe) MeteorClient.EVENT_BUS.subscribe(this);
+-                onActivate();
++            this.settings.onActivated();
++            if (this.runInMainMenu || Utils.canUpdate()) {
++                if (this.autoSubscribe) {
++                    MeteorClient.EVENT_BUS.subscribe((Object)this);
++                }
++                this.onActivate();
+             }
+         } else {
+-            if (runInMainMenu || Utils.canUpdate()) {
+-                if (autoSubscribe) MeteorClient.EVENT_BUS.unsubscribe(this);
+-                onDeactivate();
++            if (this.runInMainMenu || Utils.canUpdate()) {
++                if (this.autoSubscribe) {
++                    MeteorClient.EVENT_BUS.unsubscribe((Object)this);
++                }
++                this.onDeactivate();
+             }
+-
+-            active = false;
++            this.active = false;
+             Modules.get().removeActive(this);
+         }
+     }
+ 
+     public void enable() {
+-        if (!isActive()) toggle();
++        if (!this.isActive()) {
++            this.toggle();
++        }
+     }
+ 
+     public void disable() {
+-        if (isActive()) toggle();
++        if (this.isActive()) {
++            this.toggle();
++        }
+     }
+ 
+     public void sendToggledMsg() {
+-        if (Config.get().chatFeedback.get() && chatFeedback) {
+-            ChatUtils.forceNextPrefixClass(getClass());
+-            ChatUtils.sendMsg(this.hashCode(), ChatFormatting.GRAY, "Toggled (highlight)%s(default) %s(default).", title, isActive() ? ChatFormatting.GREEN + "on" : ChatFormatting.RED + "off");
++        if (Config.get().chatFeedback.get().booleanValue() && this.chatFeedback) {
++            ChatUtils.forceNextPrefixClass(this.getClass());
++            ChatUtils.sendMsg(this.hashCode(), ChatFormatting.GRAY, "Toggled (highlight)%s(default) %s(default).", this.title, this.isActive() ? String.valueOf(ChatFormatting.GREEN) + "on" : String.valueOf(ChatFormatting.RED) + "off");
+         }
+     }
+ 
+     public void info(Component message) {
+-        ChatUtils.forceNextPrefixClass(getClass());
+-        ChatUtils.sendMsg(title, message);
+-    }
+-
+-    public void info(String message, Object... args) {
+-        ChatUtils.forceNextPrefixClass(getClass());
+-        ChatUtils.infoPrefix(title, message, args);
+-    }
+-
+-    public void warning(String message, Object... args) {
+-        ChatUtils.forceNextPrefixClass(getClass());
+-        ChatUtils.warningPrefix(title, message, args);
+-    }
+-
+-    public void error(String message, Object... args) {
+-        ChatUtils.forceNextPrefixClass(getClass());
+-        ChatUtils.errorPrefix(title, message, args);
++        ChatUtils.forceNextPrefixClass(this.getClass());
++        ChatUtils.sendMsg(this.title, message);
++    }
++
++    public void info(String message, Object ... args) {
++        ChatUtils.forceNextPrefixClass(this.getClass());
++        ChatUtils.infoPrefix(this.title, message, args);
++    }
++
++    public void warning(String message, Object ... args) {
++        ChatUtils.forceNextPrefixClass(this.getClass());
++        ChatUtils.warningPrefix(this.title, message, args);
++    }
++
++    public void error(String message, Object ... args) {
++        ChatUtils.forceNextPrefixClass(this.getClass());
++        ChatUtils.errorPrefix(this.title, message, args);
+     }
+ 
+     public boolean isActive() {
+-        return active;
++        return this.active;
+     }
+ 
+     public String getInfoString() {
+@@ -154,53 +160,56 @@
+ 
+     @Override
+     public CompoundTag toTag() {
+-        if (!serialize) return null;
++        if (!this.serialize) {
++            return null;
++        }
+         CompoundTag tag = new CompoundTag();
+-
+-        tag.putString("name", name);
+-        tag.put("keybind", keybind.toTag());
+-        tag.putBoolean("toggleOnKeyRelease", toggleOnBindRelease);
+-        tag.putBoolean("chatFeedback", chatFeedback);
+-        tag.putBoolean("favorite", favorite);
+-        tag.put("settings", settings.toTag());
+-        tag.putBoolean("active", active);
+-
++        tag.putString("name", this.name);
++        tag.put("keybind", (Tag)this.keybind.toTag());
++        tag.putBoolean("toggleOnKeyRelease", this.toggleOnBindRelease);
++        tag.putBoolean("chatFeedback", this.chatFeedback);
++        tag.putBoolean("favorite", this.favorite);
++        tag.put("settings", (Tag)this.settings.toTag());
++        tag.putBoolean("active", this.active);
+         return tag;
+     }
+ 
+     @Override
+     public Module fromTag(CompoundTag tag) {
+-        // General
+-        keybind.fromTag(tag.getCompoundOrEmpty("keybind"));
+-        toggleOnBindRelease = tag.getBooleanOr("toggleOnKeyRelease", false);
+-        chatFeedback = !tag.contains("chatFeedback") || tag.getBooleanOr("chatFeedback", false);
+-        favorite = tag.getBooleanOr("favorite", false);
+-
+-        // Settings
++        boolean active;
++        this.keybind.fromTag(tag.getCompoundOrEmpty("keybind"));
++        this.toggleOnBindRelease = tag.getBooleanOr("toggleOnKeyRelease", false);
++        this.chatFeedback = !tag.contains("chatFeedback") || tag.getBooleanOr("chatFeedback", false);
++        this.favorite = tag.getBooleanOr("favorite", false);
+         Tag settingsTag = tag.get("settings");
+-        if (settingsTag instanceof CompoundTag compoundTag) settings.fromTag(compoundTag);
+-
+-        boolean active = tag.getBooleanOr("active", false);
+-        if (active != isActive()) toggle();
+-
++        if (settingsTag instanceof CompoundTag) {
++            CompoundTag compoundTag = (CompoundTag)settingsTag;
++            this.settings.fromTag(compoundTag);
++        }
++        if ((active = tag.getBooleanOr("active", false)) != this.isActive()) {
++            this.toggle();
++        }
+         return this;
+     }
+ 
+-    @Override
+     public boolean equals(Object o) {
+-        if (this == o) return true;
+-        if (o == null || getClass() != o.getClass()) return false;
+-        Module module = (Module) o;
+-        return Objects.equals(name, module.name);
+-    }
+-
+-    @Override
++        if (this == o) {
++            return true;
++        }
++        if (o == null || this.getClass() != o.getClass()) {
++            return false;
++        }
++        Module module = (Module)o;
++        return Objects.equals(this.name, module.name);
++    }
++
+     public int hashCode() {
+-        return Objects.hash(name);
++        return Objects.hash(this.name);
+     }
+ 
+     @Override
+     public int compareTo(@NotNull Module o) {
+-        return name.compareTo(o.name);
++        return this.name.compareTo(o.name);
+     }
+ }
++

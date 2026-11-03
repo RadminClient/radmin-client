@@ -1,0 +1,48 @@
+--- upstream261/mixin/CapabilityTrackerMixin.java
++++ v1decompiled/mixin/CapabilityTrackerMixin.java
+@@ -1,30 +1,35 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.opengl.GlStateManager$BooleanState
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Shadow
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import com.mojang.blaze3d.opengl.GlStateManager;
+-import meteordevelopment.meteorclient.mixininterface.ICapabilityTracker;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Shadow;
++import radmin.client.mixininterface.ICapabilityTracker;
+ 
+-@Mixin(GlStateManager.BooleanState.class)
+-public abstract class CapabilityTrackerMixin implements ICapabilityTracker {
++@Mixin(value={GlStateManager.BooleanState.class})
++public abstract class CapabilityTrackerMixin
++implements ICapabilityTracker {
+     @Shadow
+     private boolean enabled;
+ 
+     @Shadow
+-    public abstract void setEnabled(boolean enabled);
++    public abstract void setEnabled(boolean var1);
+ 
+     @Override
+     public boolean meteor$get() {
+-        return enabled;
++        return this.enabled;
+     }
+ 
+     @Override
+     public void meteor$set(boolean state) {
+-        setEnabled(state);
++        this.setEnabled(state);
+     }
+ }
++

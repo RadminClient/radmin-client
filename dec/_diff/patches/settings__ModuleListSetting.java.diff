@@ -1,0 +1,155 @@
+--- upstream261/settings/ModuleListSetting.java
++++ v1decompiled/settings/ModuleListSetting.java
+@@ -1,22 +1,29 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.ListTag
++ *  net.minecraft.nbt.StringTag
++ *  net.minecraft.nbt.Tag
+  */
++package radmin.client.settings;
+ 
+-package meteordevelopment.meteorclient.settings;
+-
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
++import java.util.ArrayList;
++import java.util.Collection;
++import java.util.List;
++import java.util.function.Consumer;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.nbt.ListTag;
+ import net.minecraft.nbt.StringTag;
+ import net.minecraft.nbt.Tag;
++import radmin.client.settings.IVisible;
++import radmin.client.settings.Setting;
++import radmin.client.systems.modules.Module;
++import radmin.client.systems.modules.Modules;
+ 
+-import java.util.ArrayList;
+-import java.util.List;
+-import java.util.function.Consumer;
+-
+-public class ModuleListSetting extends Setting<List<Module>> {
++public class ModuleListSetting
++extends Setting<List<Module>> {
+     private static List<String> suggestions;
+ 
+     public ModuleListSetting(String name, String description, List<Module> defaultValue, Consumer<List<Module>> onChanged, Consumer<Setting<List<Module>>> onModuleActivated, IVisible visible) {
+@@ -25,22 +32,23 @@
+ 
+     @Override
+     public void resetImpl() {
+-        value = new ArrayList<>(defaultValue);
++        this.value = new ArrayList((Collection)this.defaultValue);
+     }
+ 
+     @Override
+     protected List<Module> parseImpl(String str) {
+         String[] values = str.split(",");
+-        List<Module> modules = new ArrayList<>(values.length);
+-
++        ArrayList<Module> modules = new ArrayList<Module>(values.length);
+         try {
+             for (String value : values) {
+                 Module module = Modules.get().get(value.trim());
+-                if (module != null) modules.add(module);
++                if (module == null) continue;
++                modules.add(module);
+             }
+-        } catch (Exception _) {
+         }
+-
++        catch (Exception exception) {
++            // empty catch block
++        }
+         return modules;
+     }
+ 
+@@ -52,54 +60,57 @@
+     @Override
+     public List<String> getSuggestions() {
+         if (suggestions == null) {
+-            suggestions = new ArrayList<>(Modules.get().getAll().size());
+-            for (Module module : Modules.get().getAll()) suggestions.add(module.name);
++            suggestions = new ArrayList<String>(Modules.get().getAll().size());
++            for (Module module : Modules.get().getAll()) {
++                suggestions.add(module.name);
++            }
+         }
+-
+         return suggestions;
+     }
+ 
+     @Override
+     public CompoundTag save(CompoundTag tag) {
+         ListTag modulesTag = new ListTag();
+-        for (Module module : get()) modulesTag.add(StringTag.valueOf(module.name));
+-        tag.put("modules", modulesTag);
+-
++        for (Module module : (List)this.get()) {
++            modulesTag.add((Object)StringTag.valueOf((String)module.name));
++        }
++        tag.put("modules", (Tag)modulesTag);
+         return tag;
+     }
+ 
+     @Override
+     public List<Module> load(CompoundTag tag) {
+-        get().clear();
+-
++        ((List)this.get()).clear();
+         ListTag valueTag = tag.getListOrEmpty("modules");
+         for (Tag tagI : valueTag) {
+             Module module = Modules.get().get(tagI.asString().orElse(""));
+-            if (module != null) get().add(module);
++            if (module == null) continue;
++            ((List)this.get()).add(module);
++        }
++        return (List)this.get();
++    }
++
++    public static class Builder
++    extends Setting.SettingBuilder<Builder, List<Module>, ModuleListSetting> {
++        public Builder() {
++            super(new ArrayList(0));
+         }
+ 
+-        return get();
+-    }
+-
+-    public static class Builder extends SettingBuilder<Builder, List<Module>, ModuleListSetting> {
+-        public Builder() {
+-            super(new ArrayList<>(0));
+-        }
+-
++        @Override
+         @SafeVarargs
+-        public final Builder defaultValue(Class<? extends Module>... defaults) {
+-            List<Module> modules = new ArrayList<>();
+-
++        public final Builder defaultValue(Class<? extends Module> ... defaults) {
++            ArrayList<Module> modules = new ArrayList<Module>();
+             for (Class<? extends Module> klass : defaults) {
+-                if (Modules.get().get(klass) != null) modules.add(Modules.get().get(klass));
++                if (Modules.get().get(klass) == null) continue;
++                modules.add(Modules.get().get(klass));
+             }
+-
+-            return defaultValue(modules);
++            return (Builder)this.defaultValue(modules);
+         }
+ 
+         @Override
+         public ModuleListSetting build() {
+-            return new ModuleListSetting(name, description, defaultValue, onChanged, onModuleActivated, visible);
++            return new ModuleListSetting(this.name, this.description, (List)this.defaultValue, this.onChanged, this.onModuleActivated, this.visible);
+         }
+     }
+ }
++

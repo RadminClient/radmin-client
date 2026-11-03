@@ -1,0 +1,17 @@
+--- upstream261/utils/misc/IGetter.java
++++ v1decompiled/utils/misc/IGetter.java
+@@ -1,10 +1,9 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.utils.misc;
++package radmin.client.utils.misc;
+ 
+ public interface IGetter<T> {
+-    T get();
++    public T get();
+ }
++

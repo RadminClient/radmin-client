@@ -1,0 +1,286 @@
+--- upstream261/systems/modules/misc/Spam.java
++++ v1decompiled/systems/modules/misc/Spam.java
+@@ -1,188 +1,135 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.client.gui.screens.DisconnectedScreen
++ *  org.apache.commons.lang3.RandomStringUtils
+  */
++package radmin.client.systems.modules.misc;
+ 
+-package meteordevelopment.meteorclient.systems.modules.misc;
+-
+-import meteordevelopment.meteorclient.events.game.GameLeftEvent;
+-import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.settings.*;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.utils.Utils;
+-import meteordevelopment.meteorclient.utils.player.ChatUtils;
++import java.util.List;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.client.gui.screens.DisconnectedScreen;
+ import org.apache.commons.lang3.RandomStringUtils;
++import radmin.client.events.game.GameLeftEvent;
++import radmin.client.events.game.OpenScreenEvent;
++import radmin.client.events.world.TickEvent;
++import radmin.client.settings.BoolSetting;
++import radmin.client.settings.IntSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.settings.StringListSetting;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.utils.Utils;
++import radmin.client.utils.player.ChatUtils;
+ 
+-import java.util.List;
+-
+-public class Spam extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<List<String>> messages = sgGeneral.add(new StringListSetting.Builder()
+-        .name("messages")
+-        .description("Messages to use for spam.")
+-        .defaultValue(List.of("Meteor on Crack!"))
+-        .build()
+-    );
+-
+-    private final Setting<Integer> delay = sgGeneral.add(new IntSetting.Builder()
+-        .name("delay")
+-        .description("The delay between specified messages in ticks.")
+-        .defaultValue(20)
+-        .min(0)
+-        .sliderMax(200)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> disableOnLeave = sgGeneral.add(new BoolSetting.Builder()
+-        .name("disable-on-leave")
+-        .description("Disables spam when you leave a server.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> disableOnDisconnect = sgGeneral.add(new BoolSetting.Builder()
+-        .name("disable-on-disconnect")
+-        .description("Disables spam when you are disconnected from a server.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> random = sgGeneral.add(new BoolSetting.Builder()
+-        .name("randomise")
+-        .description("Selects a random message from your spam message list.")
+-        .defaultValue(false)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> autoSplitMessages = sgGeneral.add(new BoolSetting.Builder()
+-        .name("auto-split-messages")
+-        .description("Automatically split up large messages after a certain length")
+-        .defaultValue(false)
+-        .build()
+-    );
+-
+-    private final Setting<Integer> splitLength = sgGeneral.add(new IntSetting.Builder()
+-        .name("split-length")
+-        .description("The length after which to split messages in chat")
+-        .visible(autoSplitMessages::get)
+-        .defaultValue(256)
+-        .min(1)
+-        .sliderMax(256)
+-        .build()
+-    );
+-
+-    private final Setting<Integer> autoSplitDelay = sgGeneral.add(new IntSetting.Builder()
+-        .name("split-delay")
+-        .description("The delay between split messages in ticks.")
+-        .visible(autoSplitMessages::get)
+-        .defaultValue(20)
+-        .min(0)
+-        .sliderMax(200)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> bypass = sgGeneral.add(new BoolSetting.Builder()
+-        .name("bypass")
+-        .description("Add random text at the end of the message to try to bypass anti spams.")
+-        .defaultValue(false)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> uppercase = sgGeneral.add(new BoolSetting.Builder()
+-        .name("include-uppercase-characters")
+-        .description("Whether the bypass text should include uppercase characters.")
+-        .visible(bypass::get)
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private final Setting<Integer> length = sgGeneral.add(new IntSetting.Builder()
+-        .name("length")
+-        .description("Number of characters used to bypass anti spam.")
+-        .visible(bypass::get)
+-        .defaultValue(16)
+-        .sliderRange(1, 256)
+-        .build()
+-    );
+-
+-    private int messageI, timer, splitNum;
++public class Spam
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final Setting<List<String>> messages;
++    private final Setting<Integer> delay;
++    private final Setting<Boolean> disableOnLeave;
++    private final Setting<Boolean> disableOnDisconnect;
++    private final Setting<Boolean> random;
++    private final Setting<Boolean> autoSplitMessages;
++    private final Setting<Integer> splitLength;
++    private final Setting<Integer> autoSplitDelay;
++    private final Setting<Boolean> bypass;
++    private final Setting<Boolean> uppercase;
++    private final Setting<Integer> length;
++    private int messageI;
++    private int timer;
++    private int splitNum;
+     private String text;
+ 
+     public Spam() {
+         super(Categories.Misc, "spam", "Spams specified messages in chat.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.messages = this.sgGeneral.add(((StringListSetting.Builder)((StringListSetting.Builder)((StringListSetting.Builder)new StringListSetting.Builder().name("messages")).description("Messages to use for spam.")).defaultValue(List.of("Meteor on Crack!"))).build());
++        this.delay = this.sgGeneral.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("delay")).description("The delay between specified messages in ticks.")).defaultValue(20)).min(0).sliderMax(200).build());
++        this.disableOnLeave = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("disable-on-leave")).description("Disables spam when you leave a server.")).defaultValue(true)).build());
++        this.disableOnDisconnect = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("disable-on-disconnect")).description("Disables spam when you are disconnected from a server.")).defaultValue(true)).build());
++        this.random = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("randomise")).description("Selects a random message from your spam message list.")).defaultValue(false)).build());
++        this.autoSplitMessages = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("auto-split-messages")).description("Automatically split up large messages after a certain length")).defaultValue(false)).build());
++        this.splitLength = this.sgGeneral.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("split-length")).description("The length after which to split messages in chat")).visible(this.autoSplitMessages::get)).defaultValue(256)).min(1).sliderMax(256).build());
++        this.autoSplitDelay = this.sgGeneral.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("split-delay")).description("The delay between split messages in ticks.")).visible(this.autoSplitMessages::get)).defaultValue(20)).min(0).sliderMax(200).build());
++        this.bypass = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("bypass")).description("Add random text at the end of the message to try to bypass anti spams.")).defaultValue(false)).build());
++        this.uppercase = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("include-uppercase-characters")).description("Whether the bypass text should include uppercase characters.")).visible(this.bypass::get)).defaultValue(true)).build());
++        this.length = this.sgGeneral.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("length")).description("Number of characters used to bypass anti spam.")).visible(this.bypass::get)).defaultValue(16)).sliderRange(1, 256).build());
+     }
+ 
+     @Override
+     public void onActivate() {
+-        timer = delay.get();
+-        messageI = 0;
+-        splitNum = 0;
++        this.timer = this.delay.get();
++        this.messageI = 0;
++        this.splitNum = 0;
+     }
+ 
+     @EventHandler
+     private void onScreenOpen(OpenScreenEvent event) {
+-        if (disableOnDisconnect.get() && event.screen instanceof DisconnectedScreen) {
+-            toggle();
++        if (this.disableOnDisconnect.get().booleanValue() && event.screen instanceof DisconnectedScreen) {
++            this.toggle();
+         }
+     }
+ 
+     @EventHandler
+     private void onGameLeft(GameLeftEvent event) {
+-        if (disableOnLeave.get()) toggle();
++        if (this.disableOnLeave.get().booleanValue()) {
++            this.toggle();
++        }
+     }
+ 
+     @EventHandler
+     private void onTick(TickEvent.Post event) {
+-        if (messages.get().isEmpty()) return;
+-
+-        if (timer <= 0) {
+-            if (text == null) {
++        if (this.messages.get().isEmpty()) {
++            return;
++        }
++        if (this.timer <= 0) {
++            if (this.text == null) {
+                 int i;
+-                if (random.get()) {
+-                    i = Utils.random(0, messages.get().size());
++                if (this.random.get().booleanValue()) {
++                    i = Utils.random(0, this.messages.get().size());
+                 } else {
+-                    if (messageI >= messages.get().size()) messageI = 0;
+-                    i = messageI++;
++                    if (this.messageI >= this.messages.get().size()) {
++                        this.messageI = 0;
++                    }
++                    i = this.messageI++;
+                 }
+-
+-                text = messages.get().get(i);
+-                if (bypass.get()) {
+-                    String bypass = RandomStringUtils.insecure().nextAlphabetic(length.get());
+-                    if (!uppercase.get()) bypass = bypass.toLowerCase();
+-
+-                    text += " " + bypass;
++                this.text = this.messages.get().get(i);
++                if (this.bypass.get().booleanValue()) {
++                    String bypass = RandomStringUtils.insecure().nextAlphabetic(this.length.get().intValue());
++                    if (!this.uppercase.get().booleanValue()) {
++                        bypass = bypass.toLowerCase();
++                    }
++                    this.text = this.text + " " + bypass;
+                 }
+             }
+-
+-            if (autoSplitMessages.get() && text.length() > splitLength.get()) {
+-                // the number of individual messages the whole text needs to be broken into
+-                double length = text.length();
+-                int splits = (int) Math.ceil(length / splitLength.get());
+-
+-                // determine which chunk we need to send
+-                int start = splitNum * splitLength.get();
+-                int end = Math.min(start + splitLength.get(), text.length());
+-                ChatUtils.sendPlayerMsg(text.substring(start, end));
+-
+-                splitNum = ++splitNum % splits;
+-                timer = autoSplitDelay.get();
+-                if (splitNum == 0) { // equals zero when all chunks are sent
+-                    timer = delay.get();
+-                    text = null;
++            if (this.autoSplitMessages.get().booleanValue() && this.text.length() > this.splitLength.get()) {
++                double length = this.text.length();
++                int splits = (int)Math.ceil(length / (double)this.splitLength.get().intValue());
++                int start = this.splitNum * this.splitLength.get();
++                int end = Math.min(start + this.splitLength.get(), this.text.length());
++                ChatUtils.sendPlayerMsg(this.text.substring(start, end));
++                ++this.splitNum;
++                this.splitNum %= splits;
++                this.timer = this.autoSplitDelay.get();
++                if (this.splitNum == 0) {
++                    this.timer = this.delay.get();
++                    this.text = null;
+                 }
+             } else {
+-                if (text.length() > 256) text = text.substring(0, 256); // prevent kick
+-                ChatUtils.sendPlayerMsg(text);
+-                timer = delay.get();
+-                text = null;
++                if (this.text.length() > 256) {
++                    this.text = this.text.substring(0, 256);
++                }
++                ChatUtils.sendPlayerMsg(this.text);
++                this.timer = this.delay.get();
++                this.text = null;
+             }
+         } else {
+-            timer--;
++            --this.timer;
+         }
+     }
+ }
++

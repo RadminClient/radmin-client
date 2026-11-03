@@ -1,0 +1,187 @@
+--- upstream261/renderer/text/VanillaTextRenderer.java
++++ v1decompiled/renderer/text/VanillaTextRenderer.java
+@@ -1,115 +1,125 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.systems.RenderSystem
++ *  com.mojang.blaze3d.vertex.ByteBufferBuilder
++ *  com.mojang.blaze3d.vertex.PoseStack
++ *  net.minecraft.client.gui.Font$DisplayMode
++ *  net.minecraft.client.renderer.MultiBufferSource
++ *  net.minecraft.client.renderer.MultiBufferSource$BufferSource
++ *  org.joml.Matrix4f
++ *  org.joml.Matrix4fStack
++ *  org.joml.Matrix4fc
+  */
+-
+-package meteordevelopment.meteorclient.renderer.text;
++package radmin.client.renderer.text;
+ 
+ import com.mojang.blaze3d.systems.RenderSystem;
+ import com.mojang.blaze3d.vertex.ByteBufferBuilder;
+ import com.mojang.blaze3d.vertex.PoseStack;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
+-import net.minecraft.client.gui.Font.DisplayMode;
++import java.util.Objects;
++import net.minecraft.client.gui.Font;
+ import net.minecraft.client.renderer.MultiBufferSource;
+-import net.minecraft.util.LightCoordsUtil;
+ import org.joml.Matrix4f;
+ import org.joml.Matrix4fStack;
++import org.joml.Matrix4fc;
++import radmin.client.MeteorClient;
++import radmin.client.renderer.text.TextRenderer;
++import radmin.client.utils.render.color.Color;
+ 
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class VanillaTextRenderer implements TextRenderer {
++public class VanillaTextRenderer
++implements TextRenderer {
+     public static final VanillaTextRenderer INSTANCE = new VanillaTextRenderer();
+-
+     private final ByteBufferBuilder buffer = new ByteBufferBuilder(2048);
+-    private final MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate(buffer);
+-
++    private final MultiBufferSource.BufferSource immediate = MultiBufferSource.immediate((ByteBufferBuilder)this.buffer);
+     private final PoseStack matrices = new PoseStack();
+     private final Matrix4f emptyMatrix = new Matrix4f();
+-
+-    public double scale = 2;
++    public double scale = 2.0;
+     public boolean scaleIndividually;
+-
+     private boolean building;
+-    private double alpha = 1;
++    private double alpha = 1.0;
+ 
+     private VanillaTextRenderer() {
+-        // Use INSTANCE
+     }
+ 
+     @Override
+     public void setAlpha(double a) {
+-        alpha = a;
++        this.alpha = a;
+     }
+ 
+     @Override
+     public double getWidth(String text, int length, boolean shadow) {
+-        if (text.isEmpty()) return 0;
+-
+-        if (length != text.length()) text = text.substring(0, length);
+-        return (mc.font.width(text) + (shadow ? 1 : 0)) * scale;
++        if (text.isEmpty()) {
++            return 0.0;
++        }
++        if (length != text.length()) {
++            text = text.substring(0, length);
++        }
++        return (double)(MeteorClient.mc.font.width(text) + (shadow ? 1 : 0)) * this.scale;
+     }
+ 
+     @Override
+     public double getHeight(boolean shadow) {
+-        return (mc.font.lineHeight + (shadow ? 1 : 0)) * scale;
++        Objects.requireNonNull(MeteorClient.mc.font);
++        return (double)(9 + (shadow ? 1 : 0)) * this.scale;
+     }
+ 
+     @Override
+     public void begin(double scale, boolean scaleOnly, boolean big) {
+-        if (building) throw new RuntimeException("VanillaTextRenderer.begin() called twice");
+-
+-        this.scale = scale * 2;
++        if (this.building) {
++            throw new RuntimeException("VanillaTextRenderer.begin() called twice");
++        }
++        this.scale = scale * 2.0;
+         this.building = true;
+     }
+ 
+     @Override
+     public double render(String text, double x, double y, Color color, boolean shadow) {
+-        boolean wasBuilding = building;
+-        if (!wasBuilding) begin();
+-
+-        x += 0.5 * scale;
+-        y += 0.5 * scale;
+-
++        boolean wasBuilding = this.building;
++        if (!wasBuilding) {
++            this.begin();
++        }
++        x += 0.5 * this.scale;
++        y += 0.5 * this.scale;
+         int preA = color.a;
+-        color.a = (int) (((double) color.a / 255 * alpha) * 255);
+-
+-        Matrix4f matrix = emptyMatrix;
+-        if (scaleIndividually) {
+-            matrices.pushPose();
+-            matrices.scale((float) scale, (float) scale, 1);
+-            matrix = matrices.last().pose();
++        color.a = (int)((double)color.a / 255.0 * this.alpha * 255.0);
++        Matrix4f matrix = this.emptyMatrix;
++        if (this.scaleIndividually) {
++            this.matrices.pushPose();
++            this.matrices.scale((float)this.scale, (float)this.scale, 1.0f);
++            matrix = this.matrices.last().pose();
+         }
+-
+-        mc.font.drawInBatch(text, (float) (x / scale), (float) (y / scale), color.getPacked(), shadow, matrix, immediate, DisplayMode.NORMAL, 0, LightCoordsUtil.FULL_BRIGHT);
+-        double x2 = (x / scale) + mc.font.width(text);
+-
+-        if (scaleIndividually) matrices.popPose();
+-
++        MeteorClient.mc.font.drawInBatch(text, (float)(x / this.scale), (float)(y / this.scale), color.getPacked(), shadow, (Matrix4fc)matrix, (MultiBufferSource)this.immediate, Font.DisplayMode.NORMAL, 0, 0xF000F0);
++        double x2 = x / this.scale + (double)MeteorClient.mc.font.width(text);
++        if (this.scaleIndividually) {
++            this.matrices.popPose();
++        }
+         color.a = preA;
+-
+-        if (!wasBuilding) end();
+-        return (x2 - 1) * scale;
++        if (!wasBuilding) {
++            this.end();
++        }
++        return (x2 - 1.0) * this.scale;
+     }
+ 
+     @Override
+     public boolean isBuilding() {
+-        return building;
++        return this.building;
+     }
+ 
+     @Override
+     public void end() {
+-        if (!building) throw new RuntimeException("VanillaTextRenderer.end() called without calling begin()");
+-
++        if (!this.building) {
++            throw new RuntimeException("VanillaTextRenderer.end() called without calling begin()");
++        }
+         Matrix4fStack matrixStack = RenderSystem.getModelViewStack();
+-
+         matrixStack.pushMatrix();
+-        if (!scaleIndividually) matrixStack.scale((float) scale, (float) scale, 1);
+-
+-        immediate.endBatch();
+-
++        if (!this.scaleIndividually) {
++            matrixStack.scale((float)this.scale, (float)this.scale, 1.0f);
++        }
++        this.immediate.endBatch();
+         matrixStack.popMatrix();
+-
+-        this.scale = 2;
++        this.scale = 2.0;
+         this.building = false;
+     }
+ }
++

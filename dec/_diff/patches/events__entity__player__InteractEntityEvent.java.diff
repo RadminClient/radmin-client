@@ -1,0 +1,41 @@
+--- upstream261/events/entity/player/InteractEntityEvent.java
++++ v1decompiled/events/entity/player/InteractEntityEvent.java
+@@ -1,24 +1,27 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.InteractionHand
++ *  net.minecraft.world.entity.Entity
+  */
++package radmin.client.events.entity.player;
+ 
+-package meteordevelopment.meteorclient.events.entity.player;
++import net.minecraft.world.InteractionHand;
++import net.minecraft.world.entity.Entity;
++import radmin.client.events.Cancellable;
+ 
+-import meteordevelopment.meteorclient.events.Cancellable;
+-import net.minecraft.world.entity.Entity;
+-import net.minecraft.world.InteractionHand;
+-
+-public class InteractEntityEvent extends Cancellable {
++public class InteractEntityEvent
++extends Cancellable {
+     private static final InteractEntityEvent INSTANCE = new InteractEntityEvent();
+-
+     public Entity entity;
+     public InteractionHand hand;
+ 
+     public static InteractEntityEvent get(Entity entity, InteractionHand hand) {
+         INSTANCE.setCancelled(false);
+-        INSTANCE.entity = entity;
+-        INSTANCE.hand = hand;
++        InteractEntityEvent.INSTANCE.entity = entity;
++        InteractEntityEvent.INSTANCE.hand = hand;
+         return INSTANCE;
+     }
+ }
++

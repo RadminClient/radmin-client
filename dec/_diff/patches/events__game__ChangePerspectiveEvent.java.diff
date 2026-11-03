@@ -1,0 +1,35 @@
+--- upstream261/events/game/ChangePerspectiveEvent.java
++++ v1decompiled/events/game/ChangePerspectiveEvent.java
+@@ -1,21 +1,23 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.CameraType
+  */
++package radmin.client.events.game;
+ 
+-package meteordevelopment.meteorclient.events.game;
++import net.minecraft.client.CameraType;
++import radmin.client.events.Cancellable;
+ 
+-import meteordevelopment.meteorclient.events.Cancellable;
+-import net.minecraft.client.CameraType;
+-
+-public class ChangePerspectiveEvent extends Cancellable {
++public class ChangePerspectiveEvent
++extends Cancellable {
+     private static final ChangePerspectiveEvent INSTANCE = new ChangePerspectiveEvent();
+-
+     public CameraType perspective;
+ 
+     public static ChangePerspectiveEvent get(CameraType perspective) {
+         INSTANCE.setCancelled(false);
+-        INSTANCE.perspective = perspective;
++        ChangePerspectiveEvent.INSTANCE.perspective = perspective;
+         return INSTANCE;
+     }
+ }
++

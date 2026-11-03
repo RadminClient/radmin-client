@@ -1,0 +1,89 @@
+--- upstream261/utils/render/color/RainbowColor.java
++++ v1decompiled/utils/render/color/RainbowColor.java
+@@ -1,20 +1,17 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.utils.render.color;
+ 
+-package meteordevelopment.meteorclient.utils.render.color;
++import radmin.client.utils.render.color.Color;
+ 
+-public class RainbowColor extends Color {
++public class RainbowColor
++extends Color {
+     private double speed;
+     private static final float[] hsb = new float[3];
+ 
+-    public RainbowColor() {
+-        super();
+-    }
+-
+     public double getSpeed() {
+-        return speed;
++        return this.speed;
+     }
+ 
+     public RainbowColor setSpeed(double speed) {
+@@ -23,21 +20,21 @@
+     }
+ 
+     public RainbowColor getNext() {
+-        return getNext(1);
++        return this.getNext(1.0);
+     }
+ 
+     public RainbowColor getNext(double delta) {
+-        if (speed > 0) {
+-            java.awt.Color.RGBtoHSB(r, g, b, hsb);
+-            int c = java.awt.Color.HSBtoRGB(hsb[0] + (float) (speed * delta), 1, 1);
+-
+-            r = toRGBAR(c);
+-            g = toRGBAG(c);
+-            b = toRGBAB(c);
++        if (this.speed > 0.0) {
++            java.awt.Color.RGBtoHSB(this.r, this.g, this.b, hsb);
++            int c = java.awt.Color.HSBtoRGB(hsb[0] + (float)(this.speed * delta), 1.0f, 1.0f);
++            this.r = RainbowColor.toRGBAR(c);
++            this.g = RainbowColor.toRGBAG(c);
++            this.b = RainbowColor.toRGBAB(c);
+         }
+         return this;
+     }
+ 
++    @Override
+     public RainbowColor set(RainbowColor color) {
+         this.r = color.r;
+         this.g = color.g;
+@@ -49,17 +46,23 @@
+ 
+     @Override
+     public boolean equals(Object o) {
+-        if (this == o) return true;
+-        if (o == null || getClass() != o.getClass()) return false;
+-        if (!super.equals(o)) return false;
+-
+-        return Double.compare(((RainbowColor) o).speed, speed) == 0;
++        if (this == o) {
++            return true;
++        }
++        if (o == null || this.getClass() != o.getClass()) {
++            return false;
++        }
++        if (!super.equals(o)) {
++            return false;
++        }
++        return Double.compare(((RainbowColor)o).speed, this.speed) == 0;
+     }
+ 
+     @Override
+     public int hashCode() {
+         int result = super.hashCode();
+-        result = 31 * result + Double.hashCode(speed);
++        result = 31 * result + Double.hashCode(this.speed);
+         return result;
+     }
+ }
++

@@ -1,0 +1,34 @@
+--- upstream261/gui/themes/meteor/widgets/WMeteorTooltip.java
++++ v1decompiled/gui/themes/meteor/widgets/WMeteorTooltip.java
+@@ -1,21 +1,22 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.themes.meteor.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.themes.meteor.widgets;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.themes.meteor.MeteorWidget;
++import radmin.client.gui.widgets.WTooltip;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.gui.themes.meteor.MeteorWidget;
+-import meteordevelopment.meteorclient.gui.widgets.WTooltip;
+-
+-public class WMeteorTooltip extends WTooltip implements MeteorWidget {
++public class WMeteorTooltip
++extends WTooltip
++implements MeteorWidget {
+     public WMeteorTooltip(String text) {
+         super(text);
+     }
+ 
+     @Override
+     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        renderer.quad(this, theme().backgroundColor.get());
++        renderer.quad(this, this.theme().backgroundColor.get());
+     }
+ }
++

@@ -1,0 +1,78 @@
+--- upstream261/gui/widgets/pressable/WButton.java
++++ v1decompiled/gui/widgets/pressable/WButton.java
+@@ -1,52 +1,49 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.widgets.pressable;
+ 
+-package meteordevelopment.meteorclient.gui.widgets.pressable;
++import radmin.client.gui.renderer.packer.GuiTexture;
++import radmin.client.gui.widgets.pressable.WPressable;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.packer.GuiTexture;
+-
+-public abstract class WButton extends WPressable {
++public abstract class WButton
++extends WPressable {
+     protected String text;
+     protected double textWidth;
+-
+     protected GuiTexture texture;
+ 
+     public WButton(String text, GuiTexture texture) {
+         this.text = text;
+         this.texture = texture;
+-
+-        if (text == null) instantTooltips = true;
++        if (text == null) {
++            this.instantTooltips = true;
++        }
+     }
+ 
+     @Override
+     protected void onCalculateSize() {
+-        double pad = pad();
+-
+-        String text = getText();
+-
++        double pad = this.pad();
++        String text = this.getText();
+         if (text != null) {
+-            textWidth = theme.textWidth(text);
+-
+-            width = pad + textWidth + pad;
+-            height = pad + theme.textHeight() + pad;
+-        }
+-        else {
+-            double s = theme.textHeight();
+-
+-            width = pad + s + pad;
+-            height = pad + s + pad;
++            this.textWidth = this.theme.textWidth(text);
++            this.width = pad + this.textWidth + pad;
++            this.height = pad + this.theme.textHeight() + pad;
++        } else {
++            double s = this.theme.textHeight();
++            this.width = pad + s + pad;
++            this.height = pad + s + pad;
+         }
+     }
+ 
+     public void set(String text) {
+-        if (this.text == null || Math.round(theme.textWidth(text)) != textWidth) invalidate();
+-
++        if (this.text == null || (double)Math.round(this.theme.textWidth(text)) != this.textWidth) {
++            this.invalidate();
++        }
+         this.text = text;
+     }
+ 
+     public String getText() {
+-        return text;
++        return this.text;
+     }
+ }
++

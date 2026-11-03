@@ -1,0 +1,96 @@
+--- upstream261/gui/screens/settings/StorageBlockListSettingScreen.java
++++ v1decompiled/gui/screens/settings/StorageBlockListSettingScreen.java
+@@ -1,31 +1,51 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap
++ *  net.minecraft.core.registries.BuiltInRegistries
++ *  net.minecraft.world.item.Item
++ *  net.minecraft.world.item.Items
++ *  net.minecraft.world.level.block.entity.BlockEntityType
+  */
+-
+-package meteordevelopment.meteorclient.gui.screens.settings;
++package radmin.client.gui.screens.settings;
+ 
+ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.screens.settings.base.CollectionListSettingScreen;
+-import meteordevelopment.meteorclient.gui.widgets.WWidget;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.StorageBlockListSetting;
+-import meteordevelopment.meteorclient.utils.render.DisplayItemUtils;
++import java.util.Collection;
++import java.util.List;
++import java.util.Map;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.Items;
+ import net.minecraft.world.level.block.entity.BlockEntityType;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.screens.settings.base.CollectionListSettingScreen;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.settings.Setting;
++import radmin.client.settings.StorageBlockListSetting;
++import radmin.client.utils.render.DisplayItemUtils;
+ 
+-import java.util.List;
+-import java.util.Map;
+-
+-public class StorageBlockListSettingScreen extends CollectionListSettingScreen<BlockEntityType<?>> {
+-    private static final Map<BlockEntityType<?>, BlockEntityTypeInfo> BLOCK_ENTITY_TYPE_INFO_MAP = new Object2ObjectOpenHashMap<>();
++public class StorageBlockListSettingScreen
++extends CollectionListSettingScreen<BlockEntityType<?>> {
++    private static final Map<BlockEntityType<?>, BlockEntityTypeInfo> BLOCK_ENTITY_TYPE_INFO_MAP = new Object2ObjectOpenHashMap();
+     private static final BlockEntityTypeInfo UNKNOWN = new BlockEntityTypeInfo(Items.BARRIER, "Unknown");
+ 
++    public StorageBlockListSettingScreen(GuiTheme theme, Setting<List<BlockEntityType<?>>> setting) {
++        super(theme, "Select Storage Blocks", setting, (Collection)setting.get(), StorageBlockListSetting.REGISTRY);
++    }
++
++    @Override
++    protected WWidget getValueWidget(BlockEntityType<?> value) {
++        BlockEntityTypeInfo info = BLOCK_ENTITY_TYPE_INFO_MAP.getOrDefault(value, UNKNOWN);
++        return this.theme.itemWithLabel(DisplayItemUtils.toStack(info.item()), info.name());
++    }
++
++    @Override
++    protected String[] getValueNames(BlockEntityType<?> value) {
++        return new String[]{BLOCK_ENTITY_TYPE_INFO_MAP.getOrDefault(value, UNKNOWN).name(), BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(value).toString()};
++    }
++
+     static {
+-        // Map of storage blocks
+         BLOCK_ENTITY_TYPE_INFO_MAP.put(BlockEntityType.BARREL, new BlockEntityTypeInfo(Items.BARREL, "Barrel"));
+         BLOCK_ENTITY_TYPE_INFO_MAP.put(BlockEntityType.BLAST_FURNACE, new BlockEntityTypeInfo(Items.BLAST_FURNACE, "Blast Furnace"));
+         BLOCK_ENTITY_TYPE_INFO_MAP.put(BlockEntityType.BREWING_STAND, new BlockEntityTypeInfo(Items.BREWING_STAND, "Brewing Stand"));
+@@ -44,24 +64,7 @@
+         BLOCK_ENTITY_TYPE_INFO_MAP.put(BlockEntityType.TRAPPED_CHEST, new BlockEntityTypeInfo(Items.TRAPPED_CHEST, "Trapped Chest"));
+     }
+ 
+-    public StorageBlockListSettingScreen(GuiTheme theme, Setting<List<BlockEntityType<?>>> setting) {
+-        super(theme, "Select Storage Blocks", setting, setting.get(), StorageBlockListSetting.REGISTRY);
+-    }
+-
+-    @Override
+-    protected WWidget getValueWidget(BlockEntityType<?> value) {
+-        BlockEntityTypeInfo info = BLOCK_ENTITY_TYPE_INFO_MAP.getOrDefault(value, UNKNOWN);
+-        return theme.itemWithLabel(DisplayItemUtils.toStack(info.item()), info.name());
+-    }
+-
+-    @Override
+-    protected String[] getValueNames(BlockEntityType<?> value) {
+-        return new String[]{
+-            BLOCK_ENTITY_TYPE_INFO_MAP.getOrDefault(value, UNKNOWN).name(),
+-            BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(value).toString()
+-        };
+-    }
+-
+     private record BlockEntityTypeInfo(Item item, String name) {
+     }
+ }
++

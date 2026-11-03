@@ -1,0 +1,49 @@
+--- upstream261/utils/misc/input/KeyBinds.java
++++ v1decompiled/utils/misc/input/KeyBinds.java
+@@ -1,32 +1,33 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.platform.InputConstants$Type
++ *  net.minecraft.client.KeyMapping
++ *  net.minecraft.client.KeyMapping$Category
++ *  net.minecraft.resources.Identifier
+  */
+-
+-package meteordevelopment.meteorclient.utils.misc.input;
++package radmin.client.utils.misc.input;
+ 
+ import com.mojang.blaze3d.platform.InputConstants;
+-import meteordevelopment.meteorclient.MeteorClient;
+ import net.minecraft.client.KeyMapping;
+-import org.lwjgl.glfw.GLFW;
++import net.minecraft.resources.Identifier;
++import radmin.client.MeteorClient;
+ 
+ public class KeyBinds {
+-    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(MeteorClient.identifier("meteor-client"));
+-
+-    public static KeyMapping OPEN_GUI = new KeyMapping("key.meteor-client.open-gui", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, CATEGORY);
+-    public static KeyMapping OPEN_COMMANDS = new KeyMapping("key.meteor-client.open-commands", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_PERIOD, CATEGORY);
++    private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register((Identifier)MeteorClient.identifier("radmin-client"));
++    public static KeyMapping OPEN_GUI = new KeyMapping("key.radmin-client.open-gui", InputConstants.Type.KEYSYM, 344, CATEGORY);
++    public static KeyMapping OPEN_COMMANDS = new KeyMapping("key.radmin-client.open-commands", InputConstants.Type.KEYSYM, 46, CATEGORY);
+ 
+     private KeyBinds() {
+     }
+ 
+     public static KeyMapping[] apply(KeyMapping[] binds) {
+-        // Add key binding
+         KeyMapping[] newBinds = new KeyMapping[binds.length + 2];
+-
+         System.arraycopy(binds, 0, newBinds, 0, binds.length);
+         newBinds[binds.length] = OPEN_GUI;
+         newBinds[binds.length + 1] = OPEN_COMMANDS;
+-
+         return newBinds;
+     }
+ }
++

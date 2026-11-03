@@ -1,0 +1,91 @@
+--- upstream261/systems/hud/elements/keyboard/KeyDimensions.java
++++ v1decompiled/systems/hud/elements/keyboard/KeyDimensions.java
+@@ -1,12 +1,9 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.hud.elements.keyboard;
++package radmin.client.systems.hud.elements.keyboard;
+ 
+ enum KeyDimensions {
+-    // Standard sizes
+     UNIT_1U(1.0),
+     UNIT_1_25U(1.25),
+     UNIT_1_5U(1.5),
+@@ -17,37 +14,50 @@
+     UNIT_6_25U(6.25);
+ 
+     public final double units;
++    public static final KeyDimensions STANDARD;
++    public static final KeyDimensions TAB;
++    public static final KeyDimensions CAPS_LOCK;
++    public static final KeyDimensions ENTER_ANSI;
++    public static final KeyDimensions LEFT_SHIFT_ANSI;
++    public static final KeyDimensions RIGHT_SHIFT;
++    public static final KeyDimensions BACKSPACE;
++    public static final KeyDimensions LEFT_SHIFT_ISO;
++    public static final KeyDimensions ENTER_ISO_WIDTH;
++    public static final KeyDimensions ENTER_ISO_HEIGHT;
++    public static final KeyDimensions CTRL;
++    public static final KeyDimensions ALT;
++    public static final KeyDimensions GUI;
++    public static final KeyDimensions MENU;
++    public static final KeyDimensions SPACEBAR;
+ 
+-    KeyDimensions(double units) {
++    private KeyDimensions(double units) {
+         this.units = units;
+     }
+ 
+-    /**
+-     * Converts this dimension to pixels, accounting for gaps.
+-     * Multi-unit keys span gaps: 2u key = 2*baseUnit + 1*gap
+-     */
+     public double toPixels(double baseUnit, double gap) {
+-        return units * baseUnit + (units - 1.0) * gap;
++        return this.units * baseUnit + (this.units - 1.0) * gap;
+     }
+ 
+     public double toPixels(double baseUnit) {
+-        return units * baseUnit;
++        return this.units * baseUnit;
+     }
+ 
+-    // Aliases for common keys
+-    public static final KeyDimensions STANDARD = UNIT_1U;
+-    public static final KeyDimensions TAB = UNIT_1_5U;
+-    public static final KeyDimensions CAPS_LOCK = UNIT_1_75U;
+-    public static final KeyDimensions ENTER_ANSI = UNIT_2_25U;
+-    public static final KeyDimensions LEFT_SHIFT_ANSI = UNIT_2_25U;
+-    public static final KeyDimensions RIGHT_SHIFT = UNIT_2_75U;
+-    public static final KeyDimensions BACKSPACE = UNIT_2U;
+-    public static final KeyDimensions LEFT_SHIFT_ISO = UNIT_1_25U;
+-    public static final KeyDimensions ENTER_ISO_WIDTH = UNIT_1_25U;
+-    public static final KeyDimensions ENTER_ISO_HEIGHT = UNIT_2U;
+-    public static final KeyDimensions CTRL = UNIT_1_25U;
+-    public static final KeyDimensions ALT = UNIT_1_25U;
+-    public static final KeyDimensions GUI = UNIT_1_25U;
+-    public static final KeyDimensions MENU = UNIT_1_25U;
+-    public static final KeyDimensions SPACEBAR = UNIT_6_25U;
++    static {
++        STANDARD = UNIT_1U;
++        TAB = UNIT_1_5U;
++        CAPS_LOCK = UNIT_1_75U;
++        ENTER_ANSI = UNIT_2_25U;
++        LEFT_SHIFT_ANSI = UNIT_2_25U;
++        RIGHT_SHIFT = UNIT_2_75U;
++        BACKSPACE = UNIT_2U;
++        LEFT_SHIFT_ISO = UNIT_1_25U;
++        ENTER_ISO_WIDTH = UNIT_1_25U;
++        ENTER_ISO_HEIGHT = UNIT_2U;
++        CTRL = UNIT_1_25U;
++        ALT = UNIT_1_25U;
++        GUI = UNIT_1_25U;
++        MENU = UNIT_1_25U;
++        SPACEBAR = UNIT_6_25U;
++    }
+ }
++

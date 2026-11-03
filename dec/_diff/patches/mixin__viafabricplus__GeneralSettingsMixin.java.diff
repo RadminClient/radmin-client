@@ -1,0 +1,35 @@
+--- upstream261/mixin/viafabricplus/GeneralSettingsMixin.java
++++ v1decompiled/mixin/viafabricplus/GeneralSettingsMixin.java
+@@ -1,21 +1,24 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.llamalad7.mixinextras.injector.ModifyExpressionValue
++ *  com.viaversion.viafabricplus.settings.impl.GeneralSettings
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.injection.At
+  */
+-
+-package meteordevelopment.meteorclient.mixin.viafabricplus;
++package radmin.client.mixin.viafabricplus;
+ 
+ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+ import com.viaversion.viafabricplus.settings.impl.GeneralSettings;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.injection.At;
+ 
+-@Mixin(GeneralSettings.class)
++@Mixin(value={GeneralSettings.class})
+ public abstract class GeneralSettingsMixin {
+-    // specifies the '2' value on this line:
+-    // public final ModeSetting multiplayerScreenButtonOrientation = new ModeSetting(this, Text.translatable("general_settings.viafabricplus.multiplayer_screen_button_orientation"), 2, ORIENTATION_OPTIONS);
+-    @ModifyExpressionValue(method = "<init>", at = @At(value = "CONSTANT", args = "intValue=2", ordinal = 1), remap = false)
++    @ModifyExpressionValue(method={"<init>"}, at={@At(value="CONSTANT", args={"intValue=2"}, ordinal=1)}, remap=false)
+     private int modifyDefaultPosition(int original) {
+         return 4;
+     }
+ }
++

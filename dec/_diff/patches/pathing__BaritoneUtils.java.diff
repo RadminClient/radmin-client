@@ -1,0 +1,29 @@
+--- upstream261/pathing/BaritoneUtils.java
++++ v1decompiled/pathing/BaritoneUtils.java
+@@ -1,9 +1,10 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  baritone.api.BaritoneAPI
+  */
+-
+-package meteordevelopment.meteorclient.pathing;
++package radmin.client.pathing;
+ 
+ import baritone.api.BaritoneAPI;
+ 
+@@ -15,9 +16,9 @@
+ 
+     public static String getPrefix() {
+         if (IS_AVAILABLE) {
+-            return BaritoneAPI.getSettings().prefix.value;
++            return (String)BaritoneAPI.getSettings().prefix.value;
+         }
+-
+         return "";
+     }
+ }
++

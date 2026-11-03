@@ -1,0 +1,101 @@
+--- upstream261/systems/modules/misc/swarm/SwarmConnection.java
++++ v1decompiled/systems/modules/misc/swarm/SwarmConnection.java
+@@ -1,70 +1,65 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules.misc.swarm;
+-
+-import meteordevelopment.meteorclient.utils.player.ChatUtils;
++package radmin.client.systems.modules.misc.swarm;
+ 
+ import java.io.DataOutputStream;
+ import java.io.IOException;
+ import java.net.Socket;
++import radmin.client.utils.player.ChatUtils;
+ 
+-public class SwarmConnection extends Thread {
++public class SwarmConnection
++extends Thread {
+     public final Socket socket;
+     public String messageToSend;
+ 
+     public SwarmConnection(Socket socket) {
+         this.socket = socket;
+-        start();
++        this.start();
+     }
+ 
+     @Override
+     public void run() {
+-        ChatUtils.infoPrefix("Swarm", "New worker connected on %s.", getIp(socket.getInetAddress().getHostAddress()));
+-
++        ChatUtils.infoPrefix("Swarm", "New worker connected on %s.", this.getIp(this.socket.getInetAddress().getHostAddress()));
+         try {
+-            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+-
+-            while (!isInterrupted()) {
+-                if (messageToSend != null) {
+-                    try {
+-                        out.writeUTF(messageToSend);
+-                        out.flush();
+-                    } catch (Exception e) {
+-                        ChatUtils.errorPrefix("Swarm", "Encountered error when sending command.");
+-                        e.printStackTrace();
+-                    }
+-
+-                    messageToSend = null;
++            DataOutputStream out = new DataOutputStream(this.socket.getOutputStream());
++            while (!this.isInterrupted()) {
++                if (this.messageToSend == null) continue;
++                try {
++                    out.writeUTF(this.messageToSend);
++                    out.flush();
+                 }
++                catch (Exception e) {
++                    ChatUtils.errorPrefix("Swarm", "Encountered error when sending command.", new Object[0]);
++                    e.printStackTrace();
++                }
++                this.messageToSend = null;
+             }
+-
+             out.close();
+-        } catch (IOException e) {
+-            ChatUtils.infoPrefix("Swarm", "Error creating a connection with %s on port %s.", getIp(socket.getInetAddress().getHostAddress()), socket.getPort());
++        }
++        catch (IOException e) {
++            ChatUtils.infoPrefix("Swarm", "Error creating a connection with %s on port %s.", this.getIp(this.socket.getInetAddress().getHostAddress()), this.socket.getPort());
+             e.printStackTrace();
+         }
+     }
+ 
+     public void disconnect() {
+         try {
+-            socket.close();
+-        } catch (IOException e) {
++            this.socket.close();
++        }
++        catch (IOException e) {
+             e.printStackTrace();
+         }
+-
+-        ChatUtils.infoPrefix("Swarm", "Worker disconnected on ip: %s.", socket.getInetAddress().getHostAddress());
+-
+-        interrupt();
++        ChatUtils.infoPrefix("Swarm", "Worker disconnected on ip: %s.", this.socket.getInetAddress().getHostAddress());
++        this.interrupt();
+     }
+ 
+     public String getConnection() {
+-        return getIp(socket.getInetAddress().getHostAddress()) + ":" + socket.getPort();
++        return this.getIp(this.socket.getInetAddress().getHostAddress()) + ":" + this.socket.getPort();
+     }
+ 
+     private String getIp(String ip) {
+         return ip.equals("127.0.0.1") ? "localhost" : ip;
+     }
+ }
++

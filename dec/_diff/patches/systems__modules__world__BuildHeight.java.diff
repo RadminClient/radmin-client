@@ -1,0 +1,58 @@
+--- upstream261/systems/modules/world/BuildHeight.java
++++ v1decompiled/systems/modules/world/BuildHeight.java
+@@ -1,29 +1,42 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.core.Direction
++ *  net.minecraft.network.protocol.Packet
++ *  net.minecraft.network.protocol.game.ServerboundUseItemOnPacket
+  */
++package radmin.client.systems.modules.world;
+ 
+-package meteordevelopment.meteorclient.systems.modules.world;
+-
+-import meteordevelopment.meteorclient.events.packets.PacketEvent;
+-import meteordevelopment.meteorclient.mixin.BlockHitResultAccessor;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.core.Direction;
++import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
++import radmin.client.events.packets.PacketEvent;
++import radmin.client.mixin.BlockHitResultAccessor;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
+ 
+-public class BuildHeight extends Module {
++public class BuildHeight
++extends Module {
+     public BuildHeight() {
+         super(Categories.World, "build-height", "Allows you to interact with objects at the build limit.");
+     }
+ 
+     @EventHandler
+     private void onSendPacket(PacketEvent.Send event) {
+-        if (!(event.packet instanceof ServerboundUseItemOnPacket p)) return;
+-        if (mc.level == null) return;
+-        if (p.getHitResult().getLocation().y >= mc.level.getHeight() && p.getHitResult().getDirection() == Direction.UP) {
+-            ((BlockHitResultAccessor) p.getHitResult()).meteor$setDirection(Direction.DOWN);
++        Packet<?> packet = event.packet;
++        if (!(packet instanceof ServerboundUseItemOnPacket)) {
++            return;
++        }
++        ServerboundUseItemOnPacket p = (ServerboundUseItemOnPacket)packet;
++        if (this.mc.level == null) {
++            return;
++        }
++        if (p.getHitResult().getLocation().y >= (double)this.mc.level.getHeight() && p.getHitResult().getDirection() == Direction.UP) {
++            ((BlockHitResultAccessor)p.getHitResult()).meteor$setDirection(Direction.DOWN);
+         }
+     }
+ }
++

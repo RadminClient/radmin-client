@@ -1,0 +1,25 @@
+--- upstream261/systems/modules/misc/BetterBeacons.java
++++ v1decompiled/systems/modules/misc/BetterBeacons.java
+@@ -1,15 +1,15 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.systems.modules.misc;
+ 
+-package meteordevelopment.meteorclient.systems.modules.misc;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
+ 
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-
+-public class BetterBeacons extends Module {
++public class BetterBeacons
++extends Module {
+     public BetterBeacons() {
+         super(Categories.Misc, "better-beacons", "Select effects unaffected by beacon level.");
+     }
+ }
++

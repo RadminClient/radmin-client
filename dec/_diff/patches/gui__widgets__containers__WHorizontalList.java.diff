@@ -1,0 +1,103 @@
+--- upstream261/gui/widgets/containers/WHorizontalList.java
++++ v1decompiled/gui/widgets/containers/WHorizontalList.java
+@@ -1,64 +1,59 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.widgets.containers;
+ 
+-package meteordevelopment.meteorclient.gui.widgets.containers;
++import radmin.client.gui.utils.Cell;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.gui.widgets.containers.WContainer;
+ 
+-import meteordevelopment.meteorclient.gui.utils.Cell;
+-
+-public class WHorizontalList extends WContainer {
+-    public double spacing = 3;
+-
++public class WHorizontalList
++extends WContainer {
++    public double spacing = 3.0;
+     protected double calculatedWidth;
+     protected int fillXCount;
+ 
+     protected double spacing() {
+-        return theme.scale(spacing);
++        return this.theme.scale(this.spacing);
+     }
+ 
+     @Override
+     protected void onCalculateSize() {
+-        width = 0;
+-        height = 0;
+-
+-        fillXCount = 0;
+-
+-        for (int i = 0; i < cells.size(); i++) {
+-            Cell<?> cell = cells.get(i);
+-
+-            if (i > 0) width += spacing();
+-
+-            width += cell.padLeft() + cell.widget().width + cell.padRight();
+-            height = Math.max(height, cell.padTop() + cell.widget().height + cell.padBottom());
+-
+-            if (cell.expandCellX) fillXCount++;
++        this.width = 0.0;
++        this.height = 0.0;
++        this.fillXCount = 0;
++        for (int i = 0; i < this.cells.size(); ++i) {
++            Cell cell = (Cell)this.cells.get(i);
++            if (i > 0) {
++                this.width += this.spacing();
++            }
++            this.width += cell.padLeft() + ((WWidget)cell.widget()).width + cell.padRight();
++            this.height = Math.max(this.height, cell.padTop() + ((WWidget)cell.widget()).height + cell.padBottom());
++            if (!cell.expandCellX) continue;
++            ++this.fillXCount;
+         }
+-
+-        calculatedWidth = width;
++        this.calculatedWidth = this.width;
+     }
+ 
+     @Override
+     protected void onCalculateWidgetPositions() {
+         double x = this.x;
+-        double fillXWidth = (width - calculatedWidth) / fillXCount;
+-
+-        for (int i = 0; i < cells.size(); i++) {
+-            Cell<?> cell = cells.get(i);
+-
+-            if (i > 0) x += spacing();
+-            x += cell.padLeft();
+-
+-            cell.x = x;
+-            cell.y = y + cell.padTop();
+-
+-            cell.width = cell.widget().width;
+-            cell.height = height - cell.padTop() - cell.padTop();
+-
+-            if (cell.expandCellX) cell.width += fillXWidth;
++        double fillXWidth = (this.width - this.calculatedWidth) / (double)this.fillXCount;
++        for (int i = 0; i < this.cells.size(); ++i) {
++            Cell cell = (Cell)this.cells.get(i);
++            if (i > 0) {
++                x += this.spacing();
++            }
++            cell.x = x += cell.padLeft();
++            cell.y = this.y + cell.padTop();
++            cell.width = ((WWidget)cell.widget()).width;
++            cell.height = this.height - cell.padTop() - cell.padTop();
++            if (cell.expandCellX) {
++                cell.width += fillXWidth;
++            }
+             cell.alignWidget();
+-
+             x += cell.width + cell.padRight();
+         }
+     }
+ }
++

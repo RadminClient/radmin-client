@@ -1,0 +1,25 @@
+--- upstream261/mixininterface/IMinecraft.java
++++ v1decompiled/mixininterface/IMinecraft.java
+@@ -1,14 +1,16 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.pipeline.RenderTarget
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ import com.mojang.blaze3d.pipeline.RenderTarget;
+ 
+ public interface IMinecraft {
+-    void meteor$rightClick();
++    public void meteor$rightClick();
+ 
+-    void meteor$setFramebuffer(RenderTarget framebuffer);
++    public void meteor$setFramebuffer(RenderTarget var1);
+ }
++

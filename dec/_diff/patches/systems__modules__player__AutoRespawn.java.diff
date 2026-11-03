@@ -1,0 +1,55 @@
+--- upstream261/systems/modules/player/AutoRespawn.java
++++ v1decompiled/systems/modules/player/AutoRespawn.java
+@@ -1,30 +1,34 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.client.gui.screens.DeathScreen
+  */
++package radmin.client.systems.modules.player;
+ 
+-package meteordevelopment.meteorclient.systems.modules.player;
++import meteordevelopment.orbit.EventHandler;
++import net.minecraft.client.gui.screens.DeathScreen;
++import radmin.client.events.game.OpenScreenEvent;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.render.WaypointsModule;
+ 
+-import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.render.WaypointsModule;
+-import meteordevelopment.orbit.EventHandler;
+-import meteordevelopment.orbit.EventPriority;
+-import net.minecraft.client.gui.screens.DeathScreen;
+-
+-public class AutoRespawn extends Module {
++public class AutoRespawn
++extends Module {
+     public AutoRespawn() {
+         super(Categories.Player, "auto-respawn", "Automatically respawns after death.");
+     }
+ 
+-    @EventHandler(priority = EventPriority.HIGH)
++    @EventHandler(priority=100)
+     private void onOpenScreenEvent(OpenScreenEvent event) {
+-        if (!(event.screen instanceof DeathScreen)) return;
+-
+-        Modules.get().get(WaypointsModule.class).addDeath(mc.player.position());
+-        mc.player.respawn();
++        if (!(event.screen instanceof DeathScreen)) {
++            return;
++        }
++        Modules.get().get(WaypointsModule.class).addDeath(this.mc.player.position());
++        this.mc.player.respawn();
+         event.cancel();
+     }
+ }
++

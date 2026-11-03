@@ -1,0 +1,31 @@
+--- upstream261/mixininterface/IAABB.java
++++ v1decompiled/mixininterface/IAABB.java
+@@ -1,18 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.BlockPos
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ import net.minecraft.core.BlockPos;
+ 
+ public interface IAABB {
+-    void meteor$expand(double v);
++    public void meteor$expand(double var1);
+ 
+-    void meteor$set(double x1, double y1, double z1, double x2, double y2, double z2);
++    public void meteor$set(double var1, double var3, double var5, double var7, double var9, double var11);
+ 
+-    default void meteor$set(BlockPos pos) {
+-        meteor$set(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
++    default public void meteor$set(BlockPos pos) {
++        this.meteor$set(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
+     }
+ }
++

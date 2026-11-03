@@ -1,0 +1,87 @@
+--- upstream261/mixin/GuiMessageVisibleMixin.java
++++ v1decompiled/mixin/GuiMessageVisibleMixin.java
+@@ -1,21 +1,29 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.authlib.GameProfile
++ *  net.minecraft.client.multiplayer.chat.GuiMessage$Line
++ *  net.minecraft.util.FormattedCharSequence
++ *  org.spongepowered.asm.mixin.Final
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Shadow
++ *  org.spongepowered.asm.mixin.Unique
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import com.mojang.authlib.GameProfile;
+-import meteordevelopment.meteorclient.mixininterface.IGuiMessageVisible;
+ import net.minecraft.client.multiplayer.chat.GuiMessage;
+ import net.minecraft.util.FormattedCharSequence;
+ import org.spongepowered.asm.mixin.Final;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Shadow;
+ import org.spongepowered.asm.mixin.Unique;
++import radmin.client.mixininterface.IGuiMessageVisible;
+ 
+-@Mixin(GuiMessage.Line.class)
+-public abstract class GuiMessageVisibleMixin implements IGuiMessageVisible {
++@Mixin(value={GuiMessage.Line.class})
++public abstract class GuiMessageVisibleMixin
++implements IGuiMessageVisible {
+     @Shadow
+     @Final
+     private FormattedCharSequence content;
+@@ -29,18 +37,16 @@
+     @Override
+     public String meteor$getText() {
+         StringBuilder sb = new StringBuilder();
+-
+-        content.accept((_, _, codePoint) -> {
++        this.content.accept((n, style, codePoint) -> {
+             sb.appendCodePoint(codePoint);
+             return true;
+         });
+-
+         return sb.toString();
+     }
+ 
+     @Override
+     public int meteor$getId() {
+-        return id;
++        return this.id;
+     }
+ 
+     @Override
+@@ -50,21 +56,22 @@
+ 
+     @Override
+     public GameProfile meteor$getSender() {
+-        return sender;
++        return this.sender;
+     }
+ 
+     @Override
+     public void meteor$setSender(GameProfile profile) {
+-        sender = profile;
++        this.sender = profile;
+     }
+ 
+     @Override
+     public boolean meteor$isStartOfEntry() {
+-        return startOfEntry;
++        return this.startOfEntry;
+     }
+ 
+     @Override
+     public void meteor$setStartOfEntry(boolean start) {
+-        startOfEntry = start;
++        this.startOfEntry = start;
+     }
+ }
++

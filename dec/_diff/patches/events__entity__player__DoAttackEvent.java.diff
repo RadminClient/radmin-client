@@ -1,0 +1,25 @@
+--- upstream261/events/entity/player/DoAttackEvent.java
++++ v1decompiled/events/entity/player/DoAttackEvent.java
+@@ -1,16 +1,16 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.events.entity.player;
+ 
+-package meteordevelopment.meteorclient.events.entity.player;
++import radmin.client.events.Cancellable;
+ 
+-import meteordevelopment.meteorclient.events.Cancellable;
+-
+-public class DoAttackEvent extends Cancellable {
++public class DoAttackEvent
++extends Cancellable {
+     private static final DoAttackEvent INSTANCE = new DoAttackEvent();
+ 
+     public static DoAttackEvent get() {
+         return INSTANCE;
+     }
+ }
++

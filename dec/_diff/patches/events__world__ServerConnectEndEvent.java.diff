@@ -1,0 +1,24 @@
+--- upstream261/events/world/ServerConnectEndEvent.java
++++ v1decompiled/events/world/ServerConnectEndEvent.java
+@@ -1,9 +1,7 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.events.world;
++package radmin.client.events.world;
+ 
+ import java.net.InetSocketAddress;
+ 
+@@ -12,7 +10,8 @@
+     public InetSocketAddress address;
+ 
+     public static ServerConnectEndEvent get(InetSocketAddress address) {
+-        INSTANCE.address = address;
++        ServerConnectEndEvent.INSTANCE.address = address;
+         return INSTANCE;
+     }
+ }
++

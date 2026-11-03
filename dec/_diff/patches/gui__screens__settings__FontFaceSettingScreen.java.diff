@@ -1,0 +1,144 @@
+--- upstream261/gui/screens/settings/FontFaceSettingScreen.java
++++ v1decompiled/gui/screens/settings/FontFaceSettingScreen.java
+@@ -1,92 +1,81 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  org.apache.commons.lang3.Strings
+  */
+-
+-package meteordevelopment.meteorclient.gui.screens.settings;
+-
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WindowScreen;
+-import meteordevelopment.meteorclient.gui.utils.Cell;
+-import meteordevelopment.meteorclient.gui.widgets.WLabel;
+-import meteordevelopment.meteorclient.gui.widgets.WWidget;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WTable;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WView;
+-import meteordevelopment.meteorclient.gui.widgets.input.WDropdown;
+-import meteordevelopment.meteorclient.gui.widgets.input.WTextBox;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import meteordevelopment.meteorclient.renderer.Fonts;
+-import meteordevelopment.meteorclient.renderer.text.FontFamily;
+-import meteordevelopment.meteorclient.renderer.text.FontInfo;
+-import meteordevelopment.meteorclient.settings.FontFaceSetting;
+-import org.apache.commons.lang3.Strings;
++package radmin.client.gui.screens.settings;
+ 
+ import java.util.List;
++import org.apache.commons.lang3.Strings;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WindowScreen;
++import radmin.client.gui.utils.Cell;
++import radmin.client.gui.widgets.WLabel;
++import radmin.client.gui.widgets.containers.WTable;
++import radmin.client.gui.widgets.containers.WView;
++import radmin.client.gui.widgets.input.WDropdown;
++import radmin.client.gui.widgets.input.WTextBox;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.renderer.Fonts;
++import radmin.client.renderer.text.FontFamily;
++import radmin.client.renderer.text.FontInfo;
++import radmin.client.settings.FontFaceSetting;
+ 
+-public class FontFaceSettingScreen extends WindowScreen {
++public class FontFaceSettingScreen
++extends WindowScreen {
+     private final FontFaceSetting setting;
+-
+     private WTable table;
+-
+     private WTextBox filter;
+     private String filterText = "";
+ 
+     public FontFaceSettingScreen(GuiTheme theme, FontFaceSetting setting) {
+         super(theme, "Select Font");
+-
+         this.setting = setting;
+     }
+ 
+     @Override
+     public void initWidgets() {
+-        filter = add(theme.textBox("")).expandX().widget();
+-        filter.setFocused(true);
+-        filter.action = () -> {
+-            filterText = filter.get().trim();
+-
+-            table.clear();
+-            initTable();
++        this.filter = this.add(this.theme.textBox("")).expandX().widget();
++        this.filter.setFocused(true);
++        this.filter.action = () -> {
++            this.filterText = this.filter.get().trim();
++            this.table.clear();
++            this.initTable();
+         };
+-
+-        window.view.hasScrollBar = false;
+-
+-        enterAction = () -> {
+-            List<Cell<?>> row = table.getRow(0);
+-            if (row == null) return;
+-
+-            WWidget widget = row.get(2).widget();
+-            if (widget instanceof WButton button) {
++        this.window.view.hasScrollBar = false;
++        this.enterAction = () -> {
++            List<Cell<?>> row = this.table.getRow(0);
++            if (row == null) {
++                return;
++            }
++            Object widget = row.get(2).widget();
++            if (widget instanceof WButton) {
++                WButton button = (WButton)widget;
+                 button.action.run();
+             }
+         };
+-
+-        WView view = add(theme.view()).expandX().widget();
+-        // Prevents double scrolling for view-in-view scenario
+-        view.maxHeight = window.view.maxHeight - 128;
++        WView view = this.add(this.theme.view()).expandX().widget();
++        view.maxHeight = this.window.view.maxHeight - 128.0;
+         view.scrollOnlyWhenMouseOver = false;
+-
+-        table = view.add(theme.table()).expandX().widget();
+-
+-        initTable();
++        this.table = view.add(this.theme.table()).expandX().widget();
++        this.initTable();
+     }
+ 
+     private void initTable() {
+         for (FontFamily fontFamily : Fonts.FONT_FAMILIES) {
+             String name = fontFamily.getName();
+-
+-            WLabel item = theme.label(name);
+-            if (!filterText.isEmpty() && !Strings.CI.contains(name, filterText)) continue;
+-            table.add(item);
+-
+-            WDropdown<FontInfo.Type> dropdown = table.add(theme.dropdown(FontInfo.Type.Regular)).right().widget();
+-
+-            WButton select = table.add(theme.button("Select")).expandCellX().right().widget();
++            WLabel item = this.theme.label(name);
++            if (!this.filterText.isEmpty() && !Strings.CI.contains((CharSequence)name, (CharSequence)this.filterText)) continue;
++            this.table.add(item);
++            WDropdown<FontInfo.Type> dropdown = this.table.add(this.theme.dropdown(FontInfo.Type.Regular)).right().widget();
++            WButton select = this.table.add(this.theme.button("Select")).expandCellX().right().widget();
+             select.action = () -> {
+-                setting.set(fontFamily.get(dropdown.get()));
+-                onClose();
++                this.setting.set(fontFamily.get((FontInfo.Type)((Object)((Object)dropdown.get()))));
++                this.onClose();
+             };
+-
+-            table.row();
++            this.table.row();
+         }
+     }
+ }
++

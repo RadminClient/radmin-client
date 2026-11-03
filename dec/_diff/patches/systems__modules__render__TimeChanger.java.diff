@@ -1,0 +1,91 @@
+--- upstream261/systems/modules/render/TimeChanger.java
++++ v1decompiled/systems/modules/render/TimeChanger.java
+@@ -1,57 +1,59 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.network.protocol.Packet
++ *  net.minecraft.network.protocol.game.ClientboundSetTimePacket
+  */
++package radmin.client.systems.modules.render;
+ 
+-package meteordevelopment.meteorclient.systems.modules.render;
++import meteordevelopment.orbit.EventHandler;
++import net.minecraft.network.protocol.Packet;
++import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
++import radmin.client.events.packets.PacketEvent;
++import radmin.client.events.world.TickEvent;
++import radmin.client.settings.DoubleSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
+ 
+-import meteordevelopment.meteorclient.events.packets.PacketEvent;
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.settings.DoubleSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.orbit.EventHandler;
+-import net.minecraft.network.protocol.game.ClientboundSetTimePacket;
+-
+-public class TimeChanger extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<Double> time = sgGeneral.add(new DoubleSetting.Builder()
+-        .name("time")
+-        .description("The specified time to be set.")
+-        .defaultValue(0)
+-        .sliderRange(-20000, 20000)
+-        .build()
+-    );
+-
++public class TimeChanger
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final Setting<Double> time;
+     long oldTime;
+ 
+     public TimeChanger() {
+         super(Categories.Render, "time-changer", "Makes you able to set a custom time.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.time = this.sgGeneral.add(((DoubleSetting.Builder)((DoubleSetting.Builder)new DoubleSetting.Builder().name("time")).description("The specified time to be set.")).defaultValue(0.0).sliderRange(-20000.0, 20000.0).build());
+     }
+ 
+     @Override
+     public void onActivate() {
+-        oldTime = mc.level.getGameTime();
++        this.oldTime = this.mc.level.getGameTime();
+     }
+ 
+     @Override
+     public void onDeactivate() {
+-        mc.level.getLevelData().setGameTime(oldTime);
++        this.mc.level.getLevelData().setGameTime(this.oldTime);
+     }
+ 
+     @EventHandler
+     private void onPacketReceive(PacketEvent.Receive event) {
+-        if (event.packet instanceof ClientboundSetTimePacket packet) {
+-            oldTime = packet.gameTime();
++        Packet<?> packet = event.packet;
++        if (packet instanceof ClientboundSetTimePacket) {
++            ClientboundSetTimePacket packet2 = (ClientboundSetTimePacket)packet;
++            this.oldTime = packet2.gameTime();
+             event.cancel();
+         }
+     }
+ 
+     @EventHandler
+     private void onTick(TickEvent.Post event) {
+-        mc.level.getLevelData().setGameTime(time.get().longValue());
++        this.mc.level.getLevelData().setGameTime(this.time.get().longValue());
+     }
+ }
++

@@ -1,0 +1,47 @@
+--- upstream261/mixin/PowderSnowBlockMixin.java
++++ v1decompiled/mixin/PowderSnowBlockMixin.java
+@@ -1,25 +1,32 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.llamalad7.mixinextras.injector.ModifyReturnValue
++ *  net.minecraft.world.entity.Entity
++ *  net.minecraft.world.level.block.PowderSnowBlock
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.injection.At
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.movement.Jesus;
++import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.level.block.PowderSnowBlock;
+-import net.minecraft.world.entity.Entity;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.injection.At;
++import radmin.client.MeteorClient;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.movement.Jesus;
+ 
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-@Mixin(PowderSnowBlock.class)
++@Mixin(value={PowderSnowBlock.class})
+ public abstract class PowderSnowBlockMixin {
+-    @ModifyReturnValue(method = "canEntityWalkOnPowderSnow", at = @At("RETURN"))
++    @ModifyReturnValue(method={"canEntityWalkOnPowderSnow"}, at={@At(value="RETURN")})
+     private static boolean onCanWalkOnPowderSnow(boolean original, Entity entity) {
+-        if (entity == mc.player && Modules.get().get(Jesus.class).canWalkOnPowderSnow()) return true;
++        if (entity == MeteorClient.mc.player && Modules.get().get(Jesus.class).canWalkOnPowderSnow()) {
++            return true;
++        }
+         return original;
+     }
+ }
++

@@ -1,0 +1,21 @@
+--- upstream261/systems/hud/Alignment.java
++++ v1decompiled/systems/hud/Alignment.java
+@@ -1,13 +1,13 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.hud;
++package radmin.client.systems.hud;
+ 
+ public enum Alignment {
+     Auto,
+     Left,
+     Center,
+-    Right
++    Right;
++
+ }
++

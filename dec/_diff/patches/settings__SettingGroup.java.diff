@@ -1,0 +1,131 @@
+--- upstream261/settings/SettingGroup.java
++++ v1decompiled/settings/SettingGroup.java
+@@ -1,25 +1,30 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.ListTag
++ *  net.minecraft.nbt.Tag
++ *  org.jetbrains.annotations.NotNull
+  */
++package radmin.client.settings;
+ 
+-package meteordevelopment.meteorclient.settings;
+-
+-import meteordevelopment.meteorclient.utils.misc.ISerializable;
++import java.util.ArrayList;
++import java.util.Iterator;
++import java.util.List;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.nbt.ListTag;
+ import net.minecraft.nbt.Tag;
+ import org.jetbrains.annotations.NotNull;
++import radmin.client.settings.Setting;
++import radmin.client.utils.misc.ISerializable;
+ 
+-import java.util.ArrayList;
+-import java.util.Iterator;
+-import java.util.List;
+-
+-public class SettingGroup implements ISerializable<SettingGroup>, Iterable<Setting<?>> {
++public class SettingGroup
++implements ISerializable<SettingGroup>,
++Iterable<Setting<?>> {
+     public final String name;
+     public boolean sectionExpanded;
+-
+-    final List<Setting<?>> settings = new ArrayList<>(1);
++    final List<Setting<?>> settings = new ArrayList(1);
+ 
+     SettingGroup(String name, boolean sectionExpanded) {
+         this.name = name;
+@@ -28,62 +33,62 @@
+ 
+     public Setting<?> get(String name) {
+         for (Setting<?> setting : this) {
+-            if (setting.name.equals(name)) return setting;
++            if (!setting.name.equals(name)) continue;
++            return setting;
+         }
+-
+         return null;
+     }
+ 
+     public <T extends Setting<?>> T add(T setting) {
+-        settings.add(setting);
+-
++        this.settings.add(setting);
+         return setting;
+     }
+ 
+     public Setting<?> getByIndex(int index) {
+-        return settings.get(index);
++        return this.settings.get(index);
+     }
+ 
+     public boolean wasChanged() {
+-        for (Setting<?> setting : settings) {
+-            if (setting.wasChanged()) return true;
++        for (Setting<?> setting : this.settings) {
++            if (!setting.wasChanged()) continue;
++            return true;
+         }
+         return false;
+     }
+ 
+     @Override
+-    public @NotNull Iterator<Setting<?>> iterator() {
+-        return settings.iterator();
++    @NotNull
++    public Iterator<Setting<?>> iterator() {
++        return this.settings.iterator();
+     }
+ 
+     @Override
+     public CompoundTag toTag() {
+         CompoundTag tag = new CompoundTag();
+-
+-        tag.putString("name", name);
+-        tag.putBoolean("sectionExpanded", sectionExpanded);
+-
++        tag.putString("name", this.name);
++        tag.putBoolean("sectionExpanded", this.sectionExpanded);
+         ListTag settingsTag = new ListTag();
+         for (Setting<?> setting : this) {
+-            if (setting.wasChanged()) settingsTag.add(setting.toTag());
++            if (!setting.wasChanged()) continue;
++            settingsTag.add((Object)setting.toTag());
+         }
+-        if (!settingsTag.isEmpty()) tag.put("settings", settingsTag);
+-
++        if (!settingsTag.isEmpty()) {
++            tag.put("settings", (Tag)settingsTag);
++        }
+         return tag;
+     }
+ 
+     @Override
+     public SettingGroup fromTag(CompoundTag tag) {
+-        sectionExpanded = tag.getBooleanOr("sectionExpanded", false);
+-
++        this.sectionExpanded = tag.getBooleanOr("sectionExpanded", false);
+         ListTag settingsTag = tag.getListOrEmpty("settings");
+         for (Tag t : settingsTag) {
+-            CompoundTag settingTag = (CompoundTag) t;
+-
+-            Setting<?> setting = get(settingTag.getStringOr("name", ""));
+-            if (setting != null) setting.fromTag(settingTag);
++            CompoundTag settingTag = (CompoundTag)t;
++            Setting<?> setting = this.get(settingTag.getStringOr("name", ""));
++            if (setting == null) continue;
++            setting.fromTag(settingTag);
+         }
+-
+         return this;
+     }
+ }
++

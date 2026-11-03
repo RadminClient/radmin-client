@@ -1,0 +1,40 @@
+--- upstream261/renderer/text/BuiltinFontFace.java
++++ v1decompiled/renderer/text/BuiltinFontFace.java
+@@ -1,19 +1,26 @@
+-package meteordevelopment.meteorclient.renderer.text;
+-
+-import meteordevelopment.meteorclient.utils.render.FontUtils;
+-import org.jspecify.annotations.NullMarked;
++/*
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  org.jspecify.annotations.NullMarked
++ */
++package radmin.client.renderer.text;
+ 
+ import java.io.InputStream;
+ import java.nio.channels.Channels;
+ import java.nio.channels.ReadableByteChannel;
++import org.jspecify.annotations.NullMarked;
++import radmin.client.renderer.text.FontFace;
++import radmin.client.renderer.text.FontInfo;
++import radmin.client.utils.render.FontUtils;
+ 
+ @NullMarked
+-public non-sealed class BuiltinFontFace extends FontFace {
++public non-sealed class BuiltinFontFace
++extends FontFace {
+     private final String name;
+ 
+     public BuiltinFontFace(FontInfo info, String name) {
+         super(info);
+-
+         this.name = name;
+     }
+ 
+@@ -31,3 +38,4 @@
+         return super.toString() + " (builtin)";
+     }
+ }
++

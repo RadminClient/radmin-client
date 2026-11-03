@@ -1,0 +1,73 @@
+--- upstream261/events/render/RenderBossBarEvent.java
++++ v1decompiled/events/render/RenderBossBarEvent.java
+@@ -1,48 +1,48 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.components.LerpingBossEvent
++ *  net.minecraft.network.chat.Component
+  */
++package radmin.client.events.render;
+ 
+-package meteordevelopment.meteorclient.events.render;
+-
++import java.util.Iterator;
+ import net.minecraft.client.gui.components.LerpingBossEvent;
+ import net.minecraft.network.chat.Component;
+ 
+-import java.util.Iterator;
++public class RenderBossBarEvent {
+ 
+-public class RenderBossBarEvent {
+-    public static class BossText {
+-        private static final BossText INSTANCE = new BossText();
++    public static class BossIterator {
++        private static final BossIterator INSTANCE = new BossIterator();
++        public Iterator<LerpingBossEvent> iterator;
+ 
+-        public LerpingBossEvent bossBar;
+-        public Component name;
+-
+-        public static BossText get(LerpingBossEvent bossBar, Component name) {
+-            INSTANCE.bossBar = bossBar;
+-            INSTANCE.name = name;
++        public static BossIterator get(Iterator<LerpingBossEvent> iterator) {
++            BossIterator.INSTANCE.iterator = iterator;
+             return INSTANCE;
+         }
+     }
+ 
+     public static class BossSpacing {
+         private static final BossSpacing INSTANCE = new BossSpacing();
+-
+         public int spacing;
+ 
+         public static BossSpacing get(int spacing) {
+-            INSTANCE.spacing = spacing;
++            BossSpacing.INSTANCE.spacing = spacing;
+             return INSTANCE;
+         }
+     }
+ 
+-    public static class BossIterator {
+-        private static final BossIterator INSTANCE = new BossIterator();
++    public static class BossText {
++        private static final BossText INSTANCE = new BossText();
++        public LerpingBossEvent bossBar;
++        public Component name;
+ 
+-        public Iterator<LerpingBossEvent> iterator;
+-
+-        public static BossIterator get(Iterator<LerpingBossEvent> iterator) {
+-            INSTANCE.iterator = iterator;
++        public static BossText get(LerpingBossEvent bossBar, Component name) {
++            BossText.INSTANCE.bossBar = bossBar;
++            BossText.INSTANCE.name = name;
+             return INSTANCE;
+         }
+     }
+ }
++

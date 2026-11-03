@@ -1,0 +1,149 @@
+--- upstream261/mixin/DisconnectedScreenMixin.java
++++ v1decompiled/mixin/DisconnectedScreenMixin.java
+@@ -1,18 +1,42 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  it.unimi.dsi.fastutil.Pair
++ *  net.minecraft.client.Minecraft
++ *  net.minecraft.client.gui.components.Button
++ *  net.minecraft.client.gui.components.Button$Builder
++ *  net.minecraft.client.gui.layouts.LayoutElement
++ *  net.minecraft.client.gui.layouts.LinearLayout
++ *  net.minecraft.client.gui.screens.ConnectScreen
++ *  net.minecraft.client.gui.screens.DisconnectedScreen
++ *  net.minecraft.client.gui.screens.Screen
++ *  net.minecraft.client.gui.screens.TitleScreen
++ *  net.minecraft.client.multiplayer.ServerData
++ *  net.minecraft.client.multiplayer.resolver.ServerAddress
++ *  net.minecraft.network.chat.Component
++ *  org.spongepowered.asm.mixin.Final
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Shadow
++ *  org.spongepowered.asm.mixin.Unique
++ *  org.spongepowered.asm.mixin.injection.At
++ *  org.spongepowered.asm.mixin.injection.At$Shift
++ *  org.spongepowered.asm.mixin.injection.Inject
++ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.misc.AutoReconnect;
++import it.unimi.dsi.fastutil.Pair;
++import net.minecraft.client.Minecraft;
+ import net.minecraft.client.gui.components.Button;
++import net.minecraft.client.gui.layouts.LayoutElement;
+ import net.minecraft.client.gui.layouts.LinearLayout;
+ import net.minecraft.client.gui.screens.ConnectScreen;
+ import net.minecraft.client.gui.screens.DisconnectedScreen;
+ import net.minecraft.client.gui.screens.Screen;
+ import net.minecraft.client.gui.screens.TitleScreen;
++import net.minecraft.client.multiplayer.ServerData;
++import net.minecraft.client.multiplayer.resolver.ServerAddress;
+ import net.minecraft.network.chat.Component;
+ import org.spongepowered.asm.mixin.Final;
+ import org.spongepowered.asm.mixin.Mixin;
+@@ -21,64 +45,68 @@
+ import org.spongepowered.asm.mixin.injection.At;
+ import org.spongepowered.asm.mixin.injection.Inject;
+ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
++import radmin.client.MeteorClient;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.misc.AutoReconnect;
+ 
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-@Mixin(DisconnectedScreen.class)
+-public abstract class DisconnectedScreenMixin extends Screen {
++@Mixin(value={DisconnectedScreen.class})
++public abstract class DisconnectedScreenMixin
++extends Screen {
+     @Shadow
+     @Final
+     private LinearLayout layout;
+     @Unique
+     private Button reconnectBtn;
+     @Unique
+-    private double time = Modules.get().get(AutoReconnect.class).time.get() * 20;
++    private double time;
+ 
+     protected DisconnectedScreenMixin(Component title) {
+         super(title);
++        this.time = Modules.get().get(AutoReconnect.class).time.get() * 20.0;
+     }
+ 
+-    @Inject(method = "init", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/layouts/LinearLayout;arrangeElements()V", shift = At.Shift.BEFORE))
++    @Inject(method={"init"}, at={@At(value="INVOKE", target="Lnet/minecraft/client/gui/layouts/LinearLayout;arrangeElements()V", shift=At.Shift.BEFORE)})
+     private void addButtons(CallbackInfo ci) {
+         AutoReconnect autoReconnect = Modules.get().get(AutoReconnect.class);
+-
+-        if (autoReconnect.lastServerConnection != null && !autoReconnect.button.get()) {
+-            reconnectBtn = new Button.Builder(Component.literal(getText()), _ -> tryConnecting()).build();
+-            layout.addChild(reconnectBtn);
+-
+-            layout.addChild(
+-                new Button.Builder(Component.literal("Toggle Auto Reconnect"), _ -> {
+-                    autoReconnect.toggle();
+-                    reconnectBtn.setMessage(Component.literal(getText()));
+-                    time = autoReconnect.time.get() * 20;
+-                }).build()
+-            );
++        if (autoReconnect.lastServerConnection != null && !autoReconnect.button.get().booleanValue()) {
++            this.reconnectBtn = new Button.Builder((Component)Component.literal((String)this.getText()), button -> this.tryConnecting()).build();
++            this.layout.addChild((LayoutElement)this.reconnectBtn);
++            this.layout.addChild((LayoutElement)new Button.Builder((Component)Component.literal((String)"Toggle Auto Reconnect"), button -> {
++                autoReconnect.toggle();
++                this.reconnectBtn.setMessage((Component)Component.literal((String)this.getText()));
++                this.time = autoReconnect.time.get() * 20.0;
++            }).build());
+         }
+     }
+ 
+-    @Override
+     public void tick() {
+         AutoReconnect autoReconnect = Modules.get().get(AutoReconnect.class);
+-        if (!autoReconnect.isActive() || autoReconnect.lastServerConnection == null) return;
+-
+-        if (time <= 0) {
+-            tryConnecting();
++        if (!autoReconnect.isActive() || autoReconnect.lastServerConnection == null) {
++            return;
++        }
++        if (this.time <= 0.0) {
++            this.tryConnecting();
+         } else {
+-            time -= 1;
+-            if (reconnectBtn != null) reconnectBtn.setMessage(Component.literal(getText()));
++            this.time -= 1.0;
++            if (this.reconnectBtn != null) {
++                this.reconnectBtn.setMessage((Component)Component.literal((String)this.getText()));
++            }
+         }
+     }
+ 
+     @Unique
+     private String getText() {
+-        String reconnectText = "Reconnect";
+-        if (Modules.get().isActive(AutoReconnect.class)) reconnectText += " " + String.format("(%.1f)", time / 20);
++        Object reconnectText = "Reconnect";
++        if (Modules.get().isActive(AutoReconnect.class)) {
++            reconnectText = (String)reconnectText + " " + String.format("(%.1f)", this.time / 20.0);
++        }
+         return reconnectText;
+     }
+ 
+     @Unique
+     private void tryConnecting() {
+-        var lastServer = Modules.get().get(AutoReconnect.class).lastServerConnection;
+-        ConnectScreen.startConnecting(new TitleScreen(), mc, lastServer.left(), lastServer.right(), false, null);
++        Pair<ServerAddress, ServerData> lastServer = Modules.get().get(AutoReconnect.class).lastServerConnection;
++        ConnectScreen.startConnecting((Screen)new TitleScreen(), (Minecraft)MeteorClient.mc, (ServerAddress)((ServerAddress)lastServer.left()), (ServerData)((ServerData)lastServer.right()), (boolean)false, null);
+     }
+ }
++

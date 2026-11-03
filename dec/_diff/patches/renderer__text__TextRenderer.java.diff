@@ -1,0 +1,84 @@
+--- upstream261/renderer/text/TextRenderer.java
++++ v1decompiled/renderer/text/TextRenderer.java
+@@ -1,38 +1,58 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.renderer.text;
+ 
+-package meteordevelopment.meteorclient.renderer.text;
+-
+-import meteordevelopment.meteorclient.renderer.Fonts;
+-import meteordevelopment.meteorclient.systems.config.Config;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
++import radmin.client.renderer.Fonts;
++import radmin.client.renderer.text.VanillaTextRenderer;
++import radmin.client.systems.config.Config;
++import radmin.client.utils.render.color.Color;
+ 
+ public interface TextRenderer {
+-    static TextRenderer get() {
+-        return Config.get().customFont.get() ? Fonts.RENDERER : VanillaTextRenderer.INSTANCE;
++    public static TextRenderer get() {
++        return Config.get().customFont.get() != false ? Fonts.RENDERER : VanillaTextRenderer.INSTANCE;
+     }
+ 
+-    void setAlpha(double a);
++    public void setAlpha(double var1);
+ 
+-    void begin(double scale, boolean scaleOnly, boolean big);
+-    default void begin(double scale) { begin(scale, false, false); }
+-    default void begin() { begin(1, false, false); }
++    public void begin(double var1, boolean var3, boolean var4);
+ 
+-    default void beginBig() { begin(1, false, true); }
++    default public void begin(double scale) {
++        this.begin(scale, false, false);
++    }
+ 
+-    double getWidth(String text, int length, boolean shadow);
+-    default double getWidth(String text, boolean shadow) { return getWidth(text, text.length(), shadow); }
+-    default double getWidth(String text) { return getWidth(text, text.length(), false); }
++    default public void begin() {
++        this.begin(1.0, false, false);
++    }
+ 
+-    double getHeight(boolean shadow);
+-    default double getHeight() { return getHeight(false); }
++    default public void beginBig() {
++        this.begin(1.0, false, true);
++    }
+ 
+-    double render(String text, double x, double y, Color color, boolean shadow);
+-    default double render(String text, double x, double y, Color color) { return render(text, x, y, color, false); }
++    public double getWidth(String var1, int var2, boolean var3);
+ 
+-    boolean isBuilding();
++    default public double getWidth(String text, boolean shadow) {
++        return this.getWidth(text, text.length(), shadow);
++    }
+ 
+-    void end();
++    default public double getWidth(String text) {
++        return this.getWidth(text, text.length(), false);
++    }
++
++    public double getHeight(boolean var1);
++
++    default public double getHeight() {
++        return this.getHeight(false);
++    }
++
++    public double render(String var1, double var2, double var4, Color var6, boolean var7);
++
++    default public double render(String text, double x, double y, Color color) {
++        return this.render(text, x, y, color, false);
++    }
++
++    public boolean isBuilding();
++
++    public void end();
+ }
++

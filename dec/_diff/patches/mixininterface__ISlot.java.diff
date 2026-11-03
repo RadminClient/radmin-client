@@ -1,0 +1,20 @@
+--- upstream261/mixininterface/ISlot.java
++++ v1decompiled/mixininterface/ISlot.java
+@@ -1,12 +1,11 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ public interface ISlot {
+-    int meteor$getIndex();
++    public int meteor$getIndex();
+ 
+-    int meteor$getSlot();
++    public int meteor$getSlot();
+ }
++

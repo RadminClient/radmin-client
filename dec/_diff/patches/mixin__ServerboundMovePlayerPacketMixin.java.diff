@@ -1,0 +1,36 @@
+--- upstream261/mixin/ServerboundMovePlayerPacketMixin.java
++++ v1decompiled/mixin/ServerboundMovePlayerPacketMixin.java
+@@ -1,17 +1,21 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Unique
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.mixininterface.IServerboundMovePlayerPacket;
+ import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Unique;
++import radmin.client.mixininterface.IServerboundMovePlayerPacket;
+ 
+-@Mixin(ServerboundMovePlayerPacket.class)
+-public abstract class ServerboundMovePlayerPacketMixin implements IServerboundMovePlayerPacket {
++@Mixin(value={ServerboundMovePlayerPacket.class})
++public abstract class ServerboundMovePlayerPacketMixin
++implements IServerboundMovePlayerPacket {
+     @Unique
+     private int tag;
+ 
+@@ -25,3 +29,4 @@
+         return this.tag;
+     }
+ }
++

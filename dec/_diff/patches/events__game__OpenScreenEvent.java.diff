@@ -1,0 +1,35 @@
+--- upstream261/events/game/OpenScreenEvent.java
++++ v1decompiled/events/game/OpenScreenEvent.java
+@@ -1,21 +1,23 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.screens.Screen
+  */
++package radmin.client.events.game;
+ 
+-package meteordevelopment.meteorclient.events.game;
++import net.minecraft.client.gui.screens.Screen;
++import radmin.client.events.Cancellable;
+ 
+-import meteordevelopment.meteorclient.events.Cancellable;
+-import net.minecraft.client.gui.screens.Screen;
+-
+-public class OpenScreenEvent extends Cancellable {
++public class OpenScreenEvent
++extends Cancellable {
+     private static final OpenScreenEvent INSTANCE = new OpenScreenEvent();
+-
+     public Screen screen;
+ 
+     public static OpenScreenEvent get(Screen screen) {
+         INSTANCE.setCancelled(false);
+-        INSTANCE.screen = screen;
++        OpenScreenEvent.INSTANCE.screen = screen;
+         return INSTANCE;
+     }
+ }
++

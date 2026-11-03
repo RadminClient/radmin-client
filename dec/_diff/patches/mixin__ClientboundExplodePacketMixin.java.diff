@@ -1,0 +1,85 @@
+--- upstream261/mixin/ClientboundExplodePacketMixin.java
++++ v1decompiled/mixin/ClientboundExplodePacketMixin.java
+@@ -1,22 +1,28 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.network.protocol.game.ClientboundExplodePacket
++ *  net.minecraft.world.phys.Vec3
++ *  org.spongepowered.asm.mixin.Final
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Mutable
++ *  org.spongepowered.asm.mixin.Shadow
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.mixininterface.IClientboundExplodePacket;
++import java.util.Optional;
+ import net.minecraft.network.protocol.game.ClientboundExplodePacket;
+ import net.minecraft.world.phys.Vec3;
+ import org.spongepowered.asm.mixin.Final;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Mutable;
+ import org.spongepowered.asm.mixin.Shadow;
++import radmin.client.mixininterface.IClientboundExplodePacket;
+ 
+-import java.util.Optional;
+-
+-@Mixin(ClientboundExplodePacket.class)
+-public abstract class ClientboundExplodePacketMixin implements IClientboundExplodePacket {
++@Mixin(value={ClientboundExplodePacket.class})
++public abstract class ClientboundExplodePacketMixin
++implements IClientboundExplodePacket {
+     @Shadow
+     @Final
+     @Mutable
+@@ -24,31 +30,32 @@
+ 
+     @Override
+     public void meteor$setVelocityX(float velocity) {
+-        if (playerKnockback.isPresent()) {
+-            Vec3 kb = playerKnockback.get();
+-            playerKnockback = Optional.of(new Vec3(velocity, kb.y, kb.z));
++        if (this.playerKnockback.isPresent()) {
++            Vec3 kb = this.playerKnockback.get();
++            this.playerKnockback = Optional.of(new Vec3((double)velocity, kb.y, kb.z));
+         } else {
+-            playerKnockback = Optional.of(new Vec3(velocity, 0, 0));
++            this.playerKnockback = Optional.of(new Vec3((double)velocity, 0.0, 0.0));
+         }
+     }
+ 
+     @Override
+     public void meteor$setVelocityY(float velocity) {
+-        if (playerKnockback.isPresent()) {
+-            Vec3 kb = playerKnockback.get();
+-            playerKnockback = Optional.of(new Vec3(kb.x, velocity, kb.z));
++        if (this.playerKnockback.isPresent()) {
++            Vec3 kb = this.playerKnockback.get();
++            this.playerKnockback = Optional.of(new Vec3(kb.x, (double)velocity, kb.z));
+         } else {
+-            playerKnockback = Optional.of(new Vec3(0, velocity, 0));
++            this.playerKnockback = Optional.of(new Vec3(0.0, (double)velocity, 0.0));
+         }
+     }
+ 
+     @Override
+     public void meteor$setVelocityZ(float velocity) {
+-        if (playerKnockback.isPresent()) {
+-            Vec3 kb = playerKnockback.get();
+-            playerKnockback = Optional.of(new Vec3(kb.x, kb.y, velocity));
++        if (this.playerKnockback.isPresent()) {
++            Vec3 kb = this.playerKnockback.get();
++            this.playerKnockback = Optional.of(new Vec3(kb.x, kb.y, (double)velocity));
+         } else {
+-            playerKnockback = Optional.of(new Vec3(0, 0, velocity));
++            this.playerKnockback = Optional.of(new Vec3(0.0, 0.0, (double)velocity));
+         }
+     }
+ }
++

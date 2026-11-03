@@ -1,0 +1,21 @@
+--- upstream261/systems/modules/movement/elytrafly/ElytraFlightModes.java
++++ v1decompiled/systems/modules/movement/elytrafly/ElytraFlightModes.java
+@@ -1,13 +1,13 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules.movement.elytrafly;
++package radmin.client.systems.modules.movement.elytrafly;
+ 
+ public enum ElytraFlightModes {
+     Vanilla,
+     Packet,
+     Pitch40,
+-    Bounce
++    Bounce;
++
+ }
++

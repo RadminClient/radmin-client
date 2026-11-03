@@ -1,0 +1,34 @@
+--- upstream261/mixin/LevelEntityGetterAdapterAccessor.java
++++ v1decompiled/mixin/LevelEntityGetterAdapterAccessor.java
+@@ -1,9 +1,14 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.level.entity.EntityAccess
++ *  net.minecraft.world.level.entity.EntitySectionStorage
++ *  net.minecraft.world.level.entity.LevelEntityGetterAdapter
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.world.level.entity.EntityAccess;
+ import net.minecraft.world.level.entity.EntitySectionStorage;
+@@ -11,8 +16,9 @@
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(LevelEntityGetterAdapter.class)
++@Mixin(value={LevelEntityGetterAdapter.class})
+ public interface LevelEntityGetterAdapterAccessor {
+-    @Accessor("sectionStorage")
+-    <T extends EntityAccess> EntitySectionStorage<T> meteor$getSectionStorage();
++    @Accessor(value="sectionStorage")
++    public <T extends EntityAccess> EntitySectionStorage<T> meteor$getSectionStorage();
+ }
++

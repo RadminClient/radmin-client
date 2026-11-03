@@ -1,0 +1,34 @@
+--- upstream261/events/world/ServerConnectBeginEvent.java
++++ v1decompiled/events/world/ServerConnectBeginEvent.java
+@@ -1,12 +1,14 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.multiplayer.ServerData
++ *  net.minecraft.client.multiplayer.resolver.ServerAddress
+  */
++package radmin.client.events.world;
+ 
+-package meteordevelopment.meteorclient.events.world;
+-
++import net.minecraft.client.multiplayer.ServerData;
+ import net.minecraft.client.multiplayer.resolver.ServerAddress;
+-import net.minecraft.client.multiplayer.ServerData;
+ 
+ public class ServerConnectBeginEvent {
+     private static final ServerConnectBeginEvent INSTANCE = new ServerConnectBeginEvent();
+@@ -14,8 +16,9 @@
+     public ServerData info;
+ 
+     public static ServerConnectBeginEvent get(ServerAddress address, ServerData info) {
+-        INSTANCE.address = address;
+-        INSTANCE.info = info;
++        ServerConnectBeginEvent.INSTANCE.address = address;
++        ServerConnectBeginEvent.INSTANCE.info = info;
+         return INSTANCE;
+     }
+ }
++

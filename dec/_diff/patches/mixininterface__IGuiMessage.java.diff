@@ -1,0 +1,34 @@
+--- upstream261/mixininterface/IGuiMessage.java
++++ v1decompiled/mixininterface/IGuiMessage.java
+@@ -1,20 +1,22 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.authlib.GameProfile
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ import com.mojang.authlib.GameProfile;
+ 
+ public interface IGuiMessage {
+-    String meteor$getText();
++    public String meteor$getText();
+ 
+-    int meteor$getId();
++    public int meteor$getId();
+ 
+-    void meteor$setId(int id);
++    public void meteor$setId(int var1);
+ 
+-    GameProfile meteor$getSender();
++    public GameProfile meteor$getSender();
+ 
+-    void meteor$setSender(GameProfile profile);
++    public void meteor$setSender(GameProfile var1);
+ }
++

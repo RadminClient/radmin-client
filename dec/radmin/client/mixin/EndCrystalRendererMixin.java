@@ -1,0 +1,79 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.llamalad7.mixinextras.injector.v2.WrapWithCondition
+ *  com.mojang.blaze3d.vertex.PoseStack
+ *  net.minecraft.client.model.Model
+ *  net.minecraft.client.renderer.SubmitNodeCollector
+ *  net.minecraft.client.renderer.entity.EndCrystalRenderer
+ *  net.minecraft.client.renderer.entity.state.EndCrystalRenderState
+ *  net.minecraft.client.renderer.feature.ModelFeatureRenderer$CrumblingOverlay
+ *  net.minecraft.client.renderer.rendertype.RenderType
+ *  net.minecraft.client.renderer.rendertype.RenderTypes
+ *  net.minecraft.client.renderer.state.level.CameraRenderState
+ *  net.minecraft.resources.Identifier
+ *  org.spongepowered.asm.mixin.Final
+ *  org.spongepowered.asm.mixin.Mixin
+ *  org.spongepowered.asm.mixin.Shadow
+ *  org.spongepowered.asm.mixin.Unique
+ *  org.spongepowered.asm.mixin.injection.At
+ *  org.spongepowered.asm.mixin.injection.Inject
+ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+ */
+package radmin.client.mixin;
+
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.model.Model;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.EndCrystalRenderer;
+import net.minecraft.client.renderer.entity.state.EndCrystalRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.resources.Identifier;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import radmin.client.systems.modules.Modules;
+import radmin.client.systems.modules.render.Chams;
+
+@Mixin(value={EndCrystalRenderer.class})
+public abstract class EndCrystalRendererMixin {
+    @Unique
+    private Chams chams;
+    @Shadow
+    @Final
+    private static Identifier END_CRYSTAL_LOCATION;
+
+    @Inject(method={"<init>"}, at={@At(value="RETURN")})
+    private void onInit(CallbackInfo ci) {
+        this.chams = Modules.get().get(Chams.class);
+    }
+
+    @Inject(method={"submit(Lnet/minecraft/client/renderer/entity/state/EndCrystalRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V"}, at={@At(value="INVOKE", target="Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V")})
+    private void render$scale(EndCrystalRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera, CallbackInfo ci) {
+        if (!this.chams.isActive() || !this.chams.crystals.get().booleanValue()) {
+            return;
+        }
+        float v = this.chams.crystalsScale.get().floatValue();
+        poseStack.scale(v, v, v);
+    }
+
+    @WrapWithCondition(method={"submit(Lnet/minecraft/client/renderer/entity/state/EndCrystalRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V"}, at={@At(value="INVOKE", target="Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/resources/Identifier;IIILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V")})
+    private <S> boolean render$color(SubmitNodeCollector instance, Model<? super S> model, S state, PoseStack poseStack, Identifier identifier, int lightCoords, int overlayCoords, int outlineColor, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+        if (this.chams.isActive() && this.chams.crystals.get().booleanValue()) {
+            RenderType renderType = RenderTypes.entityTranslucent((Identifier)(this.chams.isActive() && this.chams.crystals.get() != false && this.chams.crystalsTexture.get() == false ? Chams.BLANK : END_CRYSTAL_LOCATION));
+            instance.submitModel(model, state, poseStack, renderType, lightCoords, overlayCoords, this.chams.crystalsColor.get().getPacked(), null, outlineColor, null);
+            return false;
+        }
+        return true;
+    }
+}
+

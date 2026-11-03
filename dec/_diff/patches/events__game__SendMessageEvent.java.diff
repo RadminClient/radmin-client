@@ -1,0 +1,31 @@
+--- upstream261/events/game/SendMessageEvent.java
++++ v1decompiled/events/game/SendMessageEvent.java
+@@ -1,22 +1,19 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.events.game;
+ 
+-package meteordevelopment.meteorclient.events.game;
++import radmin.client.events.Cancellable;
+ 
+-import meteordevelopment.meteorclient.events.Cancellable;
+-
+-public class SendMessageEvent extends Cancellable {
++public class SendMessageEvent
++extends Cancellable {
+     private static final SendMessageEvent INSTANCE = new SendMessageEvent();
+-
+     public String message;
+ 
+     public static SendMessageEvent get(String message) {
+         INSTANCE.setCancelled(false);
+-        INSTANCE.message = message;
++        SendMessageEvent.INSTANCE.message = message;
+         return INSTANCE;
+     }
+ }
+ 
+-

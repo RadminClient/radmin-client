@@ -1,0 +1,35 @@
+--- upstream261/mixin/MapTextureManagerAccessor.java
++++ v1decompiled/mixin/MapTextureManagerAccessor.java
+@@ -1,9 +1,15 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.resources.MapTextureManager
++ *  net.minecraft.client.resources.MapTextureManager$MapInstance
++ *  net.minecraft.world.level.saveddata.maps.MapId
++ *  net.minecraft.world.level.saveddata.maps.MapItemSavedData
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Invoker
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.client.resources.MapTextureManager;
+ import net.minecraft.world.level.saveddata.maps.MapId;
+@@ -11,8 +17,9 @@
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Invoker;
+ 
+-@Mixin(MapTextureManager.class)
++@Mixin(value={MapTextureManager.class})
+ public interface MapTextureManagerAccessor {
+-    @Invoker("getOrCreateMapInstance")
+-    MapTextureManager.MapInstance meteor$invokeGetOrCreateMapInstance(MapId id, MapItemSavedData state);
++    @Invoker(value="getOrCreateMapInstance")
++    public MapTextureManager.MapInstance meteor$invokeGetOrCreateMapInstance(MapId var1, MapItemSavedData var2);
+ }
++

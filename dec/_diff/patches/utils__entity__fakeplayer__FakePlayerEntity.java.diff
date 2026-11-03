@@ -1,0 +1,120 @@
+--- upstream261/utils/entity/fakeplayer/FakePlayerEntity.java
++++ v1decompiled/utils/entity/fakeplayer/FakePlayerEntity.java
+@@ -1,79 +1,70 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.authlib.GameProfile
++ *  net.minecraft.client.multiplayer.PlayerInfo
++ *  net.minecraft.client.player.RemotePlayer
++ *  net.minecraft.world.entity.Entity
++ *  net.minecraft.world.entity.Entity$RemovalReason
++ *  net.minecraft.world.entity.player.Player
++ *  org.jetbrains.annotations.Nullable
+  */
+-
+-package meteordevelopment.meteorclient.utils.entity.fakeplayer;
++package radmin.client.utils.entity.fakeplayer;
+ 
+ import com.mojang.authlib.GameProfile;
+-import meteordevelopment.meteorclient.mixin.AbstractClientPlayerAccessor;
++import java.util.UUID;
+ import net.minecraft.client.multiplayer.PlayerInfo;
+ import net.minecraft.client.player.RemotePlayer;
++import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.player.Player;
+ import org.jetbrains.annotations.Nullable;
++import radmin.client.MeteorClient;
++import radmin.client.mixin.AbstractClientPlayerAccessor;
+ 
+-import java.util.UUID;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class FakePlayerEntity extends RemotePlayer {
+-    /**
+-     * Disables entity push with this fake player
+-     */
++public class FakePlayerEntity
++extends RemotePlayer {
+     public boolean doNotPush;
+-    /**
+-     * Stops rendering the fake player when you are inside it
+-     */
+     public boolean hideWhenInsideCamera;
+-    /**
+-     * Prevents you from interacting with the fake player; will also prevent TargetUtils selecting it as a target
+-     */
+     public boolean noHit;
+ 
+     public FakePlayerEntity(Player player, String name, float health, boolean copyInv) {
+-        super(mc.level, new GameProfile(UUID.randomUUID(), name));
+-
+-        copyPosition(player);
+-
+-        yRotO = getYRot();
+-        xRotO = getXRot();
+-        yHeadRot = player.yHeadRot;
+-        yHeadRotO = yHeadRot;
+-        yBodyRot = player.yBodyRot;
+-        yBodyRotO = yBodyRot;
+-
+-        getAttributes().assignAllValues(player.getAttributes());
+-        setPose(player.getPose());
+-
+-        if (health <= 20) {
+-            setHealth(health);
++        super(MeteorClient.mc.level, new GameProfile(UUID.randomUUID(), name));
++        this.copyPosition((Entity)player);
++        this.yRotO = this.getYRot();
++        this.xRotO = this.getXRot();
++        this.yHeadRotO = this.yHeadRot = player.yHeadRot;
++        this.yBodyRotO = this.yBodyRot = player.yBodyRot;
++        this.getAttributes().assignAllValues(player.getAttributes());
++        this.setPose(player.getPose());
++        if (health <= 20.0f) {
++            this.setHealth(health);
+         } else {
+-            setHealth(health);
+-            setAbsorptionAmount(health - 20);
++            this.setHealth(health);
++            this.setAbsorptionAmount(health - 20.0f);
+         }
+-
+-        if (copyInv) getInventory().replaceWith(player.getInventory());
++        if (copyInv) {
++            this.getInventory().replaceWith(player.getInventory());
++        }
+     }
+ 
+     public void spawn() {
+-        unsetRemoved();
+-        mc.level.addEntity(this);
++        this.unsetRemoved();
++        MeteorClient.mc.level.addEntity((Entity)this);
+     }
+ 
+     public void despawn() {
+-        mc.level.removeEntity(getId(), RemovalReason.DISCARDED);
+-        setRemoved(RemovalReason.DISCARDED);
++        MeteorClient.mc.level.removeEntity(this.getId(), Entity.RemovalReason.DISCARDED);
++        this.setRemoved(Entity.RemovalReason.DISCARDED);
+     }
+ 
+     @Nullable
+-    @Override
+     protected PlayerInfo getPlayerInfo() {
+         PlayerInfo entry = super.getPlayerInfo();
+-
+         if (entry == null) {
+-            ((AbstractClientPlayerAccessor) this).meteor$setPlayerInfo(mc.getConnection().getPlayerInfo(mc.player.getUUID()));
++            ((AbstractClientPlayerAccessor)((Object)this)).meteor$setPlayerInfo(MeteorClient.mc.getConnection().getPlayerInfo(MeteorClient.mc.player.getUUID()));
+         }
+-
+         return entry;
+     }
+ }
++

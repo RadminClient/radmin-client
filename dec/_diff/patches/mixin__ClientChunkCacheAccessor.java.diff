@@ -1,0 +1,31 @@
+--- upstream261/mixin/ClientChunkCacheAccessor.java
++++ v1decompiled/mixin/ClientChunkCacheAccessor.java
+@@ -1,16 +1,21 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.multiplayer.ClientChunkCache
++ *  net.minecraft.client.multiplayer.ClientChunkCache$Storage
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.client.multiplayer.ClientChunkCache;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(ClientChunkCache.class)
++@Mixin(value={ClientChunkCache.class})
+ public interface ClientChunkCacheAccessor {
+-    @Accessor("storage")
+-    ClientChunkCache.Storage meteor$getStorage();
++    @Accessor(value="storage")
++    public ClientChunkCache.Storage meteor$getStorage();
+ }
++

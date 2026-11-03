@@ -1,0 +1,20 @@
+--- upstream261/mixininterface/IServerboundMovePlayerPacket.java
++++ v1decompiled/mixininterface/IServerboundMovePlayerPacket.java
+@@ -1,12 +1,11 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ public interface IServerboundMovePlayerPacket {
+-    int meteor$getTag();
++    public int meteor$getTag();
+ 
+-    void meteor$setTag(int tag);
++    public void meteor$setTag(int var1);
+ }
++

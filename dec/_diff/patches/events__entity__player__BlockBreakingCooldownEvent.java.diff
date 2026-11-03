@@ -1,0 +1,24 @@
+--- upstream261/events/entity/player/BlockBreakingCooldownEvent.java
++++ v1decompiled/events/entity/player/BlockBreakingCooldownEvent.java
+@@ -1,17 +1,15 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.events.entity.player;
++package radmin.client.events.entity.player;
+ 
+ public class BlockBreakingCooldownEvent {
+     private static final BlockBreakingCooldownEvent INSTANCE = new BlockBreakingCooldownEvent();
+-
+     public int cooldown;
+ 
+     public static BlockBreakingCooldownEvent get(int cooldown) {
+-        INSTANCE.cooldown = cooldown;
++        BlockBreakingCooldownEvent.INSTANCE.cooldown = cooldown;
+         return INSTANCE;
+     }
+ }
++

@@ -1,0 +1,30 @@
+--- upstream261/mixin/MobEffectInstanceAccessor.java
++++ v1decompiled/mixin/MobEffectInstanceAccessor.java
+@@ -1,16 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.effect.MobEffectInstance
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.world.effect.MobEffectInstance;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(MobEffectInstance.class)
++@Mixin(value={MobEffectInstance.class})
+ public interface MobEffectInstanceAccessor {
+-    @Accessor("duration")
+-    void meteor$setDuration(int duration);
++    @Accessor(value="duration")
++    public void meteor$setDuration(int var1);
+ }
++

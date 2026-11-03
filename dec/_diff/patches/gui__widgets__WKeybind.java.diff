@@ -1,0 +1,119 @@
+--- upstream261/gui/widgets/WKeybind.java
++++ v1decompiled/gui/widgets/WKeybind.java
+@@ -1,80 +1,80 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.widgets;
++import radmin.client.gui.widgets.containers.WHorizontalList;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.systems.modules.Modules;
++import radmin.client.utils.misc.Keybind;
+ 
+-import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.utils.misc.Keybind;
+-
+-public class WKeybind extends WHorizontalList {
++public class WKeybind
++extends WHorizontalList {
+     public Runnable action;
+     public Runnable actionOnSet;
+-
+     private WButton button;
+-
+     private final Keybind keybind;
+     private final Keybind defaultValue;
+-    private boolean listening;
++    protected boolean listening;
+ 
+     public WKeybind(Keybind keybind, Keybind defaultValue) {
+         this.keybind = keybind;
+         this.defaultValue = defaultValue;
+     }
+ 
++    public boolean isListening() {
++        return this.listening;
++    }
++
+     @Override
+     public void init() {
+-        button = add(theme.button("")).widget();
+-        button.action = () -> {
+-            listening = true;
+-            button.set("...");
+-
+-            if (actionOnSet != null) actionOnSet.run();
++        this.button = this.add(this.theme.button("")).widget();
++        this.button.action = () -> {
++            this.listening = true;
++            this.button.set("...");
++            if (this.actionOnSet != null) {
++                this.actionOnSet.run();
++            }
+         };
+-
+-        refreshLabel();
++        this.refreshLabel();
+     }
+ 
+     public boolean onClear() {
+-        if (listening) {
+-            keybind.reset();
+-            reset();
+-
++        if (this.listening) {
++            this.keybind.reset();
++            this.reset();
+             return true;
+         }
+-
+         return false;
+     }
+ 
+     public boolean onAction(boolean isKey, int value, int modifiers) {
+-        if (listening && keybind.canBindTo(isKey, value, modifiers)) {
+-            keybind.set(isKey, value, modifiers);
+-            reset();
+-
++        if (this.listening && this.keybind.canBindTo(isKey, value, modifiers)) {
++            this.keybind.set(isKey, value, modifiers);
++            this.reset();
+             return true;
+         }
+-
+         return false;
+     }
+ 
+     public void resetBind() {
+-        keybind.set(defaultValue);
+-        reset();
++        this.keybind.set(this.defaultValue);
++        this.reset();
+     }
+ 
+     public void reset() {
+-        listening = false;
+-        refreshLabel();
++        this.listening = false;
++        this.refreshLabel();
+         if (Modules.get().isBinding()) {
+             Modules.get().setModuleToBind(null);
+         }
+-        if (action != null) action.run();
++        if (this.action != null) {
++            this.action.run();
++        }
+     }
+ 
+     private void refreshLabel() {
+-        button.set(keybind.toString());
++        this.button.set(this.keybind.toString());
+     }
+ }
++

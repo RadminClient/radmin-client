@@ -1,0 +1,19 @@
+--- upstream261/systems/modules/movement/speed/SpeedModes.java
++++ v1decompiled/systems/modules/movement/speed/SpeedModes.java
+@@ -1,11 +1,11 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules.movement.speed;
++package radmin.client.systems.modules.movement.speed;
+ 
+ public enum SpeedModes {
+     Strafe,
+-    Vanilla
++    Vanilla;
++
+ }
++

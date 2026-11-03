@@ -1,0 +1,41 @@
+--- upstream261/utils/world/Dimension.java
++++ v1decompiled/utils/world/Dimension.java
+@@ -1,28 +1,28 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.utils.world;
++package radmin.client.utils.world;
+ 
+ public enum Dimension {
+     Overworld,
+     Nether,
+     End;
+ 
++
+     public Dimension opposite() {
+-        return switch (this) {
+-            case Overworld -> Nether;
+-            case Nether -> Overworld;
++        return switch (this.ordinal()) {
++            case 0 -> Nether;
++            case 1 -> Overworld;
+             default -> this;
+         };
+     }
+ 
+     public String toString() {
+-        return switch (this) {
+-            case Nether -> "minecraft:the_nether";
+-            case End -> "minecraft:the_end";
++        return switch (this.ordinal()) {
++            case 1 -> "minecraft:the_nether";
++            case 2 -> "minecraft:the_end";
+             default -> "minecraft:overworld";
+         };
+     }
+ }
++

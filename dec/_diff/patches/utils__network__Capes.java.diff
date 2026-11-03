@@ -1,0 +1,294 @@
+--- upstream261/utils/network/Capes.java
++++ v1decompiled/utils/network/Capes.java
+@@ -1,42 +1,50 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.platform.NativeImage
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.client.renderer.texture.AbstractTexture
++ *  net.minecraft.client.renderer.texture.DynamicTexture
++ *  net.minecraft.resources.Identifier
++ *  net.minecraft.world.entity.player.Player
+  */
+-
+-package meteordevelopment.meteorclient.utils.network;
++package radmin.client.utils.network;
+ 
+ import com.mojang.blaze3d.platform.NativeImage;
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.utils.PreInit;
++import java.io.IOException;
++import java.io.InputStream;
++import java.util.ArrayList;
++import java.util.HashMap;
++import java.util.List;
++import java.util.Map;
++import java.util.UUID;
++import java.util.stream.Stream;
+ import meteordevelopment.orbit.EventHandler;
++import net.minecraft.client.renderer.texture.AbstractTexture;
+ import net.minecraft.client.renderer.texture.DynamicTexture;
+ import net.minecraft.resources.Identifier;
+ import net.minecraft.world.entity.player.Player;
+-
+-import java.io.IOException;
+-import java.io.InputStream;
+-import java.util.*;
+-import java.util.stream.Stream;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
++import radmin.client.MeteorClient;
++import radmin.client.events.world.TickEvent;
++import radmin.client.utils.PreInit;
++import radmin.client.utils.network.Http;
++import radmin.client.utils.network.MeteorExecutor;
+ 
+ public class Capes {
+     private static final String CAPE_OWNERS_URL = "https://meteorclient.com/api/capeowners";
+     private static final String CAPES_URL = "https://meteorclient.com/api/capes";
+-
+-    private static final Map<UUID, String> OWNERS = new HashMap<>();
+-    private static final Map<String, String> URLS = new HashMap<>();
+-    private static final Map<String, Cape> TEXTURES = new HashMap<>();
+-
+-    private static final List<Cape> TO_REGISTER = new ArrayList<>();
+-    private static final List<Cape> TO_RETRY = new ArrayList<>();
+-    private static final List<Cape> TO_REMOVE = new ArrayList<>();
++    private static final Map<UUID, String> OWNERS = new HashMap<UUID, String>();
++    private static final Map<String, String> URLS = new HashMap<String, String>();
++    private static final Map<String, Cape> TEXTURES = new HashMap<String, Cape>();
++    private static final List<Cape> TO_REGISTER = new ArrayList<Cape>();
++    private static final List<Cape> TO_RETRY = new ArrayList<Cape>();
++    private static final List<Cape> TO_REMOVE = new ArrayList<Cape>();
+ 
+     private Capes() {
+     }
+ 
+-    @PreInit(dependencies = MeteorExecutor.class)
++    @PreInit(dependencies={MeteorExecutor.class})
+     public static void init() {
+         OWNERS.clear();
+         URLS.clear();
+@@ -44,56 +52,57 @@
+         TO_REGISTER.clear();
+         TO_RETRY.clear();
+         TO_REMOVE.clear();
+-
+         MeteorExecutor.execute(() -> {
+-            // Cape owners
+-            Stream<String> lines = Http.get(CAPE_OWNERS_URL)
+-                .exceptionHandler(e -> MeteorClient.LOG.error("Could not load capes: {}", e.getMessage()))
+-                .sendLines();
++            Stream<String> lines = Http.get(CAPE_OWNERS_URL).exceptionHandler(e -> MeteorClient.LOG.error("Could not load capes: {}", (Object)e.getMessage())).sendLines();
++            if (lines == null) {
++                return;
++            }
++            lines.forEach(s -> {
++                String[] split = s.split(" ");
++                if (split.length >= 2) {
++                    OWNERS.put(UUID.fromString(split[0]), split[1]);
++                    if (!TEXTURES.containsKey(split[1])) {
++                        TEXTURES.put(split[1], new Cape(split[1]));
++                    }
++                }
++            });
++            lines = Http.get(CAPES_URL).sendLines();
+             if (lines != null) {
+                 lines.forEach(s -> {
+                     String[] split = s.split(" ");
+-
+-                    if (split.length >= 2) {
+-                        OWNERS.put(UUID.fromString(split[0]), split[1]);
+-                        if (!TEXTURES.containsKey(split[1])) TEXTURES.put(split[1], new Cape(split[1]));
++                    if (split.length >= 2 && !URLS.containsKey(split[0])) {
++                        URLS.put(split[0], split[1]);
+                     }
+                 });
+-            } else return;
+-
+-            // Capes
+-            lines = Http.get(CAPES_URL).sendLines();
+-            if (lines != null) lines.forEach(s -> {
+-                String[] split = s.split(" ");
+-
+-                if (split.length >= 2) {
+-                    if (!URLS.containsKey(split[0])) URLS.put(split[0], split[1]);
+-                }
+-            });
++            }
+         });
+-
+         MeteorClient.EVENT_BUS.subscribe(Capes.class);
+     }
+ 
++    /*
++     * WARNING - Removed try catching itself - possible behaviour change.
++     */
+     @EventHandler
+     private static void onTick(TickEvent.Post event) {
+-        synchronized (TO_REGISTER) {
+-            for (Cape cape : TO_REGISTER) cape.register();
++        List<Cape> list = TO_REGISTER;
++        synchronized (list) {
++            for (Cape cape : TO_REGISTER) {
++                cape.register();
++            }
+             TO_REGISTER.clear();
+         }
+-
+-        synchronized (TO_RETRY) {
++        list = TO_RETRY;
++        synchronized (list) {
+             TO_RETRY.removeIf(Cape::tick);
+         }
+-
+-        synchronized (TO_REMOVE) {
++        list = TO_REMOVE;
++        synchronized (list) {
+             for (Cape cape : TO_REMOVE) {
+                 URLS.remove(cape.name);
+                 TEXTURES.remove(cape.name);
+                 TO_REGISTER.remove(cape);
+                 TO_RETRY.remove(cape);
+             }
+-
+             TO_REMOVE.clear();
+         }
+     }
+@@ -102,96 +111,93 @@
+         String capeName = OWNERS.get(player.getUUID());
+         if (capeName != null) {
+             Cape cape = TEXTURES.get(capeName);
+-            if (cape == null) return null;
+-
+-            if (cape.isDownloaded()) return cape.getIdentifier();
+-
++            if (cape == null) {
++                return null;
++            }
++            if (cape.isDownloaded()) {
++                return cape.getIdentifier();
++            }
+             cape.download();
+             return null;
+         }
+-
+         return null;
+     }
+ 
+     private static class Cape {
+         private static int COUNT = 0;
+-
+         private final String name;
+-        private final Identifier identifier;
+-
++        private final Identifier identifier = MeteorClient.identifier("capes/" + COUNT++);
+         private boolean downloaded;
+         private boolean downloading;
+-
+         private NativeImage img;
+-
+         private int retryTimer;
+ 
+         public Cape(String name) {
+-            this.identifier = MeteorClient.identifier("capes/" + COUNT++);
+             this.name = name;
+         }
+ 
+         public Identifier getIdentifier() {
+-            return identifier;
++            return this.identifier;
+         }
+ 
+         public void download() {
+-            if (downloaded || downloading || retryTimer > 0) return;
+-            downloading = true;
+-
++            if (this.downloaded || this.downloading || this.retryTimer > 0) {
++                return;
++            }
++            this.downloading = true;
+             MeteorExecutor.execute(() -> {
+                 try {
+-                    String url = URLS.get(name);
++                    String url = URLS.get(this.name);
+                     if (url == null) {
+-                        synchronized (TO_REMOVE) {
++                        List<Cape> list = TO_REMOVE;
++                        synchronized (list) {
+                             TO_REMOVE.add(this);
+-                            downloading = false;
++                            this.downloading = false;
+                             return;
+                         }
+                     }
+-
+                     InputStream in = Http.get(url).sendInputStream();
+                     if (in == null) {
+-                        synchronized (TO_RETRY) {
++                        List<Cape> list = TO_RETRY;
++                        synchronized (list) {
+                             TO_RETRY.add(this);
+-                            retryTimer = 10 * 20;
+-                            downloading = false;
++                            this.retryTimer = 200;
++                            this.downloading = false;
+                             return;
+                         }
+                     }
+-
+-                    img = NativeImage.read(in);
+-
+-                    synchronized (TO_REGISTER) {
++                    this.img = NativeImage.read((InputStream)in);
++                    List<Cape> list = TO_REGISTER;
++                    synchronized (list) {
+                         TO_REGISTER.add(this);
+                     }
+-                } catch (IOException e) {
+-                    MeteorClient.LOG.error("Failed to download cape '{}'", name, e);
++                }
++                catch (IOException e) {
++                    MeteorClient.LOG.error("Failed to download cape '{}'", (Object)this.name, (Object)e);
+                 }
+             });
+         }
+ 
+         public void register() {
+-            mc.getTextureManager().register(identifier, new DynamicTexture(null, img));
+-            img = null;
+-
+-            downloading = false;
+-            downloaded = true;
++            MeteorClient.mc.getTextureManager().register(this.identifier, (AbstractTexture)new DynamicTexture(null, this.img));
++            this.img = null;
++            this.downloading = false;
++            this.downloaded = true;
+         }
+ 
+         public boolean tick() {
+-            if (retryTimer > 0) {
+-                retryTimer--;
++            if (this.retryTimer > 0) {
++                --this.retryTimer;
+             } else {
+-                download();
++                this.download();
+                 return true;
+             }
+-
+             return false;
+         }
+ 
+         public boolean isDownloaded() {
+-            return downloaded;
++            return this.downloaded;
+         }
+     }
+ }
++

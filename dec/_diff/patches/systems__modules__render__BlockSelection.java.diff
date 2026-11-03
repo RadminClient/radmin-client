@@ -1,0 +1,200 @@
+--- upstream261/systems/modules/render/BlockSelection.java
++++ v1decompiled/systems/modules/render/BlockSelection.java
+@@ -1,121 +1,111 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.core.BlockPos
++ *  net.minecraft.core.Direction
++ *  net.minecraft.world.level.BlockGetter
++ *  net.minecraft.world.phys.AABB
++ *  net.minecraft.world.phys.BlockHitResult
++ *  net.minecraft.world.phys.HitResult
++ *  net.minecraft.world.phys.HitResult$Type
++ *  net.minecraft.world.phys.shapes.VoxelShape
+  */
++package radmin.client.systems.modules.render;
+ 
+-package meteordevelopment.meteorclient.systems.modules.render;
+-
+-import meteordevelopment.meteorclient.events.render.Render3DEvent;
+-import meteordevelopment.meteorclient.renderer.ShapeMode;
+-import meteordevelopment.meteorclient.settings.*;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.utils.render.color.SettingColor;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
++import net.minecraft.world.level.BlockGetter;
+ import net.minecraft.world.phys.AABB;
+ import net.minecraft.world.phys.BlockHitResult;
+ import net.minecraft.world.phys.HitResult;
+ import net.minecraft.world.phys.shapes.VoxelShape;
++import radmin.client.events.render.Render3DEvent;
++import radmin.client.renderer.ShapeMode;
++import radmin.client.settings.BoolSetting;
++import radmin.client.settings.ColorSetting;
++import radmin.client.settings.EnumSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.utils.render.color.SettingColor;
+ 
+-public class BlockSelection extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<Boolean> advanced = sgGeneral.add(new BoolSetting.Builder()
+-        .name("advanced")
+-        .description("Shows a more advanced outline on different types of shape blocks.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> oneSide = sgGeneral.add(new BoolSetting.Builder()
+-        .name("single-side")
+-        .description("Only renders the side you are looking at.")
+-        .defaultValue(false)
+-        .build()
+-    );
+-
+-    private final Setting<ShapeMode> shapeMode = sgGeneral.add(new EnumSetting.Builder<ShapeMode>()
+-        .name("shape-mode")
+-        .description("How the shapes are rendered.")
+-        .defaultValue(ShapeMode.Both)
+-        .build()
+-    );
+-
+-    private final Setting<SettingColor> sideColor = sgGeneral.add(new ColorSetting.Builder()
+-        .name("side-color")
+-        .description("The side color.")
+-        .defaultValue(new SettingColor(255, 255, 255, 50))
+-        .build()
+-    );
+-
+-    private final Setting<SettingColor> lineColor = sgGeneral.add(new ColorSetting.Builder()
+-        .name("line-color")
+-        .description("The line color.")
+-        .defaultValue(new SettingColor(255, 255, 255, 255))
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> hideInside = sgGeneral.add(new BoolSetting.Builder()
+-        .name("hide-when-inside-block")
+-        .description("Hide selection when inside target block.")
+-        .defaultValue(true)
+-        .build()
+-    );
++public class BlockSelection
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final Setting<Boolean> advanced;
++    private final Setting<Boolean> oneSide;
++    private final Setting<ShapeMode> shapeMode;
++    private final Setting<SettingColor> sideColor;
++    private final Setting<SettingColor> lineColor;
++    private final Setting<Boolean> hideInside;
+ 
+     public BlockSelection() {
+         super(Categories.Render, "block-selection", "Modifies how your block selection is rendered.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.advanced = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("advanced")).description("Shows a more advanced outline on different types of shape blocks.")).defaultValue(true)).build());
++        this.oneSide = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("single-side")).description("Only renders the side you are looking at.")).defaultValue(false)).build());
++        this.shapeMode = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("shape-mode")).description("How the shapes are rendered.")).defaultValue(ShapeMode.Both)).build());
++        this.sideColor = this.sgGeneral.add(((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("side-color")).description("The side color.")).defaultValue(new SettingColor(255, 255, 255, 50)).build());
++        this.lineColor = this.sgGeneral.add(((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("line-color")).description("The line color.")).defaultValue(new SettingColor(255, 255, 255, 255)).build());
++        this.hideInside = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("hide-when-inside-block")).description("Hide selection when inside target block.")).defaultValue(true)).build());
+     }
+ 
+     @EventHandler
+     private void onRender(Render3DEvent event) {
+-        if (mc.hitResult == null || !(mc.hitResult instanceof BlockHitResult result) || result.getType() == HitResult.Type.MISS)
++        BlockHitResult result;
++        HitResult hitResult;
++        if (this.mc.hitResult == null || !((hitResult = this.mc.hitResult) instanceof BlockHitResult) || (result = (BlockHitResult)hitResult).getType() == HitResult.Type.MISS) {
+             return;
+-
+-        if (hideInside.get() && result.isInside()) return;
+-
++        }
++        if (this.hideInside.get().booleanValue() && result.isInside()) {
++            return;
++        }
+         BlockPos bp = result.getBlockPos();
+         Direction side = result.getDirection();
+-
+-        VoxelShape shape = mc.level.getBlockState(bp).getShape(mc.level, bp);
+-
+-        if (shape.isEmpty()) return;
++        VoxelShape shape = this.mc.level.getBlockState(bp).getShape((BlockGetter)this.mc.level, bp);
++        if (shape.isEmpty()) {
++            return;
++        }
+         AABB box = shape.bounds();
+-
+-        if (oneSide.get()) {
++        if (this.oneSide.get().booleanValue()) {
+             switch (side) {
+-                case Direction.UP, Direction.DOWN ->
+-                    event.renderer.sideHorizontal(bp.getX() + box.minX, bp.getY() + (side == Direction.DOWN ? box.minY : box.maxY), bp.getZ() + box.minZ, bp.getX() + box.maxX, bp.getZ() + box.maxZ, sideColor.get(), lineColor.get(), shapeMode.get());
+-                case Direction.SOUTH, Direction.NORTH -> {
++                case UP: 
++                case DOWN: {
++                    event.renderer.sideHorizontal((double)bp.getX() + box.minX, (double)bp.getY() + (side == Direction.DOWN ? box.minY : box.maxY), (double)bp.getZ() + box.minZ, (double)bp.getX() + box.maxX, (double)bp.getZ() + box.maxZ, this.sideColor.get(), this.lineColor.get(), this.shapeMode.get());
++                    break;
++                }
++                case SOUTH: 
++                case NORTH: {
+                     double z = side == Direction.NORTH ? box.minZ : box.maxZ;
+-                    event.renderer.sideVertical(bp.getX() + box.minX, bp.getY() + box.minY, bp.getZ() + z, bp.getX() + box.maxX, bp.getY() + box.maxY, bp.getZ() + z, sideColor.get(), lineColor.get(), shapeMode.get());
++                    event.renderer.sideVertical((double)bp.getX() + box.minX, (double)bp.getY() + box.minY, (double)bp.getZ() + z, (double)bp.getX() + box.maxX, (double)bp.getY() + box.maxY, (double)bp.getZ() + z, this.sideColor.get(), this.lineColor.get(), this.shapeMode.get());
++                    break;
+                 }
+-                case Direction.EAST, Direction.WEST -> {
++                case EAST: 
++                case WEST: {
+                     double x = side == Direction.WEST ? box.minX : box.maxX;
+-                    event.renderer.sideVertical(bp.getX() + x, bp.getY() + box.minY, bp.getZ() + box.minZ, bp.getX() + x, bp.getY() + box.maxY, bp.getZ() + box.maxZ, sideColor.get(), lineColor.get(), shapeMode.get());
++                    event.renderer.sideVertical((double)bp.getX() + x, (double)bp.getY() + box.minY, (double)bp.getZ() + box.minZ, (double)bp.getX() + x, (double)bp.getY() + box.maxY, (double)bp.getZ() + box.maxZ, this.sideColor.get(), this.lineColor.get(), this.shapeMode.get());
++                }
++            }
++        } else if (this.advanced.get().booleanValue()) {
++            if (this.shapeMode.get() == ShapeMode.Both || this.shapeMode.get() == ShapeMode.Lines) {
++                shape.forAllEdges((minX, minY, minZ, maxX, maxY, maxZ) -> event.renderer.line((double)bp.getX() + minX, (double)bp.getY() + minY, (double)bp.getZ() + minZ, (double)bp.getX() + maxX, (double)bp.getY() + maxY, (double)bp.getZ() + maxZ, this.lineColor.get()));
++            }
++            if (this.shapeMode.get() == ShapeMode.Both || this.shapeMode.get() == ShapeMode.Sides) {
++                for (AABB b : shape.toAabbs()) {
++                    this.render(event, bp, b);
+                 }
+             }
+         } else {
+-            if (advanced.get()) {
+-                if (shapeMode.get() == ShapeMode.Both || shapeMode.get() == ShapeMode.Lines) {
+-                    shape.forAllEdges((minX, minY, minZ, maxX, maxY, maxZ) -> {
+-                        event.renderer.line(bp.getX() + minX, bp.getY() + minY, bp.getZ() + minZ, bp.getX() + maxX, bp.getY() + maxY, bp.getZ() + maxZ, lineColor.get());
+-                    });
+-                }
+-
+-                if (shapeMode.get() == ShapeMode.Both || shapeMode.get() == ShapeMode.Sides) {
+-                    for (AABB b : shape.toAabbs()) {
+-                        render(event, bp, b);
+-                    }
+-                }
+-            } else {
+-                render(event, bp, box);
+-            }
++            this.render(event, bp, box);
+         }
+     }
+ 
+     private void render(Render3DEvent event, BlockPos bp, AABB box) {
+-        event.renderer.box(bp.getX() + box.minX, bp.getY() + box.minY, bp.getZ() + box.minZ, bp.getX() + box.maxX, bp.getY() + box.maxY, bp.getZ() + box.maxZ, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
++        event.renderer.box((double)bp.getX() + box.minX, (double)bp.getY() + box.minY, (double)bp.getZ() + box.minZ, (double)bp.getX() + box.maxX, (double)bp.getY() + box.maxY, (double)bp.getZ() + box.maxZ, this.sideColor.get(), this.lineColor.get(), this.shapeMode.get(), 0);
+     }
+ }
++

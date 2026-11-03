@@ -1,0 +1,76 @@
+--- upstream261/commands/commands/WaspCommand.java
++++ v1decompiled/commands/commands/WaspCommand.java
+@@ -1,45 +1,52 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.Message
++ *  com.mojang.brigadier.builder.LiteralArgumentBuilder
++ *  com.mojang.brigadier.exceptions.SimpleCommandExceptionType
++ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
++ *  net.minecraft.network.chat.Component
++ *  net.minecraft.world.entity.player.Player
+  */
++package radmin.client.commands.commands;
+ 
+-package meteordevelopment.meteorclient.commands.commands;
+-
++import com.mojang.brigadier.Message;
+ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+-import meteordevelopment.meteorclient.commands.Command;
+-import meteordevelopment.meteorclient.commands.arguments.PlayerArgumentType;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.movement.AutoWasp;
+ import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.world.entity.player.Player;
++import radmin.client.commands.Command;
++import radmin.client.commands.arguments.PlayerArgumentType;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.movement.AutoWasp;
+ 
+-public class WaspCommand extends Command {
+-    private static final SimpleCommandExceptionType CANT_WASP_SELF = new SimpleCommandExceptionType(Component.literal("You cannot target yourself!"));
++public class WaspCommand
++extends Command {
++    private static final SimpleCommandExceptionType CANT_WASP_SELF = new SimpleCommandExceptionType((Message)Component.literal((String)"You cannot target yourself!"));
+ 
+     public WaspCommand() {
+-        super("wasp", "Sets the auto wasp target.");
++        super("wasp", "Sets the auto wasp target.", new String[0]);
+     }
+ 
+     @Override
+     public void build(LiteralArgumentBuilder<ClientSuggestionProvider> builder) {
+         AutoWasp wasp = Modules.get().get(AutoWasp.class);
+-
+-        builder.then(literal("reset").executes(_ -> {
++        builder.then(WaspCommand.literal("reset").executes(commandContext -> {
+             wasp.disable();
+-            return SINGLE_SUCCESS;
++            return 1;
+         }));
+-
+-        builder.then(argument("player", PlayerArgumentType.create()).executes(context -> {
++        builder.then(WaspCommand.argument("player", PlayerArgumentType.create()).executes(context -> {
+             Player player = PlayerArgumentType.get(context);
+-
+-            if (player == mc.player) throw CANT_WASP_SELF.create();
+-
++            if (player == WaspCommand.mc.player) {
++                throw CANT_WASP_SELF.create();
++            }
+             wasp.target = player;
+             wasp.enable();
+-            info(player.getName().getString() + " set as target.");
+-            return SINGLE_SUCCESS;
++            this.info(player.getName().getString() + " set as target.", new Object[0]);
++            return 1;
+         }));
+     }
+ }
++

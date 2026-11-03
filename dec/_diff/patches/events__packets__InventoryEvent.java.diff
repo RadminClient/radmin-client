@@ -1,0 +1,29 @@
+--- upstream261/events/packets/InventoryEvent.java
++++ v1decompiled/events/packets/InventoryEvent.java
+@@ -1,19 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket
+  */
+-
+-package meteordevelopment.meteorclient.events.packets;
++package radmin.client.events.packets;
+ 
+ import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
+ 
+ public class InventoryEvent {
+     private static final InventoryEvent INSTANCE = new InventoryEvent();
+-
+     public ClientboundContainerSetContentPacket packet;
+ 
+     public static InventoryEvent get(ClientboundContainerSetContentPacket packet) {
+-        INSTANCE.packet = packet;
++        InventoryEvent.INSTANCE.packet = packet;
+         return INSTANCE;
+     }
+ }
++

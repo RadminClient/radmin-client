@@ -1,0 +1,23 @@
+--- upstream261/mixininterface/IClientboundExplodePacket.java
++++ v1decompiled/mixininterface/IClientboundExplodePacket.java
+@@ -1,14 +1,13 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ public interface IClientboundExplodePacket {
+-    void meteor$setVelocityX(float velocity);
++    public void meteor$setVelocityX(float var1);
+ 
+-    void meteor$setVelocityY(float velocity);
++    public void meteor$setVelocityY(float var1);
+ 
+-    void meteor$setVelocityZ(float velocity);
++    public void meteor$setVelocityZ(float var1);
+ }
++

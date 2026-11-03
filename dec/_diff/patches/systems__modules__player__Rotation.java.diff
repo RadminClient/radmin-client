@@ -1,0 +1,156 @@
+--- upstream261/systems/modules/player/Rotation.java
++++ v1decompiled/systems/modules/player/Rotation.java
+@@ -1,100 +1,85 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
+  */
++package radmin.client.systems.modules.player;
+ 
+-package meteordevelopment.meteorclient.systems.modules.player;
++import meteordevelopment.orbit.EventHandler;
++import radmin.client.events.world.TickEvent;
++import radmin.client.settings.DoubleSetting;
++import radmin.client.settings.EnumSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
+ 
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.settings.DoubleSetting;
+-import meteordevelopment.meteorclient.settings.EnumSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.orbit.EventHandler;
+-
+-public class Rotation extends Module {
+-    private final SettingGroup sgYaw = settings.createGroup("Yaw");
+-    private final SettingGroup sgPitch = settings.createGroup("Pitch");
+-
+-    // Yaw
+-
+-    private final Setting<LockMode> yawLockMode = sgYaw.add(new EnumSetting.Builder<LockMode>()
+-        .name("yaw-lock-mode")
+-        .description("The way in which your yaw is locked.")
+-        .defaultValue(LockMode.Simple)
+-        .build()
+-    );
+-
+-    private final Setting<Double> yawAngle = sgYaw.add(new DoubleSetting.Builder()
+-        .name("yaw-angle")
+-        .description("Yaw angle in degrees.")
+-        .defaultValue(0)
+-        .sliderMax(360)
+-        .max(360)
+-        .visible(() -> yawLockMode.get() == LockMode.Simple)
+-        .build()
+-    );
+-
+-    // Pitch
+-
+-    private final Setting<LockMode> pitchLockMode = sgPitch.add(new EnumSetting.Builder<LockMode>()
+-        .name("pitch-lock-mode")
+-        .description("The way in which your pitch is locked.")
+-        .defaultValue(LockMode.Simple)
+-        .build()
+-    );
+-
+-    private final Setting<Double> pitchAngle = sgPitch.add(new DoubleSetting.Builder()
+-        .name("pitch-angle")
+-        .description("Pitch angle in degrees.")
+-        .defaultValue(0)
+-        .range(-90, 90)
+-        .sliderRange(-90, 90)
+-        .visible(() -> pitchLockMode.get() == LockMode.Simple)
+-        .build()
+-    );
++public class Rotation
++extends Module {
++    private final SettingGroup sgYaw;
++    private final SettingGroup sgPitch;
++    private final Setting<LockMode> yawLockMode;
++    private final Setting<Double> yawAngle;
++    private final Setting<LockMode> pitchLockMode;
++    private final Setting<Double> pitchAngle;
+ 
+     public Rotation() {
+         super(Categories.Player, "rotation", "Changes/locks your yaw and pitch.");
++        this.sgYaw = this.settings.createGroup("Yaw");
++        this.sgPitch = this.settings.createGroup("Pitch");
++        this.yawLockMode = this.sgYaw.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("yaw-lock-mode")).description("The way in which your yaw is locked.")).defaultValue(LockMode.Simple)).build());
++        this.yawAngle = this.sgYaw.add(((DoubleSetting.Builder)((DoubleSetting.Builder)((DoubleSetting.Builder)new DoubleSetting.Builder().name("yaw-angle")).description("Yaw angle in degrees.")).defaultValue(0.0).sliderMax(360.0).max(360.0).visible(() -> this.yawLockMode.get() == LockMode.Simple)).build());
++        this.pitchLockMode = this.sgPitch.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("pitch-lock-mode")).description("The way in which your pitch is locked.")).defaultValue(LockMode.Simple)).build());
++        this.pitchAngle = this.sgPitch.add(((DoubleSetting.Builder)((DoubleSetting.Builder)((DoubleSetting.Builder)new DoubleSetting.Builder().name("pitch-angle")).description("Pitch angle in degrees.")).defaultValue(0.0).range(-90.0, 90.0).sliderRange(-90.0, 90.0).visible(() -> this.pitchLockMode.get() == LockMode.Simple)).build());
+     }
+ 
+     @Override
+     public void onActivate() {
+-        onTick(null);
++        this.onTick(null);
+     }
+ 
+     @EventHandler
+     private void onTick(TickEvent.Post event) {
+-        switch (yawLockMode.get()) {
+-            case Simple -> setYawAngle(yawAngle.get().floatValue());
+-            case Smart -> setYawAngle(getSmartYawDirection());
++        switch (this.yawLockMode.get().ordinal()) {
++            case 1: {
++                this.setYawAngle(this.yawAngle.get().floatValue());
++                break;
++            }
++            case 0: {
++                this.setYawAngle(this.getSmartYawDirection());
++            }
+         }
+-
+-        switch (pitchLockMode.get()) {
+-            case Simple -> mc.player.setXRot(pitchAngle.get().floatValue());
+-            case Smart -> mc.player.setXRot(getSmartPitchDirection());
++        switch (this.pitchLockMode.get().ordinal()) {
++            case 1: {
++                this.mc.player.setXRot(this.pitchAngle.get().floatValue());
++                break;
++            }
++            case 0: {
++                this.mc.player.setXRot(this.getSmartPitchDirection());
++            }
+         }
+     }
+ 
+     private float getSmartYawDirection() {
+-        return Math.round((mc.player.getYRot() + 1f) / 45f) * 45f;
++        return (float)Math.round((this.mc.player.getYRot() + 1.0f) / 45.0f) * 45.0f;
+     }
+ 
+     private float getSmartPitchDirection() {
+-        return Math.round((mc.player.getXRot() + 1f) / 30f) * 30f;
++        return (float)Math.round((this.mc.player.getXRot() + 1.0f) / 30.0f) * 30.0f;
+     }
+ 
+     private void setYawAngle(float yawAngle) {
+-        mc.player.setYRot(yawAngle);
+-        mc.player.yHeadRot = yawAngle;
+-        mc.player.yBodyRot = yawAngle;
++        this.mc.player.setYRot(yawAngle);
++        this.mc.player.yHeadRot = yawAngle;
++        this.mc.player.yBodyRot = yawAngle;
+     }
+ 
+-    public enum LockMode {
++    public static enum LockMode {
+         Smart,
+         Simple,
+-        None
++        None;
++
+     }
+ }
++

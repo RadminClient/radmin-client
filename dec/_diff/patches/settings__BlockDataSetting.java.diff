@@ -1,0 +1,118 @@
+--- upstream261/settings/BlockDataSetting.java
++++ v1decompiled/settings/BlockDataSetting.java
+@@ -1,40 +1,47 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.registries.BuiltInRegistries
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.Tag
++ *  net.minecraft.resources.Identifier
++ *  net.minecraft.world.level.block.Block
+  */
+-
+-package meteordevelopment.meteorclient.settings;
+-
+-import meteordevelopment.meteorclient.utils.misc.IChangeable;
+-import meteordevelopment.meteorclient.utils.misc.ICopyable;
+-import meteordevelopment.meteorclient.utils.misc.IGetter;
+-import meteordevelopment.meteorclient.utils.misc.ISerializable;
+-import net.minecraft.core.registries.BuiltInRegistries;
+-import net.minecraft.nbt.CompoundTag;
+-import net.minecraft.resources.Identifier;
+-import net.minecraft.world.level.block.Block;
++package radmin.client.settings;
+ 
+ import java.util.HashMap;
+ import java.util.Map;
+ import java.util.function.Consumer;
++import net.minecraft.core.registries.BuiltInRegistries;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.Tag;
++import net.minecraft.resources.Identifier;
++import net.minecraft.world.level.block.Block;
++import radmin.client.settings.IBlockData;
++import radmin.client.settings.IVisible;
++import radmin.client.settings.Setting;
++import radmin.client.utils.misc.ICopyable;
++import radmin.client.utils.misc.IGetter;
++import radmin.client.utils.misc.ISerializable;
+ 
+-public class BlockDataSetting<T extends ICopyable<T> & ISerializable<T> & IChangeable & IBlockData<T>> extends Setting<Map<Block, T>> {
++public class BlockDataSetting<T extends ICopyable<T> & ISerializable<T> & IBlockData<T>>
++extends Setting<Map<Block, T>> {
+     public final IGetter<T> defaultData;
+ 
+     public BlockDataSetting(String name, String description, Map<Block, T> defaultValue, Consumer<Map<Block, T>> onChanged, Consumer<Setting<Map<Block, T>>> onModuleActivated, IGetter<T> defaultData, IVisible visible) {
+         super(name, description, defaultValue, onChanged, onModuleActivated, visible);
+-
+         this.defaultData = defaultData;
+     }
+ 
+     @Override
+     public void resetImpl() {
+-        value = new HashMap<>(defaultValue);
++        this.value = new HashMap((Map)this.defaultValue);
+     }
+ 
+     @Override
+     protected Map<Block, T> parseImpl(String str) {
+-        return HashMap.newHashMap(0);
++        return HashMap.newHashMap((int)0);
+     }
+ 
+     @Override
+@@ -45,31 +52,29 @@
+     @Override
+     protected CompoundTag save(CompoundTag tag) {
+         CompoundTag valueTag = new CompoundTag();
+-        for (Block block : get().keySet()) {
+-            valueTag.put(BuiltInRegistries.BLOCK.getKey(block).toString(), get().get(block).toTag());
++        for (Block block : ((Map)this.get()).keySet()) {
++            valueTag.put(BuiltInRegistries.BLOCK.getKey((Object)block).toString(), (Tag)((ISerializable)((Object)((ICopyable)((Map)this.get()).get(block)))).toTag());
+         }
+-        tag.put("value", valueTag);
+-
++        tag.put("value", (Tag)valueTag);
+         return tag;
+     }
+ 
+     @Override
+     protected Map<Block, T> load(CompoundTag tag) {
+-        get().clear();
+-
++        ((Map)this.get()).clear();
+         CompoundTag valueTag = tag.getCompoundOrEmpty("value");
+         for (String key : valueTag.keySet()) {
+-            get().put(BuiltInRegistries.BLOCK.getValue(Identifier.parse(key)), defaultData.get().copy().fromTag(valueTag.getCompoundOrEmpty(key)));
++            ((Map)this.get()).put((Block)BuiltInRegistries.BLOCK.getValue(Identifier.parse((String)key)), (ICopyable)((ISerializable)((ICopyable)this.defaultData.get()).copy()).fromTag(valueTag.getCompoundOrEmpty(key)));
+         }
+-
+-        return get();
++        return (Map)this.get();
+     }
+ 
+-    public static class Builder<T extends ICopyable<T> & ISerializable<T> & IChangeable & IBlockData<T>> extends SettingBuilder<Builder<T>, Map<Block, T>, BlockDataSetting<T>> {
++    public static class Builder<T extends ICopyable<T> & ISerializable<T> & IBlockData<T>>
++    extends Setting.SettingBuilder<Builder<T>, Map<Block, T>, BlockDataSetting<T>> {
+         private IGetter<T> defaultData;
+ 
+         public Builder() {
+-            super(HashMap.newHashMap(0));
++            super(HashMap.newHashMap((int)0));
+         }
+ 
+         public Builder<T> defaultData(IGetter<T> defaultData) {
+@@ -79,7 +84,8 @@
+ 
+         @Override
+         public BlockDataSetting<T> build() {
+-            return new BlockDataSetting<>(name, description, defaultValue, onChanged, onModuleActivated, defaultData, visible);
++            return new BlockDataSetting<T>(this.name, this.description, (Map)this.defaultValue, this.onChanged, this.onModuleActivated, this.defaultData, this.visible);
+         }
+     }
+ }
++

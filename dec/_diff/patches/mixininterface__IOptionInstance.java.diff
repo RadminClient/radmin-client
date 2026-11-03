@@ -1,0 +1,17 @@
+--- upstream261/mixininterface/IOptionInstance.java
++++ v1decompiled/mixininterface/IOptionInstance.java
+@@ -1,10 +1,9 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ public interface IOptionInstance {
+-    void meteor$set(Object value);
++    public void meteor$set(Object var1);
+ }
++

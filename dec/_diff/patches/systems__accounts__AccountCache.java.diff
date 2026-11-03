@@ -1,0 +1,118 @@
+--- upstream261/systems/accounts/AccountCache.java
++++ v1decompiled/systems/accounts/AccountCache.java
+@@ -1,51 +1,57 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.util.UndashedUuid
++ *  net.minecraft.nbt.CompoundTag
+  */
+-
+-package meteordevelopment.meteorclient.systems.accounts;
++package radmin.client.systems.accounts;
+ 
+ import com.mojang.util.UndashedUuid;
+-import meteordevelopment.meteorclient.utils.misc.ISerializable;
+-import meteordevelopment.meteorclient.utils.misc.NbtException;
+-import meteordevelopment.meteorclient.utils.network.MeteorExecutor;
+-import meteordevelopment.meteorclient.utils.render.PlayerHeadTexture;
+-import meteordevelopment.meteorclient.utils.render.PlayerHeadUtils;
+ import net.minecraft.nbt.CompoundTag;
++import radmin.client.MeteorClient;
++import radmin.client.utils.misc.ISerializable;
++import radmin.client.utils.misc.NbtException;
++import radmin.client.utils.network.MeteorExecutor;
++import radmin.client.utils.render.PlayerHeadTexture;
++import radmin.client.utils.render.PlayerHeadUtils;
+ 
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class AccountCache implements ISerializable<AccountCache> {
++public class AccountCache
++implements ISerializable<AccountCache> {
+     public String username = "";
+     public String uuid = "";
+     private PlayerHeadTexture headTexture;
+     private volatile boolean loadingHead;
+ 
+     public PlayerHeadTexture getHeadTexture() {
+-        return headTexture != null ? headTexture : PlayerHeadUtils.STEVE_HEAD;
++        return this.headTexture != null ? this.headTexture : PlayerHeadUtils.STEVE_HEAD;
+     }
+ 
+     public void loadHead() {
+-        loadHead(null);
++        this.loadHead(null);
+     }
+ 
+     public void loadHead(Runnable callback) {
+-        if (headTexture != null || uuid == null || uuid.isBlank()) {
+-            if (callback != null) mc.execute(callback);
++        if (this.headTexture != null || this.uuid == null || this.uuid.isBlank()) {
++            if (callback != null) {
++                MeteorClient.mc.execute(callback);
++            }
+             return;
+         }
+-
+-        if (loadingHead) return;
+-
+-        loadingHead = true;
+-
++        if (this.loadingHead) {
++            return;
++        }
++        this.loadingHead = true;
+         MeteorExecutor.execute(() -> {
+-            byte[] head = PlayerHeadUtils.fetchHead(UndashedUuid.fromStringLenient(uuid));
+-
+-            mc.execute(() -> {
+-                if (head != null) headTexture = new PlayerHeadTexture(head, true);
+-                loadingHead = false;
+-                if (callback != null) callback.run();
++            byte[] head = PlayerHeadUtils.fetchHead(UndashedUuid.fromStringLenient((String)this.uuid));
++            MeteorClient.mc.execute(() -> {
++                if (head != null) {
++                    this.headTexture = new PlayerHeadTexture(head, true);
++                }
++                this.loadingHead = false;
++                if (callback != null) {
++                    callback.run();
++                }
+             });
+         });
+     }
+@@ -53,21 +59,20 @@
+     @Override
+     public CompoundTag toTag() {
+         CompoundTag tag = new CompoundTag();
+-
+-        tag.putString("username", username);
+-        tag.putString("uuid", uuid);
+-
++        tag.putString("username", this.username);
++        tag.putString("uuid", this.uuid);
+         return tag;
+     }
+ 
+     @Override
+     public AccountCache fromTag(CompoundTag tag) {
+-        if (tag.getString("username").isEmpty() || tag.getString("uuid").isEmpty()) throw new NbtException();
+-
+-        username = tag.getString("username").get();
+-        uuid = tag.getString("uuid").get();
+-        loadHead();
+-
++        if (tag.getString("username").isEmpty() || tag.getString("uuid").isEmpty()) {
++            throw new NbtException();
++        }
++        this.username = (String)tag.getString("username").get();
++        this.uuid = (String)tag.getString("uuid").get();
++        this.loadHead();
+         return this;
+     }
+ }
++

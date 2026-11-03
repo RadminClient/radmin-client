@@ -1,0 +1,68 @@
+--- upstream261/systems/modules/movement/speed/modes/Vanilla.java
++++ v1decompiled/systems/modules/movement/speed/modes/Vanilla.java
+@@ -1,43 +1,44 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.effect.MobEffects
++ *  net.minecraft.world.phys.Vec3
+  */
++package radmin.client.systems.modules.movement.speed.modes;
+ 
+-package meteordevelopment.meteorclient.systems.modules.movement.speed.modes;
+-
+-import meteordevelopment.meteorclient.events.entity.player.PlayerMoveEvent;
+-import meteordevelopment.meteorclient.mixininterface.IVec3;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.movement.Anchor;
+-import meteordevelopment.meteorclient.systems.modules.movement.speed.SpeedMode;
+-import meteordevelopment.meteorclient.systems.modules.movement.speed.SpeedModes;
+-import meteordevelopment.meteorclient.utils.player.PlayerUtils;
+ import net.minecraft.world.effect.MobEffects;
+ import net.minecraft.world.phys.Vec3;
++import radmin.client.events.entity.player.PlayerMoveEvent;
++import radmin.client.mixininterface.IVec3;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.movement.Anchor;
++import radmin.client.systems.modules.movement.speed.SpeedMode;
++import radmin.client.systems.modules.movement.speed.SpeedModes;
++import radmin.client.utils.player.PlayerUtils;
+ 
+-public class Vanilla extends SpeedMode {
++public class Vanilla
++extends SpeedMode {
+     public Vanilla() {
+         super(SpeedModes.Vanilla);
+     }
+ 
+     @Override
+     public void onMove(PlayerMoveEvent event) {
+-        Vec3 vel = PlayerUtils.getHorizontalVelocity(settings.vanillaSpeed.get());
++        Anchor anchor;
++        Vec3 vel = PlayerUtils.getHorizontalVelocity(this.settings.vanillaSpeed.get());
+         double velX = vel.x();
+         double velZ = vel.z();
+-
+-        if (mc.player.hasEffect(MobEffects.SPEED)) {
+-            double value = (mc.player.getEffect(MobEffects.SPEED).getAmplifier() + 1) * 0.205;
++        if (this.mc.player.hasEffect(MobEffects.SPEED)) {
++            double value = (double)(this.mc.player.getEffect(MobEffects.SPEED).getAmplifier() + 1) * 0.205;
+             velX += velX * value;
+             velZ += velZ * value;
+         }
+-
+-        Anchor anchor = Modules.get().get(Anchor.class);
+-        if (anchor.isActive() && anchor.controlMovement) {
++        if ((anchor = Modules.get().get(Anchor.class)).isActive() && anchor.controlMovement) {
+             velX = anchor.deltaX;
+             velZ = anchor.deltaZ;
+         }
+-
+-        ((IVec3) event.movement).meteor$set(velX, event.movement.y, velZ);
++        ((IVec3)event.movement).meteor$set(velX, event.movement.y, velZ);
+     }
+ }
++

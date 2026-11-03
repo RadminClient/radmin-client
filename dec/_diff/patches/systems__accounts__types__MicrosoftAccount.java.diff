@@ -1,0 +1,94 @@
+--- upstream261/systems/accounts/types/MicrosoftAccount.java
++++ v1decompiled/systems/accounts/types/MicrosoftAccount.java
+@@ -1,21 +1,25 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.util.UndashedUuid
++ *  net.minecraft.client.User
++ *  org.jetbrains.annotations.Nullable
+  */
+-
+-package meteordevelopment.meteorclient.systems.accounts.types;
++package radmin.client.systems.accounts.types;
+ 
+ import com.mojang.util.UndashedUuid;
+-import meteordevelopment.meteorclient.systems.accounts.Account;
+-import meteordevelopment.meteorclient.systems.accounts.AccountType;
+-import meteordevelopment.meteorclient.systems.accounts.MicrosoftLogin;
++import java.util.Optional;
+ import net.minecraft.client.User;
+ import org.jetbrains.annotations.Nullable;
++import radmin.client.systems.accounts.Account;
++import radmin.client.systems.accounts.AccountType;
++import radmin.client.systems.accounts.MicrosoftLogin;
+ 
+-import java.util.Optional;
+-
+-public class MicrosoftAccount extends Account<MicrosoftAccount> {
+-    private @Nullable String token;
++public class MicrosoftAccount
++extends Account<MicrosoftAccount> {
++    @Nullable
++    private String token;
+ 
+     public MicrosoftAccount(String refreshToken) {
+         super(AccountType.Microsoft, refreshToken);
+@@ -23,34 +27,38 @@
+ 
+     @Override
+     public boolean fetchInfo() {
+-        token = auth();
+-        return token != null;
++        this.token = this.auth();
++        return this.token != null;
+     }
+ 
+     @Override
+     public boolean login() {
+-        if (token == null) return false;
+-
++        if (this.token == null) {
++            return false;
++        }
+         super.login();
+-
+-        setSession(new User(cache.username, UndashedUuid.fromStringLenient(cache.uuid), token, Optional.empty(), Optional.empty()));
++        MicrosoftAccount.setSession(new User(this.cache.username, UndashedUuid.fromStringLenient((String)this.cache.uuid), this.token, Optional.empty(), Optional.empty()));
+         return true;
+     }
+ 
+-    private @Nullable String auth() {
+-        MicrosoftLogin.LoginData data = MicrosoftLogin.login(name);
+-        if (!data.isGood()) return null;
+-
+-        name = data.newRefreshToken;
+-        cache.username = data.username;
+-        cache.uuid = data.uuid;
+-
++    @Nullable
++    private String auth() {
++        MicrosoftLogin.LoginData data = MicrosoftLogin.login(this.name);
++        if (!data.isGood()) {
++            return null;
++        }
++        this.name = data.newRefreshToken;
++        this.cache.username = data.username;
++        this.cache.uuid = data.uuid;
+         return data.mcToken;
+     }
+ 
+-    @Override
+     public boolean equals(Object o) {
+-        if (!(o instanceof MicrosoftAccount account)) return false;
++        if (!(o instanceof MicrosoftAccount)) {
++            return false;
++        }
++        MicrosoftAccount account = (MicrosoftAccount)o;
+         return account.name.equals(this.name);
+     }
+ }
++

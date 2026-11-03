@@ -1,0 +1,40 @@
+--- upstream261/events/world/BlockUpdateEvent.java
++++ v1decompiled/events/world/BlockUpdateEvent.java
+@@ -1,24 +1,26 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.BlockPos
++ *  net.minecraft.world.level.block.state.BlockState
+  */
++package radmin.client.events.world;
+ 
+-package meteordevelopment.meteorclient.events.world;
+-
++import net.minecraft.core.BlockPos;
+ import net.minecraft.world.level.block.state.BlockState;
+-import net.minecraft.core.BlockPos;
+ 
+ public class BlockUpdateEvent {
+     private static final BlockUpdateEvent INSTANCE = new BlockUpdateEvent();
+-
+     public BlockPos pos;
+-    public BlockState oldState, newState;
++    public BlockState oldState;
++    public BlockState newState;
+ 
+     public static BlockUpdateEvent get(BlockPos pos, BlockState oldState, BlockState newState) {
+-        INSTANCE.pos = pos;
+-        INSTANCE.oldState = oldState;
+-        INSTANCE.newState = newState;
+-
++        BlockUpdateEvent.INSTANCE.pos = pos;
++        BlockUpdateEvent.INSTANCE.oldState = oldState;
++        BlockUpdateEvent.INSTANCE.newState = newState;
+         return INSTANCE;
+     }
+ }
++

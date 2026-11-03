@@ -1,0 +1,17 @@
+--- upstream261/utils/misc/NbtException.java
++++ v1decompiled/utils/misc/NbtException.java
+@@ -1,9 +1,9 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.utils.misc;
+ 
+-package meteordevelopment.meteorclient.utils.misc;
++public class NbtException
++extends RuntimeException {
++}
+ 
+-public class NbtException extends RuntimeException {
+-}

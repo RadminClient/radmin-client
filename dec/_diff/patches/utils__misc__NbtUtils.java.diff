@@ -1,0 +1,158 @@
+--- upstream261/utils/misc/NbtUtils.java
++++ v1decompiled/utils/misc/NbtUtils.java
+@@ -1,95 +1,119 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.ListTag
++ *  net.minecraft.nbt.NbtAccounter
++ *  net.minecraft.nbt.NbtIo
++ *  net.minecraft.nbt.Tag
+  */
+-
+-package meteordevelopment.meteorclient.utils.misc;
+-
+-import meteordevelopment.meteorclient.MeteorClient;
+-import net.minecraft.nbt.*;
++package radmin.client.utils.misc;
+ 
+ import java.io.ByteArrayInputStream;
+ import java.io.ByteArrayOutputStream;
+ import java.io.DataInputStream;
+-import java.util.*;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.util.ArrayList;
++import java.util.Base64;
++import java.util.HashMap;
++import java.util.List;
++import java.util.Map;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.ListTag;
++import net.minecraft.nbt.NbtAccounter;
++import net.minecraft.nbt.NbtIo;
++import net.minecraft.nbt.Tag;
++import radmin.client.MeteorClient;
++import radmin.client.utils.misc.ISerializable;
+ 
+ public class NbtUtils {
+     public static <T extends ISerializable<?>> ListTag listToTag(Iterable<T> list) {
+         ListTag tag = new ListTag();
+-        for (T item : list) tag.add(item.toTag());
++        for (ISerializable item : list) {
++            tag.add((Object)item.toTag());
++        }
+         return tag;
+     }
+ 
+     public static <T> List<T> listFromTag(ListTag tag, ToValue<T> toItem) {
+-        List<T> list = new ArrayList<>(tag.size());
++        ArrayList<T> list = new ArrayList<T>(tag.size());
+         for (Tag itemTag : tag) {
+             T value = toItem.toValue(itemTag);
+-            if (value != null) list.add(value);
++            if (value == null) continue;
++            list.add(value);
+         }
+         return list;
+     }
+ 
+     public static <K, V extends ISerializable<?>> CompoundTag mapToTag(Map<K, V> map) {
+         CompoundTag tag = new CompoundTag();
+-        for (var entry : map.entrySet()) tag.put(entry.getKey().toString(), entry.getValue().toTag());
++        for (Map.Entry<K, V> entry : map.entrySet()) {
++            tag.put(entry.getKey().toString(), (Tag)((ISerializable)entry.getValue()).toTag());
++        }
+         return tag;
+     }
+ 
+     public static <K, V> Map<K, V> mapFromTag(CompoundTag tag, ToKey<K> toKey, ToValue<V> toValue) {
+-        Map<K, V> map = HashMap.newHashMap(tag.size());
+-        for (String key : tag.keySet()) map.put(toKey.toKey(key), toValue.toValue(tag.get(key)));
++        HashMap map = HashMap.newHashMap((int)tag.size());
++        for (String key : tag.keySet()) {
++            map.put(toKey.toKey(key), toValue.toValue(tag.get(key)));
++        }
+         return map;
+     }
+ 
+     public static boolean toClipboard(ISerializable<?> serializable) {
+-        return toClipboard(serializable.toTag());
++        return NbtUtils.toClipboard(serializable.toTag());
+     }
+ 
+     public static boolean toClipboard(CompoundTag tag) {
+-        String preClipboard = mc.keyboardHandler.getClipboard();
++        String preClipboard = MeteorClient.mc.keyboardHandler.getClipboard();
+         try {
+             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+-            NbtIo.writeCompressed(tag, byteArrayOutputStream);
+-            mc.keyboardHandler.setClipboard(Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray()));
++            NbtIo.writeCompressed((CompoundTag)tag, (OutputStream)byteArrayOutputStream);
++            MeteorClient.mc.keyboardHandler.setClipboard(Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray()));
+             return true;
+-        } catch (Exception e) {
+-            MeteorClient.LOG.error("Error copying NBT to clipboard!", e);
+-            mc.keyboardHandler.setClipboard(preClipboard);
++        }
++        catch (Exception e) {
++            MeteorClient.LOG.error("Error copying NBT to clipboard!", (Throwable)e);
++            MeteorClient.mc.keyboardHandler.setClipboard(preClipboard);
+             return false;
+         }
+     }
+ 
+     public static boolean fromClipboard(ISerializable<?> serializable) {
+-        CompoundTag tag = fromClipboard();
+-        if (tag == null) return false;
+-
++        CompoundTag tag = NbtUtils.fromClipboard();
++        if (tag == null) {
++            return false;
++        }
+         CompoundTag sourceTag = serializable.toTag();
+         for (String key : sourceTag.keySet()) {
+-            if (!tag.contains(key)) return false;
++            if (tag.contains(key)) continue;
++            return false;
+         }
+-
+         serializable.fromTag(tag);
+         return true;
+     }
+ 
+     public static CompoundTag fromClipboard() {
+         try {
+-            byte[] data = Base64.getDecoder().decode(mc.keyboardHandler.getClipboard().trim());
++            byte[] data = Base64.getDecoder().decode(MeteorClient.mc.keyboardHandler.getClipboard().trim());
+             ByteArrayInputStream bis = new ByteArrayInputStream(data);
+-            return NbtIo.readCompressed(new DataInputStream(bis), NbtAccounter.unlimitedHeap());
+-        } catch (Exception e) {
+-            MeteorClient.LOG.error("Invalid NBT data pasted!", e);
++            return NbtIo.readCompressed((InputStream)new DataInputStream(bis), (NbtAccounter)NbtAccounter.unlimitedHeap());
++        }
++        catch (Exception e) {
++            MeteorClient.LOG.error("Invalid NBT data pasted!", (Throwable)e);
+             return null;
+         }
+     }
+ 
+-    public interface ToKey<T> {
+-        T toKey(String string);
++    public static interface ToValue<T> {
++        public T toValue(Tag var1);
+     }
+ 
+-    public interface ToValue<T> {
+-        T toValue(Tag tag);
++    public static interface ToKey<T> {
++        public T toKey(String var1);
+     }
+ }
++

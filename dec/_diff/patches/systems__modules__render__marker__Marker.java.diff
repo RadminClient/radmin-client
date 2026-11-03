@@ -1,0 +1,210 @@
+--- upstream261/systems/modules/render/marker/Marker.java
++++ v1decompiled/systems/modules/render/marker/Marker.java
+@@ -1,34 +1,41 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.ListTag
++ *  net.minecraft.nbt.Tag
+  */
++package radmin.client.systems.modules.render.marker;
+ 
+-package meteordevelopment.meteorclient.systems.modules.render.marker;
+-
+-import meteordevelopment.meteorclient.events.render.Render3DEvent;
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.gui.widgets.WLabel;
+-import meteordevelopment.meteorclient.gui.widgets.WWidget;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WVerticalList;
+-import meteordevelopment.meteorclient.gui.widgets.input.WDropdown;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WCheckbox;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WMinus;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
++import java.lang.invoke.StringConcatFactory;
++import java.util.ArrayList;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.nbt.ListTag;
+ import net.minecraft.nbt.Tag;
++import radmin.client.events.render.Render3DEvent;
++import radmin.client.events.world.TickEvent;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.widgets.WLabel;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.gui.widgets.containers.WHorizontalList;
++import radmin.client.gui.widgets.containers.WVerticalList;
++import radmin.client.gui.widgets.input.WDropdown;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.gui.widgets.pressable.WCheckbox;
++import radmin.client.gui.widgets.pressable.WMinus;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.systems.modules.render.marker.BaseMarker;
++import radmin.client.systems.modules.render.marker.MarkerFactory;
+ 
+-import java.util.ArrayList;
+-
+-public class Marker extends Module {
++public class Marker
++extends Module {
+     private final MarkerFactory factory = new MarkerFactory();
+-    private final ArrayList<BaseMarker> markers = new ArrayList<>();
++    private final ArrayList<BaseMarker> markers = new ArrayList();
+ 
+     public Marker() {
+         super(Categories.Render, "marker", "Renders shapes. Useful for large scale projects");
+@@ -36,111 +43,91 @@
+ 
+     @EventHandler
+     private void onTick(TickEvent.Post event) {
+-        for (BaseMarker marker : markers) {
+-            if (marker.isVisible()) marker.tick();
++        for (BaseMarker marker : this.markers) {
++            if (!marker.isVisible()) continue;
++            marker.tick();
+         }
+     }
+ 
+     @EventHandler
+     private void onRender(Render3DEvent event) {
+-        for (BaseMarker marker : markers) {
+-            if (marker.isVisible()) marker.render(event);
++        for (BaseMarker marker : this.markers) {
++            if (!marker.isVisible()) continue;
++            marker.render(event);
+         }
+     }
+ 
+     @Override
+     public CompoundTag toTag() {
+         CompoundTag tag = super.toTag();
+-
+         ListTag list = new ListTag();
+-        for (BaseMarker marker : markers) {
++        for (BaseMarker marker : this.markers) {
+             CompoundTag mTag = new CompoundTag();
+             mTag.putString("type", marker.getTypeName());
+-            mTag.put("marker", marker.toTag());
+-
+-            list.add(mTag);
++            mTag.put("marker", (Tag)marker.toTag());
++            list.add((Object)mTag);
+         }
+-
+-        tag.put("markers", list);
++        tag.put("markers", (Tag)list);
+         return tag;
+     }
+ 
+     @Override
+     public Module fromTag(CompoundTag tag) {
+         super.fromTag(tag);
+-
+-        markers.clear();
++        this.markers.clear();
+         ListTag list = tag.getListOrEmpty("markers");
+-
+         for (Tag tagII : list) {
+-            CompoundTag tagI = (CompoundTag) tagII;
+-
++            CompoundTag tagI = (CompoundTag)tagII;
+             String type = tagI.getStringOr("type", "");
+-            BaseMarker marker = factory.createMarker(type);
+-
+-            if (marker != null) {
+-                CompoundTag markerTag = (CompoundTag) tagI.get("marker");
+-                if (markerTag != null) marker.fromTag(markerTag);
+-
+-                markers.add(marker);
++            BaseMarker marker = this.factory.createMarker(type);
++            if (marker == null) continue;
++            CompoundTag markerTag = (CompoundTag)tagI.get("marker");
++            if (markerTag != null) {
++                marker.fromTag(markerTag);
+             }
++            this.markers.add(marker);
+         }
+-
+         return this;
+     }
+ 
+     @Override
+     public WWidget getWidget(GuiTheme theme) {
+         WVerticalList list = theme.verticalList();
+-        fillList(theme, list);
++        this.fillList(theme, list);
+         return list;
+     }
+ 
+     protected void fillList(GuiTheme theme, WVerticalList list) {
+-        // Marker List
+-        for (BaseMarker marker : markers) {
++        for (BaseMarker marker : this.markers) {
+             WHorizontalList hList = list.add(theme.horizontalList()).expandX().widget();
+-
+-            // Name
+             WLabel label = hList.add(theme.label(marker.name.get())).widget();
+             label.tooltip = marker.description.get();
+-
+-            // Dimension
+-            hList.add(theme.label(" - " + marker.getDimension().toString())).expandX().widget().color = theme.textSecondaryColor();
+-
+-            // Toggle
++            hList.add(theme.label((String)((Object)StringConcatFactory.makeConcatWithConstants("makeConcatWithConstants", new Object[]{" - \u0001"}, (String)marker.getDimension().toString())))).expandX().widget().color = theme.textSecondaryColor();
+             WCheckbox checkbox = hList.add(theme.checkbox(marker.isActive())).widget();
+             checkbox.action = () -> {
+-                if (marker.isActive() != checkbox.checked) marker.toggle();
++                if (marker.isActive() != checkbox.checked) {
++                    marker.toggle();
++                }
+             };
+-
+-            // Edit
+             WButton edit = hList.add(theme.button(GuiRenderer.EDIT)).widget();
+-            edit.action = () -> mc.setScreen(marker.getScreen(theme));
+-
+-            // Remove
++            edit.action = () -> this.mc.setScreen(marker.getScreen(theme));
+             WMinus remove = hList.add(theme.minus()).widget();
+             remove.action = () -> {
+-                markers.remove(marker);
++                this.markers.remove(marker);
+                 marker.settings.unregisterColorSettings();
+-
+                 list.clear();
+-                fillList(theme, list);
++                this.fillList(theme, list);
+             };
+         }
+-
+-        // Bottom
+         WHorizontalList bottom = list.add(theme.horizontalList()).expandX().widget();
+-
+-        WDropdown<String> newMarker = bottom.add(theme.dropdown(factory.getNames(), factory.getNames()[0])).widget();
++        WDropdown<String> newMarker = bottom.add(theme.dropdown(this.factory.getNames(), this.factory.getNames()[0])).widget();
+         WButton add = bottom.add(theme.button("Add")).expandX().widget();
+         add.action = () -> {
+-            String name = newMarker.get();
+-            markers.add(factory.createMarker(name));
+-
++            String name = (String)newMarker.get();
++            this.markers.add(this.factory.createMarker(name));
+             list.clear();
+-            fillList(theme, list);
++            this.fillList(theme, list);
+         };
+-
+     }
+ }
++

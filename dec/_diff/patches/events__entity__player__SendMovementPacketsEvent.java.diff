@@ -1,0 +1,37 @@
+--- upstream261/events/entity/player/SendMovementPacketsEvent.java
++++ v1decompiled/events/entity/player/SendMovementPacketsEvent.java
+@@ -1,18 +1,9 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.events.entity.player;
++package radmin.client.events.entity.player;
+ 
+ public class SendMovementPacketsEvent {
+-    public static class Pre {
+-        private static final Pre INSTANCE = new Pre();
+-
+-        public static Pre get() {
+-            return INSTANCE;
+-        }
+-    }
+ 
+     public static class Post {
+         private static final Post INSTANCE = new Post();
+@@ -21,4 +12,13 @@
+             return INSTANCE;
+         }
+     }
++
++    public static class Pre {
++        private static final Pre INSTANCE = new Pre();
++
++        public static Pre get() {
++            return INSTANCE;
++        }
++    }
+ }
++

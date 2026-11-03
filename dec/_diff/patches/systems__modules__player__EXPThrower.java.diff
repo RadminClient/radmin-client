@@ -1,0 +1,65 @@
+--- upstream261/systems/modules/player/EXPThrower.java
++++ v1decompiled/systems/modules/player/EXPThrower.java
+@@ -1,20 +1,25 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.world.entity.player.Player
++ *  net.minecraft.world.item.Items
+  */
++package radmin.client.systems.modules.player;
+ 
+-package meteordevelopment.meteorclient.systems.modules.player;
++import meteordevelopment.orbit.EventHandler;
++import net.minecraft.world.entity.player.Player;
++import net.minecraft.world.item.Items;
++import radmin.client.events.world.TickEvent;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.utils.player.FindItemResult;
++import radmin.client.utils.player.InvUtils;
++import radmin.client.utils.player.Rotations;
+ 
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.utils.player.FindItemResult;
+-import meteordevelopment.meteorclient.utils.player.InvUtils;
+-import meteordevelopment.meteorclient.utils.player.Rotations;
+-import meteordevelopment.orbit.EventHandler;
+-import net.minecraft.world.item.Items;
+-
+-public class EXPThrower extends Module {
++public class EXPThrower
++extends Module {
+     public EXPThrower() {
+         super(Categories.Player, "exp-thrower", "Automatically throws XP bottles from your hotbar.");
+     }
+@@ -22,16 +27,18 @@
+     @EventHandler
+     private void onTick(TickEvent.Pre event) {
+         FindItemResult exp = InvUtils.findInHotbar(Items.EXPERIENCE_BOTTLE);
+-        if (!exp.found()) return;
+-
+-        Rotations.rotate(mc.player.getYRot(), 90, () -> {
++        if (!exp.found()) {
++            return;
++        }
++        Rotations.rotate((double)this.mc.player.getYRot(), 90.0, () -> {
+             if (exp.getHand() != null) {
+-                mc.gameMode.useItem(mc.player, exp.getHand());
++                this.mc.gameMode.useItem((Player)this.mc.player, exp.getHand());
+             } else {
+                 InvUtils.swap(exp.slot(), true);
+-                mc.gameMode.useItem(mc.player, exp.getHand());
++                this.mc.gameMode.useItem((Player)this.mc.player, exp.getHand());
+                 InvUtils.swapBack();
+             }
+         });
+     }
+ }
++

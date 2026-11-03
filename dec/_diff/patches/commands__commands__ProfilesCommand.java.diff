@@ -1,0 +1,82 @@
+--- upstream261/commands/commands/ProfilesCommand.java
++++ v1decompiled/commands/commands/ProfilesCommand.java
+@@ -1,56 +1,51 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.builder.LiteralArgumentBuilder
++ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
+  */
+-
+-package meteordevelopment.meteorclient.commands.commands;
++package radmin.client.commands.commands;
+ 
+ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+-import meteordevelopment.meteorclient.commands.Command;
+-import meteordevelopment.meteorclient.commands.arguments.ProfileArgumentType;
+-import meteordevelopment.meteorclient.systems.profiles.Profile;
+-import meteordevelopment.meteorclient.systems.profiles.Profiles;
+ import net.minecraft.client.multiplayer.ClientSuggestionProvider;
++import radmin.client.commands.Command;
++import radmin.client.commands.arguments.ProfileArgumentType;
++import radmin.client.systems.profiles.Profile;
++import radmin.client.systems.profiles.Profiles;
+ 
+-public class ProfilesCommand extends Command {
+-
++public class ProfilesCommand
++extends Command {
+     public ProfilesCommand() {
+-        super("profiles", "Loads and saves profiles.");
++        super("profiles", "Loads and saves profiles.", new String[0]);
+     }
+ 
+     @Override
+     public void build(LiteralArgumentBuilder<ClientSuggestionProvider> builder) {
+-        builder.then(literal("load").then(argument("profile", ProfileArgumentType.create()).executes(context -> {
++        builder.then(ProfilesCommand.literal("load").then(ProfilesCommand.argument("profile", ProfileArgumentType.create()).executes(context -> {
+             Profile profile = ProfileArgumentType.get(context);
+-
+             if (profile != null) {
+                 profile.load();
+-                info("Loaded profile (highlight)%s(default).", profile.name.get());
++                this.info("Loaded profile (highlight)%s(default).", profile.name.get());
+             }
+-
+-            return SINGLE_SUCCESS;
++            return 1;
+         })));
+-
+-        builder.then(literal("save").then(argument("profile", ProfileArgumentType.create()).executes(context -> {
++        builder.then(ProfilesCommand.literal("save").then(ProfilesCommand.argument("profile", ProfileArgumentType.create()).executes(context -> {
+             Profile profile = ProfileArgumentType.get(context);
+-
+             if (profile != null) {
+                 profile.save();
+-                info("Saved profile (highlight)%s(default).", profile.name.get());
++                this.info("Saved profile (highlight)%s(default).", profile.name.get());
+             }
+-
+-            return SINGLE_SUCCESS;
++            return 1;
+         })));
+-
+-        builder.then(literal("delete").then(argument("profile", ProfileArgumentType.create()).executes(context -> {
++        builder.then(ProfilesCommand.literal("delete").then(ProfilesCommand.argument("profile", ProfileArgumentType.create()).executes(context -> {
+             Profile profile = ProfileArgumentType.get(context);
+-
+             if (profile != null) {
+                 Profiles.get().remove(profile);
+-                info("Deleted profile (highlight)%s(default).", profile.name.get());
++                this.info("Deleted profile (highlight)%s(default).", profile.name.get());
+             }
+-
+-            return SINGLE_SUCCESS;
++            return 1;
+         })));
+     }
+ }
++

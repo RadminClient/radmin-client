@@ -1,0 +1,22 @@
+--- upstream261/mixininterface/IAbstractFurnaceMenu.java
++++ v1decompiled/mixininterface/IAbstractFurnaceMenu.java
+@@ -1,12 +1,14 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.item.ItemStack
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ import net.minecraft.world.item.ItemStack;
+ 
+ public interface IAbstractFurnaceMenu {
+-    boolean meteor$canSmelt(ItemStack itemStack);
++    public boolean meteor$canSmelt(ItemStack var1);
+ }
++

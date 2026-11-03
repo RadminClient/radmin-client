@@ -1,0 +1,146 @@
+--- upstream261/utils/world/BlockIterator.java
++++ v1decompiled/utils/world/BlockIterator.java
+@@ -1,35 +1,34 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  it.unimi.dsi.fastutil.objects.ReferenceArrayList
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.core.BlockPos
++ *  net.minecraft.core.BlockPos$MutableBlockPos
++ *  net.minecraft.world.level.block.state.BlockState
+  */
+-
+-package meteordevelopment.meteorclient.utils.world;
++package radmin.client.utils.world;
+ 
+ import it.unimi.dsi.fastutil.objects.ReferenceArrayList;
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.utils.PreInit;
+-import meteordevelopment.meteorclient.utils.Utils;
+-import meteordevelopment.meteorclient.utils.misc.Pool;
++import java.util.List;
++import java.util.function.BiConsumer;
+ import meteordevelopment.orbit.EventHandler;
+-import meteordevelopment.orbit.EventPriority;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.world.level.block.state.BlockState;
+-
+-import java.util.List;
+-import java.util.function.BiConsumer;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
++import radmin.client.MeteorClient;
++import radmin.client.events.world.TickEvent;
++import radmin.client.utils.PreInit;
++import radmin.client.utils.Utils;
++import radmin.client.utils.misc.Pool;
+ 
+ public class BlockIterator {
+-    private static final Pool<Callback> callbackPool = new Pool<>(Callback::new);
+-    private static final List<Callback> callbacks = new ReferenceArrayList<>();
+-
+-    private static final List<Runnable> afterCallbacks = new ReferenceArrayList<>();
+-
++    private static final Pool<Callback> callbackPool = new Pool<Callback>(Callback::new);
++    private static final List<Callback> callbacks = new ReferenceArrayList();
++    private static final List<Runnable> afterCallbacks = new ReferenceArrayList();
+     private static final BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos();
+-    private static int hRadius, vRadius;
+-
++    private static int hRadius;
++    private static int vRadius;
+     private static boolean disableCurrent;
+ 
+     private BlockIterator() {
+@@ -40,30 +39,26 @@
+         MeteorClient.EVENT_BUS.subscribe(BlockIterator.class);
+     }
+ 
+-    @EventHandler(priority = EventPriority.LOWEST - 1)
++    @EventHandler(priority=-201)
+     private static void onTick(TickEvent.Pre event) {
+-        if (!Utils.canUpdate()) return;
+-
+-        int px = mc.player.getBlockX();
+-        int py = mc.player.getBlockY();
+-        int pz = mc.player.getBlockZ();
+-
+-        for (int x = px - hRadius; x <= px + hRadius; x++) {
+-            for (int z = pz - hRadius; z <= pz + hRadius; z++) {
+-                for (int y = Math.max(mc.level.getMinY(), py - vRadius); y <= py + vRadius; y++) {
+-                    if (y > mc.level.getHeight()) break;
+-
++        if (!Utils.canUpdate()) {
++            return;
++        }
++        int px = MeteorClient.mc.player.getBlockX();
++        int py = MeteorClient.mc.player.getBlockY();
++        int pz = MeteorClient.mc.player.getBlockZ();
++        for (int x = px - hRadius; x <= px + hRadius; ++x) {
++            for (int z = pz - hRadius; z <= pz + hRadius; ++z) {
++                for (int y = Math.max(MeteorClient.mc.level.getMinY(), py - vRadius); y <= py + vRadius && y <= MeteorClient.mc.level.getHeight(); ++y) {
+                     blockPos.set(x, y, z);
+-                    BlockState blockState = mc.level.getBlockState(blockPos);
+-
++                    BlockState blockState = MeteorClient.mc.level.getBlockState((BlockPos)blockPos);
+                     int dx = Math.abs(x - px);
+                     int dy = Math.abs(y - py);
+                     int dz = Math.abs(z - pz);
+-
+                     callbacks.removeIf(callback -> {
+                         if (dx <= callback.hRadius && dy <= callback.vRadius && dz <= callback.hRadius) {
+                             disableCurrent = false;
+-                            callback.function.accept(blockPos, blockState);
++                            callback.function.accept((BlockPos)blockPos, blockState);
+                             return disableCurrent;
+                         }
+                         return false;
+@@ -71,27 +66,23 @@
+                 }
+             }
+         }
+-
+         hRadius = 0;
+         vRadius = 0;
+-
+         callbackPool.freeAll(callbacks);
+         callbacks.clear();
+-
+-        for (Runnable callback : afterCallbacks) callback.run();
++        for (Runnable callback2 : afterCallbacks) {
++            callback2.run();
++        }
+         afterCallbacks.clear();
+     }
+ 
+     public static void register(int horizontalRadius, int verticalRadius, BiConsumer<BlockPos, BlockState> function) {
+         hRadius = Math.max(hRadius, horizontalRadius);
+         vRadius = Math.max(vRadius, verticalRadius);
+-
+         Callback callback = callbackPool.get();
+-
+         callback.function = function;
+         callback.hRadius = horizontalRadius;
+         callback.vRadius = verticalRadius;
+-
+         callbacks.add(callback);
+     }
+ 
+@@ -105,6 +96,11 @@
+ 
+     private static class Callback {
+         public BiConsumer<BlockPos, BlockState> function;
+-        public int hRadius, vRadius;
++        public int hRadius;
++        public int vRadius;
++
++        private Callback() {
++        }
+     }
+ }
++

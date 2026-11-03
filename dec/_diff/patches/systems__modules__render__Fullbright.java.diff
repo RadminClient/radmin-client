@@ -1,0 +1,190 @@
+--- upstream261/systems/modules/render/Fullbright.java
++++ v1decompiled/systems/modules/render/Fullbright.java
+@@ -1,110 +1,119 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.core.registries.BuiltInRegistries
++ *  net.minecraft.world.effect.MobEffect
++ *  net.minecraft.world.effect.MobEffectInstance
++ *  net.minecraft.world.effect.MobEffects
++ *  net.minecraft.world.level.LightLayer
+  */
++package radmin.client.systems.modules.render;
+ 
+-package meteordevelopment.meteorclient.systems.modules.render;
+-
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.mixin.MobEffectInstanceAccessor;
+-import meteordevelopment.meteorclient.settings.EnumSetting;
+-import meteordevelopment.meteorclient.settings.IntSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.core.registries.BuiltInRegistries;
++import net.minecraft.world.effect.MobEffect;
+ import net.minecraft.world.effect.MobEffectInstance;
+ import net.minecraft.world.effect.MobEffects;
+ import net.minecraft.world.level.LightLayer;
++import radmin.client.events.world.TickEvent;
++import radmin.client.mixin.MobEffectInstanceAccessor;
++import radmin.client.settings.EnumSetting;
++import radmin.client.settings.IntSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
+ 
+-public class Fullbright extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    public final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
+-        .name("mode")
+-        .description("The mode to use for Fullbright.")
+-        .defaultValue(Mode.Gamma)
+-        .onChanged(mode -> {
+-            if (isActive()) {
+-                if (mode != Mode.Potion) disableNightVision();
+-                if (mc.levelRenderer != null) mc.levelRenderer.allChanged();
+-            }
+-        })
+-        .build()
+-    );
+-
+-    public final Setting<LightLayer> lightType = sgGeneral.add(new EnumSetting.Builder<LightLayer>()
+-        .name("light-type")
+-        .description("Which type of light to use for Luminance mode.")
+-        .defaultValue(LightLayer.BLOCK)
+-        .visible(() -> mode.get() == Mode.Luminance)
+-        .onChanged(_ -> {
+-            if (mc.levelRenderer != null && isActive()) mc.levelRenderer.allChanged();
+-        })
+-        .build()
+-    );
+-
+-    private final Setting<Integer> minimumLightLevel = sgGeneral.add(new IntSetting.Builder()
+-        .name("minimum-light-level")
+-        .description("Minimum light level when using Luminance mode.")
+-        .visible(() -> mode.get() == Mode.Luminance)
+-        .defaultValue(8)
+-        .range(0, 15)
+-        .sliderMax(15)
+-        .onChanged(_ -> {
+-            if (mc.levelRenderer != null && isActive()) mc.levelRenderer.allChanged();
+-        })
+-        .build()
+-    );
++public class Fullbright
++extends Module {
++    private final SettingGroup sgGeneral;
++    public final Setting<Mode> mode;
++    public final Setting<LightLayer> lightType;
++    private final Setting<Integer> minimumLightLevel;
+ 
+     public Fullbright() {
+         super(Categories.Render, "fullbright", "Lights up your world!");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.mode = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("mode")).description("The mode to use for Fullbright.")).defaultValue(Mode.Gamma)).onChanged(mode -> {
++            if (this.isActive()) {
++                if (mode != Mode.Potion) {
++                    this.disableNightVision();
++                }
++                if (this.mc.levelRenderer != null) {
++                    this.mc.levelRenderer.allChanged();
++                }
++            }
++        })).build());
++        this.lightType = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("light-type")).description("Which type of light to use for Luminance mode.")).defaultValue(LightLayer.BLOCK)).visible(() -> this.mode.get() == Mode.Luminance)).onChanged(lightLayer -> {
++            if (this.mc.levelRenderer != null && this.isActive()) {
++                this.mc.levelRenderer.allChanged();
++            }
++        })).build());
++        this.minimumLightLevel = this.sgGeneral.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("minimum-light-level")).description("Minimum light level when using Luminance mode.")).visible(() -> this.mode.get() == Mode.Luminance)).defaultValue(8)).range(0, 15).sliderMax(15).onChanged(n -> {
++            if (this.mc.levelRenderer != null && this.isActive()) {
++                this.mc.levelRenderer.allChanged();
++            }
++        })).build());
+     }
+ 
+     @Override
+     public void onActivate() {
+-        if (mode.get() == Mode.Luminance) mc.levelRenderer.allChanged();
++        if (this.mode.get() == Mode.Luminance) {
++            this.mc.levelRenderer.allChanged();
++        }
+     }
+ 
+     @Override
+     public void onDeactivate() {
+-        if (mode.get() == Mode.Luminance) mc.levelRenderer.allChanged();
+-        else if (mode.get() == Mode.Potion) disableNightVision();
++        if (this.mode.get() == Mode.Luminance) {
++            this.mc.levelRenderer.allChanged();
++        } else if (this.mode.get() == Mode.Potion) {
++            this.disableNightVision();
++        }
+     }
+ 
+     public int getLuminance(LightLayer type) {
+-        if (!isActive() || mode.get() != Mode.Luminance || type != lightType.get()) return 0;
+-        return minimumLightLevel.get();
++        if (!this.isActive() || this.mode.get() != Mode.Luminance || type != this.lightType.get()) {
++            return 0;
++        }
++        return this.minimumLightLevel.get();
+     }
+ 
+     public boolean getGamma() {
+-        return isActive() && mode.get() == Mode.Gamma;
++        return this.isActive() && this.mode.get() == Mode.Gamma;
+     }
+ 
+     @EventHandler
+     private void onTick(TickEvent.Post event) {
+-        if (mc.player == null || !mode.get().equals(Mode.Potion)) return;
+-        if (mc.player.hasEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value()))) {
+-            MobEffectInstance instance = mc.player.getEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value()));
+-            if (instance != null && instance.getDuration() < 420)
+-                ((MobEffectInstanceAccessor) instance).meteor$setDuration(420);
++        if (this.mc.player == null || !this.mode.get().equals((Object)Mode.Potion)) {
++            return;
++        }
++        if (this.mc.player.hasEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder((Object)((MobEffect)MobEffects.NIGHT_VISION.value())))) {
++            MobEffectInstance instance = this.mc.player.getEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder((Object)((MobEffect)MobEffects.NIGHT_VISION.value())));
++            if (instance != null && instance.getDuration() < 420) {
++                ((MobEffectInstanceAccessor)instance).meteor$setDuration(420);
++            }
+         } else {
+-            mc.player.addEffect(new MobEffectInstance(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value()), 420, 0));
++            this.mc.player.addEffect(new MobEffectInstance(BuiltInRegistries.MOB_EFFECT.wrapAsHolder((Object)((MobEffect)MobEffects.NIGHT_VISION.value())), 420, 0));
+         }
+     }
+ 
+     private void disableNightVision() {
+-        if (mc.player == null) return;
+-        if (mc.player.hasEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value()))) {
+-            mc.player.removeEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(MobEffects.NIGHT_VISION.value()));
++        if (this.mc.player == null) {
++            return;
++        }
++        if (this.mc.player.hasEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder((Object)((MobEffect)MobEffects.NIGHT_VISION.value())))) {
++            this.mc.player.removeEffect(BuiltInRegistries.MOB_EFFECT.wrapAsHolder((Object)((MobEffect)MobEffects.NIGHT_VISION.value())));
+         }
+     }
+ 
+-    public enum Mode {
++    public static enum Mode {
+         Gamma,
+         Potion,
+-        Luminance
++        Luminance;
++
+     }
+ }
++

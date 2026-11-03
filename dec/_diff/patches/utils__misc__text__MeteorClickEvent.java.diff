@@ -1,0 +1,45 @@
+--- upstream261/utils/misc/text/MeteorClickEvent.java
++++ v1decompiled/utils/misc/text/MeteorClickEvent.java
+@@ -1,30 +1,24 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.network.chat.ClickEvent
++ *  net.minecraft.network.chat.ClickEvent$Action
+  */
++package radmin.client.utils.misc.text;
+ 
+-package meteordevelopment.meteorclient.utils.misc.text;
++import net.minecraft.network.chat.ClickEvent;
+ 
+-import meteordevelopment.meteorclient.mixin.ScreenMixin;
+-import net.minecraft.client.Minecraft;
+-import net.minecraft.client.gui.screens.Screen;
+-import net.minecraft.network.chat.ClickEvent;
+-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+-
+-/**
+- * This class does nothing except ensure that {@link ClickEvent}'s containing Meteor Client commands can only be executed if they come from the client.
+- *
+- * @see ScreenMixin#onDefaultHandleClickEvent(ClickEvent, Minecraft, Screen, CallbackInfo)
+- */
+-public class MeteorClickEvent implements ClickEvent {
++public class MeteorClickEvent
++implements ClickEvent {
+     public final String value;
+ 
+     public MeteorClickEvent(String value) {
+         this.value = value;
+     }
+ 
+-    @Override
+-    public Action action() {
+-        return Action.RUN_COMMAND;
++    public ClickEvent.Action action() {
++        return ClickEvent.Action.RUN_COMMAND;
+     }
+ }
++

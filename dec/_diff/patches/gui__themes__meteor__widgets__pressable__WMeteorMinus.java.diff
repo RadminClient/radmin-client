@@ -1,0 +1,38 @@
+--- upstream261/gui/themes/meteor/widgets/pressable/WMeteorMinus.java
++++ v1decompiled/gui/themes/meteor/widgets/pressable/WMeteorMinus.java
+@@ -1,21 +1,22 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.themes.meteor.widgets.pressable;
+ 
+-package meteordevelopment.meteorclient.gui.themes.meteor.widgets.pressable;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.themes.meteor.MeteorWidget;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.gui.widgets.pressable.WMinus;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.gui.themes.meteor.MeteorWidget;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WMinus;
+-
+-public class WMeteorMinus extends WMinus implements MeteorWidget {
++public class WMeteorMinus
++extends WMinus
++implements MeteorWidget {
+     @Override
+     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        double pad = pad();
+-        double s = theme.scale(3);
+-
+-        renderBackground(renderer, this, pressed, mouseOver);
+-        renderer.quad(x + pad, y + height / 2 - s / 2, width - pad * 2, s, theme().minusColor.get());
++        double pad = this.pad();
++        double s = this.theme.scale(3.0);
++        this.renderBackground(renderer, (WWidget)this, this.pressed, this.mouseOver);
++        renderer.quad(this.x + pad, this.y + this.height / 2.0 - s / 2.0, this.width - pad * 2.0, s, this.theme().minusColor.get());
+     }
+ }
++

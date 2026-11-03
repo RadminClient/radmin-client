@@ -1,0 +1,20 @@
+--- upstream261/systems/hud/YAnchor.java
++++ v1decompiled/systems/hud/YAnchor.java
+@@ -1,12 +1,12 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.hud;
++package radmin.client.systems.hud;
+ 
+ public enum YAnchor {
+     Top,
+     Center,
+-    Bottom
++    Bottom;
++
+ }
++

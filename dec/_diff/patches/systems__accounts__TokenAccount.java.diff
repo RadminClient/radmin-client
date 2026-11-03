@@ -1,0 +1,17 @@
+--- upstream261/systems/accounts/TokenAccount.java
++++ v1decompiled/systems/accounts/TokenAccount.java
+@@ -1,10 +1,9 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.accounts;
++package radmin.client.systems.accounts;
+ 
+ public interface TokenAccount {
+-    String getToken();
++    public String getToken();
+ }
++

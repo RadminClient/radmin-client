@@ -1,0 +1,32 @@
+--- upstream261/mixin/DirectionAccessor.java
++++ v1decompiled/mixin/DirectionAccessor.java
+@@ -1,18 +1,22 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.Direction
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.core.Direction;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(Direction.class)
++@Mixin(value={Direction.class})
+ public interface DirectionAccessor {
+-    @Accessor("BY_2D_DATA")
+-    static Direction[] meteor$getHorizontal() {
++    @Accessor(value="BY_2D_DATA")
++    public static Direction[] meteor$getHorizontal() {
+         throw new AssertionError();
+     }
+ }
++

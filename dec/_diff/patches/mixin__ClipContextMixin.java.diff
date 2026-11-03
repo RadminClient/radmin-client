@@ -1,0 +1,51 @@
+--- upstream261/mixin/ClipContextMixin.java
++++ v1decompiled/mixin/ClipContextMixin.java
+@@ -1,11 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.entity.Entity
++ *  net.minecraft.world.level.ClipContext
++ *  net.minecraft.world.level.ClipContext$Block
++ *  net.minecraft.world.level.ClipContext$Fluid
++ *  net.minecraft.world.phys.Vec3
++ *  net.minecraft.world.phys.shapes.CollisionContext
++ *  org.spongepowered.asm.mixin.Final
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Mutable
++ *  org.spongepowered.asm.mixin.Shadow
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.mixininterface.IClipContext;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.level.ClipContext;
+ import net.minecraft.world.phys.Vec3;
+@@ -14,9 +23,11 @@
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Mutable;
+ import org.spongepowered.asm.mixin.Shadow;
++import radmin.client.mixininterface.IClipContext;
+ 
+-@Mixin(ClipContext.class)
+-public abstract class ClipContextMixin implements IClipContext {
++@Mixin(value={ClipContext.class})
++public abstract class ClipContextMixin
++implements IClipContext {
+     @Shadow
+     @Final
+     @Mutable
+@@ -44,6 +55,7 @@
+         this.to = end;
+         this.block = shapeType;
+         this.fluid = fluidHandling;
+-        this.collisionContext = CollisionContext.of(entity);
++        this.collisionContext = CollisionContext.of((Entity)entity);
+     }
+ }
++

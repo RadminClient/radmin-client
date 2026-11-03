@@ -1,0 +1,21 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.world.phys.HitResult
+ */
+package radmin.client.utils.entity.simulator;
+
+import net.minecraft.world.phys.HitResult;
+
+public class SimulationStep {
+    public static final SimulationStep MISS = new SimulationStep(true, new HitResult[0]);
+    public boolean shouldStop;
+    public HitResult[] hitResults;
+
+    public SimulationStep(boolean stop, HitResult ... hitResults) {
+        this.shouldStop = stop;
+        this.hitResults = hitResults;
+    }
+}
+

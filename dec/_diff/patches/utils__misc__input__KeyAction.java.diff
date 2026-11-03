@@ -1,0 +1,31 @@
+--- upstream261/utils/misc/input/KeyAction.java
++++ v1decompiled/utils/misc/input/KeyAction.java
+@@ -1,22 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.utils.misc.input;
+-
+-import org.lwjgl.glfw.GLFW;
++package radmin.client.utils.misc.input;
+ 
+ public enum KeyAction {
+     Press,
+     Repeat,
+     Release;
+ 
++
+     public static KeyAction get(int action) {
+         return switch (action) {
+-            case GLFW.GLFW_PRESS -> Press;
+-            case GLFW.GLFW_RELEASE -> Release;
++            case 1 -> Press;
++            case 0 -> Release;
+             default -> Repeat;
+         };
+     }
+ }
++

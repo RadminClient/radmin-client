@@ -1,0 +1,19 @@
+--- upstream261/events/game/GameLeftEvent.java
++++ v1decompiled/events/game/GameLeftEvent.java
+@@ -1,9 +1,7 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.events.game;
++package radmin.client.events.game;
+ 
+ public class GameLeftEvent {
+     private static final GameLeftEvent INSTANCE = new GameLeftEvent();
+@@ -12,3 +10,4 @@
+         return INSTANCE;
+     }
+ }
++

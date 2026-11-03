@@ -1,0 +1,52 @@
+--- upstream261/gui/themes/meteor/widgets/pressable/WMeteorConfirmedMinus.java
++++ v1decompiled/gui/themes/meteor/widgets/pressable/WMeteorConfirmedMinus.java
+@@ -1,28 +1,29 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.themes.meteor.widgets.pressable;
+ 
+-package meteordevelopment.meteorclient.gui.themes.meteor.widgets.pressable;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.themes.meteor.MeteorGuiTheme;
++import radmin.client.gui.themes.meteor.MeteorWidget;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.gui.widgets.pressable.WConfirmedMinus;
++import radmin.client.utils.render.color.Color;
++import radmin.client.utils.render.color.SettingColor;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.gui.themes.meteor.MeteorGuiTheme;
+-import meteordevelopment.meteorclient.gui.themes.meteor.MeteorWidget;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WConfirmedMinus;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
+-
+-public class WMeteorConfirmedMinus extends WConfirmedMinus implements MeteorWidget {
++public class WMeteorConfirmedMinus
++extends WConfirmedMinus
++implements MeteorWidget {
+     @Override
+     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        MeteorGuiTheme theme = theme();
+-        double pad = pad();
+-        double s = theme.scale(3);
+-
+-        Color outline = theme.outlineColor.get(pressed, mouseOver);
+-        Color fg = pressedOnce ? theme.backgroundColor.get(pressed, mouseOver) : theme().minusColor.get();
+-        Color bg = pressedOnce ? theme().minusColor.get() : theme.backgroundColor.get(pressed, mouseOver);
+-
+-        renderBackground(renderer, this, outline, bg);
+-        renderer.quad(x + pad, y + height / 2 - s / 2, width - pad * 2, s, fg);
++        MeteorGuiTheme theme = this.theme();
++        double pad = this.pad();
++        double s = theme.scale(3.0);
++        SettingColor outline = theme.outlineColor.get(this.pressed, this.mouseOver);
++        Color fg = this.pressedOnce ? theme.backgroundColor.get(this.pressed, this.mouseOver) : (Color)this.theme().minusColor.get();
++        Color bg = this.pressedOnce ? (Color)this.theme().minusColor.get() : theme.backgroundColor.get(this.pressed, this.mouseOver);
++        this.renderBackground(renderer, (WWidget)this, outline, bg);
++        renderer.quad(this.x + pad, this.y + this.height / 2.0 - s / 2.0, this.width - pad * 2.0, s, fg);
+     }
+ }
++

@@ -1,0 +1,222 @@
+--- upstream261/gui/screens/settings/base/SortingHelper.java
++++ v1decompiled/gui/screens/settings/base/SortingHelper.java
+@@ -1,23 +1,28 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  it.unimi.dsi.fastutil.objects.ObjectArrayList
++ *  net.minecraft.core.IdMap
++ *  org.jetbrains.annotations.NotNull
++ *  org.jetbrains.annotations.Nullable
+  */
+-
+-package meteordevelopment.meteorclient.gui.screens.settings.base;
++package radmin.client.gui.screens.settings.base;
+ 
+ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+-import meteordevelopment.meteorclient.utils.Utils;
+-import net.minecraft.core.IdMap;
+-import org.jetbrains.annotations.NotNull;
+-import org.jetbrains.annotations.Nullable;
+-
++import java.lang.runtime.SwitchBootstraps;
+ import java.util.Collection;
+ import java.util.Comparator;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.function.Consumer;
+ import java.util.function.Function;
+ import java.util.function.Predicate;
++import net.minecraft.core.IdMap;
++import org.jetbrains.annotations.NotNull;
++import org.jetbrains.annotations.Nullable;
++import radmin.client.utils.Utils;
+ 
+ public final class SortingHelper {
+     private static final Comparator<Entry<?>> FILTER_COMPARATOR = Comparator.comparingInt(Entry::distance);
+@@ -26,114 +31,111 @@
+     }
+ 
+     public static <T> Iterable<T> sort(Iterable<T> registry, Predicate<T> filter, Function<T, String[]> nameFunction, String filterText) {
+-        return sortInternal(registry, filter, nameFunction, filterText, null);
++        return SortingHelper.sortInternal(registry, filter, nameFunction, filterText, null);
+     }
+ 
+     public static <T> Iterable<T> sortWithPriority(Iterable<T> registry, Predicate<T> filter, Function<T, String[]> nameFunction, String filterText, Comparator<T> comparator) {
+-        return sortInternal(registry, filter, nameFunction, filterText, comparator);
++        return SortingHelper.sortInternal(registry, filter, nameFunction, filterText, comparator);
+     }
+ 
+     private static <T> Iterable<T> sortInternal(Iterable<T> registry, Predicate<T> filter, Function<T, String[]> nameFunction, String filterText, @Nullable Comparator<T> comparator) {
+         if (filterText.isBlank()) {
+             if (comparator == null) {
+-                return filtering(registry, filter);
+-            } else {
+-                List<T> list = createList(registry);
+-
+-                for (T value : registry) {
+-                    if (filter.test(value)) {
+-                        list.add(value);
+-                    }
+-                }
+-
+-                list.sort(comparator);
+-
+-                return list;
++                return SortingHelper.filtering(registry, filter);
+             }
+-        } else {
+-            List<Entry<T>> list = createList(registry);
+-
++            List<T> list = SortingHelper.createList(registry);
+             for (T value : registry) {
+-                if (!filter.test(value)) {
+-                    continue;
+-                }
+-
+-                String[] names = nameFunction.apply(value);
+-                int bestWords = 0;
+-                int bestDistance = Integer.MAX_VALUE;
+-                float relevancy = 0f;
+-                for (String name : names) {
+-                    int words = Utils.searchInWords(name, filterText);
+-                    int distance = Utils.searchLevenshteinDefault(name, filterText, false);
+-                    bestWords = Math.max(bestWords, words);
+-                    bestDistance = Math.min(bestDistance, distance);
+-                    relevancy = Math.max(relevancy, 1f - (float) distance / name.length());
+-                }
+-
+-                if (bestWords > 0 || relevancy >= 0.5f) {
+-                    list.add(new Entry<>(value, bestDistance));
+-                }
++                if (!filter.test(value)) continue;
++                list.add(value);
+             }
+-
+-            Comparator<Entry<T>> entryComparator = comparator != null
+-                ? Comparator.<Entry<T>, T>comparing(Entry::value, comparator).thenComparing(filterComparator())
+-                : filterComparator();
+-
+-            list.sort(entryComparator);
+-
+-            return iterate(list);
++            list.sort(comparator);
++            return list;
+         }
++        List<Entry<T>> list = SortingHelper.createList(registry);
++        for (T value : registry) {
++            if (!filter.test(value)) continue;
++            String[] names = nameFunction.apply(value);
++            int bestWords = 0;
++            int bestDistance = Integer.MAX_VALUE;
++            float relevancy = 0.0f;
++            for (String name : names) {
++                int words = Utils.searchInWords(name, filterText);
++                int distance = Utils.searchLevenshteinDefault(name, filterText, false);
++                bestWords = Math.max(bestWords, words);
++                bestDistance = Math.min(bestDistance, distance);
++                relevancy = Math.max(relevancy, 1.0f - (float)distance / (float)name.length());
++            }
++            if (bestWords <= 0 && !(relevancy >= 0.5f)) continue;
++            list.add(new Entry<T>(value, bestDistance));
++        }
++        Comparator<Entry<T>> entryComparator = comparator != null ? Comparator.comparing(Entry::value, comparator).thenComparing(SortingHelper.filterComparator()) : SortingHelper.filterComparator();
++        list.sort(entryComparator);
++        return SortingHelper.iterate(list);
+     }
+ 
+     private static <T> List<T> createList(Iterable<?> iterable) {
+-        return switch (iterable) {
+-            case IdMap<?> indexed -> new ObjectArrayList<>(indexed.size());
+-            case Collection<?> collection -> new ObjectArrayList<>(collection.size());
+-            default -> new ObjectArrayList<>();
++        Iterable<?> iterable2 = iterable;
++        Objects.requireNonNull(iterable2);
++        Iterable<?> iterable3 = iterable2;
++        int n = 0;
++        return switch (SwitchBootstraps.typeSwitch("typeSwitch", new Object[]{IdMap.class, Collection.class}, iterable3, n)) {
++            case 0 -> {
++                IdMap indexed = (IdMap)iterable3;
++                yield new ObjectArrayList(indexed.size());
++            }
++            case 1 -> {
++                Collection collection = (Collection)iterable3;
++                yield new ObjectArrayList(collection.size());
++            }
++            default -> new ObjectArrayList();
+         };
+     }
+ 
+-    @SuppressWarnings("unchecked")
+     private static <T> Comparator<Entry<T>> filterComparator() {
+-        return (Comparator<Entry<T>>) (Object) FILTER_COMPARATOR;
++        return FILTER_COMPARATOR;
+     }
+ 
+-    private static <T> Iterable<T> iterate(List<Entry<T>> sortedList) {
+-        return new Iterable<>() {
++    private static <T> Iterable<T> iterate(final List<Entry<T>> sortedList) {
++        return new Iterable<T>(){
++
++            @Override
+             @NotNull
+-            @Override
+             public Iterator<T> iterator() {
+-                return new Iterator<>() {
+-                    private final Iterator<Entry<T>> it = sortedList.iterator();
++                return new Iterator<T>(this){
++                    private final Iterator<Entry<T>> it;
++                    {
++                        Objects.requireNonNull(this$0);
++                        this.it = sortedList.iterator();
++                    }
+ 
+                     @Override
+                     public boolean hasNext() {
+-                        return it.hasNext();
++                        return this.it.hasNext();
+                     }
+ 
+                     @Override
+                     public T next() {
+-                        return it.next().value();
++                        return this.it.next().value();
+                     }
+                 };
+             }
+         };
+     }
+ 
+-    private static <T> Iterable<T> filtering(Iterable<T> iterable, Predicate<T> filter) {
+-        return new Iterable<>() {
++    private static <T> Iterable<T> filtering(final Iterable<T> iterable, final Predicate<T> filter) {
++        return new Iterable<T>(){
++
++            @Override
+             @NotNull
+-            @Override
+             public Iterator<T> iterator() {
+                 throw new UnsupportedOperationException("iterator() not supported by this Iterable, use forEach() instead.");
+             }
+ 
+             @Override
+             public void forEach(Consumer<? super T> action) {
+-                for (T value : iterable) {
+-                    if (filter.test(value)) {
+-                        action.accept(value);
+-                    }
++                for (Object value : iterable) {
++                    if (!filter.test(value)) continue;
++                    action.accept(value);
+                 }
+             }
+         };
+@@ -142,3 +144,4 @@
+     public record Entry<T>(T value, int distance) {
+     }
+ }
++

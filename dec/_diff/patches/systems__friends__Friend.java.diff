@@ -1,0 +1,186 @@
+--- upstream261/systems/friends/Friend.java
++++ v1decompiled/systems/friends/Friend.java
+@@ -1,32 +1,39 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.util.UndashedUuid
++ *  javax.annotation.Nullable
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.world.entity.player.Player
++ *  org.jetbrains.annotations.NotNull
+  */
+-
+-package meteordevelopment.meteorclient.systems.friends;
++package radmin.client.systems.friends;
+ 
+ import com.mojang.util.UndashedUuid;
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.utils.misc.ISerializable;
+-import meteordevelopment.meteorclient.utils.network.FailedHttpResponse;
+-import meteordevelopment.meteorclient.utils.network.Http;
+-import meteordevelopment.meteorclient.utils.render.PlayerHeadTexture;
+-import meteordevelopment.meteorclient.utils.render.PlayerHeadUtils;
++import java.lang.reflect.Type;
++import java.net.http.HttpResponse;
++import java.util.Objects;
++import java.util.UUID;
++import javax.annotation.Nullable;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.world.entity.player.Player;
+ import org.jetbrains.annotations.NotNull;
++import radmin.client.MeteorClient;
++import radmin.client.utils.misc.ISerializable;
++import radmin.client.utils.network.FailedHttpResponse;
++import radmin.client.utils.network.Http;
++import radmin.client.utils.render.PlayerHeadTexture;
++import radmin.client.utils.render.PlayerHeadUtils;
+ 
+-import javax.annotation.Nullable;
+-import java.net.http.HttpResponse;
+-import java.util.Objects;
+-import java.util.UUID;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class Friend implements ISerializable<Friend>, Comparable<Friend> {
++public class Friend
++implements ISerializable<Friend>,
++Comparable<Friend> {
+     public volatile String name;
+-    private volatile @Nullable UUID id;
+-    private volatile @Nullable PlayerHeadTexture headTexture;
++    @Nullable
++    private volatile UUID id;
++    @Nullable
++    private volatile PlayerHeadTexture headTexture;
+     private volatile boolean updating;
+ 
+     public Friend(String name, @Nullable UUID id) {
+@@ -44,59 +51,48 @@
+     }
+ 
+     public String getName() {
+-        return name;
++        return this.name;
+     }
+ 
+     public PlayerHeadTexture getHead() {
+-        return headTexture != null ? headTexture : PlayerHeadUtils.STEVE_HEAD;
++        return this.headTexture != null ? this.headTexture : PlayerHeadUtils.STEVE_HEAD;
+     }
+ 
+     public void updateInfo() {
+-        updating = true;
+-        HttpResponse<APIResponse> res = null;
+-
+-        if (id != null) {
+-            res = Http.get("https://sessionserver.mojang.com/session/minecraft/profile/" + UndashedUuid.toString(id))
+-                .exceptionHandler(_ -> MeteorClient.LOG.error("Error while trying to connect session server for friend '{}'", name))
+-                .sendJsonResponse(APIResponse.class);
++        this.updating = true;
++        HttpResponse res = null;
++        if (this.id != null) {
++            res = Http.get("https://sessionserver.mojang.com/session/minecraft/profile/" + UndashedUuid.toString((UUID)this.id)).exceptionHandler(exception -> MeteorClient.LOG.error("Error while trying to connect session server for friend '{}'", (Object)this.name)).sendJsonResponse((Type)((Object)APIResponse.class));
+         }
+-
+-        // Fallback to name-based lookup
+         if (res == null || res.statusCode() != 200) {
+-            res = Http.get("https://api.mojang.com/users/profiles/minecraft/" + name)
+-                .exceptionHandler(_ -> MeteorClient.LOG.error("Error while trying to update info for friend '{}'", name))
+-                .sendJsonResponse(APIResponse.class);
++            res = Http.get("https://api.mojang.com/users/profiles/minecraft/" + this.name).exceptionHandler(exception -> MeteorClient.LOG.error("Error while trying to update info for friend '{}'", (Object)this.name)).sendJsonResponse((Type)((Object)APIResponse.class));
+         }
+-
+         if (res != null && res.statusCode() == 200) {
+-            name = res.body().name;
+-            id = UndashedUuid.fromStringLenient(res.body().id);
+-
+-            byte[] head = PlayerHeadUtils.fetchHead(id);
+-            mc.execute(() -> {
+-                if (head != null) headTexture = new PlayerHeadTexture(head, true);
++            this.name = ((APIResponse)res.body()).name;
++            this.id = UndashedUuid.fromStringLenient((String)((APIResponse)res.body()).id);
++            byte[] head = PlayerHeadUtils.fetchHead(this.id);
++            MeteorClient.mc.execute(() -> {
++                if (head != null) {
++                    this.headTexture = new PlayerHeadTexture(head, true);
++                }
+             });
++        } else if (!(res instanceof FailedHttpResponse)) {
++            this.id = null;
+         }
+-
+-        // cracked accounts shouldn't be assigned ids
+-        else if (!(res instanceof FailedHttpResponse)) {
+-            id = null;
+-        }
+-
+-        updating = false;
++        this.updating = false;
+     }
+ 
+     public boolean headTextureNeedsUpdate() {
+-        return !this.updating && headTexture == null;
++        return !this.updating && this.headTexture == null;
+     }
+ 
+     @Override
+     public CompoundTag toTag() {
+         CompoundTag tag = new CompoundTag();
+-
+-        tag.putString("name", name);
+-        if (id != null) tag.putString("id", UndashedUuid.toString(id));
+-
++        tag.putString("name", this.name);
++        if (this.id != null) {
++            tag.putString("id", UndashedUuid.toString((UUID)this.id));
++        }
+         return tag;
+     }
+ 
+@@ -105,25 +101,32 @@
+         return this;
+     }
+ 
+-    @Override
+     public boolean equals(Object o) {
+-        if (this == o) return true;
+-        if (o == null || getClass() != o.getClass()) return false;
+-        Friend friend = (Friend) o;
+-        return Objects.equals(name, friend.name);
++        if (this == o) {
++            return true;
++        }
++        if (o == null || this.getClass() != o.getClass()) {
++            return false;
++        }
++        Friend friend = (Friend)o;
++        return Objects.equals(this.name, friend.name);
+     }
+ 
+-    @Override
+     public int hashCode() {
+-        return Objects.hash(name);
++        return Objects.hash(this.name);
+     }
+ 
+     @Override
+     public int compareTo(@NotNull Friend friend) {
+-        return name.compareToIgnoreCase(friend.name);
++        return this.name.compareToIgnoreCase(friend.name);
+     }
+ 
+     private static class APIResponse {
+-        String name, id;
++        String name;
++        String id;
++
++        private APIResponse() {
++        }
+     }
+ }
++

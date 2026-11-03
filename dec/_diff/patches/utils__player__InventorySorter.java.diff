@@ -1,0 +1,343 @@
+--- upstream261/utils/player/InventorySorter.java
++++ v1decompiled/utils/player/InventorySorter.java
+@@ -1,12 +1,24 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
++ *  net.minecraft.client.gui.screens.inventory.ContainerScreen
++ *  net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen
++ *  net.minecraft.client.gui.screens.inventory.ShulkerBoxScreen
++ *  net.minecraft.core.registries.BuiltInRegistries
++ *  net.minecraft.util.Tuple
++ *  net.minecraft.world.SimpleContainer
++ *  net.minecraft.world.entity.player.Inventory
++ *  net.minecraft.world.inventory.Slot
++ *  net.minecraft.world.item.ItemStack
++ *  net.minecraft.world.level.ItemLike
+  */
+-
+-package meteordevelopment.meteorclient.utils.player;
+-
+-import meteordevelopment.meteorclient.mixininterface.ISlot;
+-import meteordevelopment.meteorclient.utils.render.PeekScreen;
++package radmin.client.utils.player;
++
++import java.util.ArrayList;
++import java.util.Comparator;
++import java.util.List;
+ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+ import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+@@ -17,185 +29,161 @@
+ import net.minecraft.world.entity.player.Inventory;
+ import net.minecraft.world.inventory.Slot;
+ import net.minecraft.world.item.ItemStack;
+-
+-import java.util.ArrayList;
+-import java.util.Comparator;
+-import java.util.List;
++import net.minecraft.world.level.ItemLike;
++import radmin.client.mixininterface.ISlot;
++import radmin.client.utils.player.InvUtils;
++import radmin.client.utils.player.SlotUtils;
++import radmin.client.utils.render.PeekScreen;
+ 
+ public class InventorySorter {
+     private final AbstractContainerScreen<?> screen;
+     private final InvPart originInvPart;
+-
+     private boolean invalid;
+     private List<Action> actions;
+-    private int timer, currentActionI;
++    private int timer;
++    private int currentActionI;
+ 
+     public InventorySorter(AbstractContainerScreen<?> screen, Slot originSlot) {
+         this.screen = screen;
+-
+-        this.originInvPart = getInvPart(originSlot);
+-        if (originInvPart == InvPart.Invalid || originInvPart == InvPart.Hotbar || screen instanceof PeekScreen) {
+-            invalid = true;
++        this.originInvPart = this.getInvPart(originSlot);
++        if (this.originInvPart == InvPart.Invalid || this.originInvPart == InvPart.Hotbar || screen instanceof PeekScreen) {
++            this.invalid = true;
+             return;
+         }
+-
+-        this.actions = new ArrayList<>();
+-        generateActions();
++        this.actions = new ArrayList<Action>();
++        this.generateActions();
+     }
+ 
+     public boolean tick(int delay) {
+-        if (invalid) return true;
+-        if (currentActionI >= actions.size()) return true;
+-
+-        if (timer >= delay) {
+-            timer = 0;
+-        } else {
+-            timer++;
++        if (this.invalid) {
++            return true;
++        }
++        if (this.currentActionI >= this.actions.size()) {
++            return true;
++        }
++        if (this.timer < delay) {
++            ++this.timer;
+             return false;
+         }
+-
+-        Action action = actions.get(currentActionI);
++        this.timer = 0;
++        Action action = this.actions.get(this.currentActionI);
+         InvUtils.move().fromId(action.from).toId(action.to);
+-
+-        currentActionI++;
++        ++this.currentActionI;
+         return false;
+     }
+ 
+     private void generateActions() {
+-        // Find all slots and sort them
+-        List<MySlot> slots = new ArrayList<>();
+-
+-        for (Slot slot : screen.getMenu().slots) {
+-            if (getInvPart(slot) == originInvPart)
+-                slots.add(new MySlot(((ISlot) slot).meteor$getIndex(), slot.getItem()));
+-        }
+-
++        ArrayList<MySlot> slots = new ArrayList<MySlot>();
++        for (Slot slot : this.screen.getMenu().slots) {
++            if (this.getInvPart(slot) != this.originInvPart) continue;
++            slots.add(new MySlot(((ISlot)slot).meteor$getIndex(), slot.getItem()));
++        }
+         slots.sort(Comparator.comparingInt(value -> value.id));
+-
+-        // Generate actions
+-        generateStackingActions(slots);
+-        generateSortingActions(slots);
++        this.generateStackingActions(slots);
++        this.generateSortingActions(slots);
+     }
+ 
+     private void generateStackingActions(List<MySlot> slots) {
+-        // Generate a map for slots that can be stacked
+         SlotMap slotMap = new SlotMap();
+-
+-        for (MySlot slot : slots) {
+-            if (slot.itemStack.isEmpty() || !slot.itemStack.isStackable() || slot.itemStack.getCount() >= slot.itemStack.getMaxStackSize())
+-                continue;
+-
+-            slotMap.get(slot.itemStack).add(slot);
+-        }
+-
+-        // Stack previously found slots
+-        for (var entry : slotMap.map) {
+-            List<MySlot> slotsToStack = entry.getB();
++        for (MySlot mySlot : slots) {
++            if (mySlot.itemStack.isEmpty() || !mySlot.itemStack.isStackable() || mySlot.itemStack.getCount() >= mySlot.itemStack.getMaxStackSize()) continue;
++            slotMap.get(mySlot.itemStack).add(mySlot);
++        }
++        for (Tuple tuple : slotMap.map) {
++            List slotsToStack = (List)tuple.getB();
+             MySlot slotToStackTo = null;
+-
+-            for (int i = 0; i < slotsToStack.size(); i++) {
+-                MySlot slot = slotsToStack.get(i);
+-
+-                // Check if slotToStackTo is null and update it if it is
++            for (int i = 0; i < slotsToStack.size(); ++i) {
++                MySlot slot = (MySlot)slotsToStack.get(i);
+                 if (slotToStackTo == null) {
+                     slotToStackTo = slot;
+                     continue;
+                 }
+-
+-                // Generate action
+-                actions.add(new Action(slot.id, slotToStackTo.id));
+-
+-                // Handle state when the two stacks can combine without any leftovers
++                this.actions.add(new Action(slot.id, slotToStackTo.id));
+                 if (slotToStackTo.itemStack.getCount() + slot.itemStack.getCount() <= slotToStackTo.itemStack.getMaxStackSize()) {
+-                    slotToStackTo.itemStack = new ItemStack(slotToStackTo.itemStack.getItem(), slotToStackTo.itemStack.getCount() + slot.itemStack.getCount());
++                    slotToStackTo.itemStack = new ItemStack((ItemLike)slotToStackTo.itemStack.getItem(), slotToStackTo.itemStack.getCount() + slot.itemStack.getCount());
+                     slot.itemStack = ItemStack.EMPTY;
+-
+-                    if (slotToStackTo.itemStack.getCount() >= slotToStackTo.itemStack.getMaxStackSize())
+-                        slotToStackTo = null;
++                    if (slotToStackTo.itemStack.getCount() < slotToStackTo.itemStack.getMaxStackSize()) continue;
++                    slotToStackTo = null;
++                    continue;
+                 }
+-                // Handle state when combining the two stacks produces leftovers
+-                else {
+-                    int needed = slotToStackTo.itemStack.getMaxStackSize() - slotToStackTo.itemStack.getCount();
+-
+-                    slotToStackTo.itemStack = new ItemStack(slotToStackTo.itemStack.getItem(), slotToStackTo.itemStack.getMaxStackSize());
+-                    slot.itemStack = new ItemStack(slot.itemStack.getItem(), slot.itemStack.getCount() - needed);
+-
+-                    slotToStackTo = null;
+-                    i--;
+-                }
++                int needed = slotToStackTo.itemStack.getMaxStackSize() - slotToStackTo.itemStack.getCount();
++                slotToStackTo.itemStack = new ItemStack((ItemLike)slotToStackTo.itemStack.getItem(), slotToStackTo.itemStack.getMaxStackSize());
++                slot.itemStack = new ItemStack((ItemLike)slot.itemStack.getItem(), slot.itemStack.getCount() - needed);
++                slotToStackTo = null;
++                --i;
+             }
+         }
+     }
+ 
+     private void generateSortingActions(List<MySlot> slots) {
+-        for (int i = 0; i < slots.size(); i++) {
+-            // Find best slot to move here
++        for (int i = 0; i < slots.size(); ++i) {
+             MySlot bestSlot = null;
+-
+-            for (int j = i; j < slots.size(); j++) {
++            for (int j = i; j < slots.size(); ++j) {
+                 MySlot slot = slots.get(j);
+-
+                 if (bestSlot == null) {
+                     bestSlot = slot;
+                     continue;
+                 }
+-
+-                if (isSlotBetter(bestSlot, slot)) bestSlot = slot;
+-            }
+-
+-            // Generate action
+-            if (!bestSlot.itemStack.isEmpty()) {
+-                MySlot toSlot = slots.get(i);
+-
+-                int from = bestSlot.id;
+-                int to = toSlot.id;
+-
+-                if (from != to) {
+-                    ItemStack temp = bestSlot.itemStack;
+-                    bestSlot.itemStack = toSlot.itemStack;
+-                    toSlot.itemStack = temp;
+-
+-                    actions.add(new Action(from, to));
+-                }
+-            }
++                if (!this.isSlotBetter(bestSlot, slot)) continue;
++                bestSlot = slot;
++            }
++            if (bestSlot.itemStack.isEmpty()) continue;
++            MySlot toSlot = slots.get(i);
++            int from = bestSlot.id;
++            int to = toSlot.id;
++            if (from == to) continue;
++            ItemStack temp = bestSlot.itemStack;
++            bestSlot.itemStack = toSlot.itemStack;
++            toSlot.itemStack = temp;
++            this.actions.add(new Action(from, to));
+         }
+     }
+ 
+     private boolean isSlotBetter(MySlot best, MySlot slot) {
+         ItemStack bestI = best.itemStack;
+         ItemStack slotI = slot.itemStack;
+-
+-        if (bestI.isEmpty() && !slotI.isEmpty()) return true;
+-        else if (!bestI.isEmpty() && slotI.isEmpty()) return false;
+-
+-        int c = BuiltInRegistries.ITEM.getKey(bestI.getItem()).compareTo(BuiltInRegistries.ITEM.getKey(slotI.getItem()));
++        if (bestI.isEmpty() && !slotI.isEmpty()) {
++            return true;
++        }
++        if (!bestI.isEmpty() && slotI.isEmpty()) {
++            return false;
++        }
++        int c = BuiltInRegistries.ITEM.getKey((Object)bestI.getItem()).compareTo(BuiltInRegistries.ITEM.getKey((Object)slotI.getItem()));
+         if (c == 0) {
+-            if (slotI.getCount() != bestI.getCount()) return slotI.getCount() > bestI.getCount();
+-            if (slotI.getDamageValue() != bestI.getDamageValue())
++            if (slotI.getCount() != bestI.getCount()) {
++                return slotI.getCount() > bestI.getCount();
++            }
++            if (slotI.getDamageValue() != bestI.getDamageValue()) {
+                 return slotI.getDamageValue() > bestI.getDamageValue();
+-        }
+-
++            }
++        }
+         return c > 0;
+     }
+ 
+     private InvPart getInvPart(Slot slot) {
+-        int i = ((ISlot) slot).meteor$getSlot();
+-
+-        if (slot.container instanceof Inventory && (!(screen instanceof CreativeModeInventoryScreen) || ((ISlot) slot).meteor$getIndex() > 8)) {
+-            if (SlotUtils.isHotbar(i)) return InvPart.Hotbar;
+-            else if (SlotUtils.isMain(i)) return InvPart.Player;
+-        } else if ((screen instanceof ContainerScreen || screen instanceof ShulkerBoxScreen) && slot.container instanceof SimpleContainer) {
++        int i = ((ISlot)slot).meteor$getSlot();
++        if (slot.container instanceof Inventory && (!(this.screen instanceof CreativeModeInventoryScreen) || ((ISlot)slot).meteor$getIndex() > 8)) {
++            if (SlotUtils.isHotbar(i)) {
++                return InvPart.Hotbar;
++            }
++            if (SlotUtils.isMain(i)) {
++                return InvPart.Player;
++            }
++        } else if ((this.screen instanceof ContainerScreen || this.screen instanceof ShulkerBoxScreen) && slot.container instanceof SimpleContainer) {
+             return InvPart.Main;
+         }
+-
+         return InvPart.Invalid;
+     }
+ 
+-    private enum InvPart {
++    private static enum InvPart {
+         Hotbar,
+         Player,
+         Main,
+-        Invalid
++        Invalid;
++
++    }
++
++    private record Action(int from, int to) {
+     }
+ 
+     private static class MySlot {
+@@ -209,21 +197,20 @@
+     }
+ 
+     private static class SlotMap {
+-        private final List<Tuple<ItemStack, List<MySlot>>> map = new ArrayList<>();
++        private final List<Tuple<ItemStack, List<MySlot>>> map = new ArrayList<Tuple<ItemStack, List<MySlot>>>();
++
++        private SlotMap() {
++        }
+ 
+         public List<MySlot> get(ItemStack itemStack) {
+-            for (Tuple<ItemStack, List<MySlot>> entry : map) {
+-                if (ItemStack.isSameItemSameComponents(itemStack, entry.getA())) {
+-                    return entry.getB();
+-                }
+-            }
+-
+-            List<MySlot> list = new ArrayList<>();
+-            map.add(new Tuple<>(itemStack, list));
++            for (Tuple<ItemStack, List<MySlot>> entry : this.map) {
++                if (!ItemStack.isSameItemSameComponents((ItemStack)itemStack, (ItemStack)((ItemStack)entry.getA()))) continue;
++                return (List)entry.getB();
++            }
++            ArrayList<MySlot> list = new ArrayList<MySlot>();
++            this.map.add((Tuple<ItemStack, List<MySlot>>)new Tuple((Object)itemStack, list));
+             return list;
+         }
+     }
+-
+-    private record Action(int from, int to) {
+-    }
+ }
++

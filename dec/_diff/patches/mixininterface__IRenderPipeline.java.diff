@@ -1,0 +1,20 @@
+--- upstream261/mixininterface/IRenderPipeline.java
++++ v1decompiled/mixininterface/IRenderPipeline.java
+@@ -1,12 +1,11 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ public interface IRenderPipeline {
+-    void meteor$setLineSmooth(boolean lineSmooth);
++    public void meteor$setLineSmooth(boolean var1);
+ 
+-    boolean meteor$getLineSmooth();
++    public boolean meteor$getLineSmooth();
+ }
++

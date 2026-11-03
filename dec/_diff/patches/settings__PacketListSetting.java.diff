@@ -1,0 +1,165 @@
+--- upstream261/settings/PacketListSetting.java
++++ v1decompiled/settings/PacketListSetting.java
+@@ -1,12 +1,25 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.ListTag
++ *  net.minecraft.nbt.StringTag
++ *  net.minecraft.nbt.Tag
++ *  net.minecraft.network.protocol.Packet
++ *  net.minecraft.network.protocol.PacketFlow
++ *  net.minecraft.network.protocol.PacketType
++ *  org.jetbrains.annotations.NotNull
+  */
+-
+-package meteordevelopment.meteorclient.settings;
++package radmin.client.settings;
+ 
+ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+-import meteordevelopment.meteorclient.utils.network.PacketUtils;
++import java.util.Collection;
++import java.util.List;
++import java.util.Set;
++import java.util.function.Consumer;
++import java.util.function.Predicate;
+ import net.minecraft.nbt.CompoundTag;
+ import net.minecraft.nbt.ListTag;
+ import net.minecraft.nbt.StringTag;
+@@ -15,39 +28,41 @@
+ import net.minecraft.network.protocol.PacketFlow;
+ import net.minecraft.network.protocol.PacketType;
+ import org.jetbrains.annotations.NotNull;
++import radmin.client.settings.IVisible;
++import radmin.client.settings.Setting;
++import radmin.client.utils.network.PacketUtils;
+ 
+-import java.util.List;
+-import java.util.Set;
+-import java.util.function.Consumer;
+-import java.util.function.Predicate;
+-
+-public class PacketListSetting extends Setting<Set<PacketType<? extends @NotNull Packet<?>>>> {
++public class PacketListSetting
++extends Setting<Set<PacketType<? extends Packet<?>>>> {
+     public final Predicate<PacketType<? extends @NotNull Packet<?>>> filter;
+ 
+     public PacketListSetting(String name, String description, Set<PacketType<? extends @NotNull Packet<?>>> defaultValue, Consumer<Set<PacketType<? extends @NotNull Packet<?>>>> onChanged, Consumer<Setting<Set<PacketType<? extends @NotNull Packet<?>>>>> onModuleActivated, Predicate<PacketType<? extends @NotNull Packet<?>>> filter, IVisible visible) {
+         super(name, description, defaultValue, onChanged, onModuleActivated, visible);
+-
+         this.filter = filter;
+     }
+ 
+     @Override
+     public void resetImpl() {
+-        value = new ObjectOpenHashSet<>(defaultValue);
++        this.value = new ObjectOpenHashSet((Collection)this.defaultValue);
+     }
+ 
++    /*
++     * Issues handling annotations - annotations may be inaccurate
++     */
+     @Override
+     protected Set<PacketType<? extends @NotNull Packet<?>>> parseImpl(String str) {
+         String[] values = str.split(",");
+-        Set<PacketType<? extends @NotNull Packet<?>>> packets = new ObjectOpenHashSet<>(values.length);
+-
++        @NotNull ObjectOpenHashSet packets = new ObjectOpenHashSet(values.length);
+         try {
+             for (String value : values) {
+                 PacketType<? extends @NotNull Packet<?>> packet = PacketUtils.getPacket(value.trim());
+-                if (packet != null && (filter == null || filter.test(packet))) packets.add(packet);
++                if (packet == null || this.filter != null && !this.filter.test(packet)) continue;
++                packets.add(packet);
+             }
+-        } catch (Exception _) {
+         }
+-
++        catch (Exception exception) {
++            // empty catch block
++        }
+         return packets;
+     }
+ 
+@@ -58,42 +73,40 @@
+ 
+     @Override
+     public List<String> getSuggestions() {
+-        return filter == null
+-            ? PacketUtils.getPackets().stream().map(PacketType::toString).toList()
+-            : PacketUtils.getPackets().stream().filter(filter).map(PacketType::toString).toList();
++        return this.filter == null ? PacketUtils.getPackets().stream().map(PacketType::toString).toList() : PacketUtils.getPackets().stream().filter(this.filter).map(PacketType::toString).toList();
+     }
+ 
+     @Override
+     public CompoundTag save(CompoundTag tag) {
+         ListTag valueTag = new ListTag();
+-        for (PacketType<? extends @NotNull Packet<?>> packet : get()) {
+-            valueTag.add(StringTag.valueOf(packet.toString()));
++        for (PacketType packet : (Set)this.get()) {
++            valueTag.add((Object)StringTag.valueOf((String)packet.toString()));
+         }
+-        tag.put("value", valueTag);
+-
++        tag.put("value", (Tag)valueTag);
+         return tag;
+     }
+ 
+     @Override
+     public Set<PacketType<? extends @NotNull Packet<?>>> load(CompoundTag tag) {
+-        get().clear();
+-
++        ((Set)this.get()).clear();
+         Tag valueTag = tag.get("value");
+-        if (valueTag instanceof ListTag listTag) {
++        if (valueTag instanceof ListTag) {
++            ListTag listTag = (ListTag)valueTag;
+             for (Tag t : listTag) {
+                 PacketType<? extends @NotNull Packet<?>> packet = PacketUtils.getPacket(t.asString().orElse(""));
+-                if (packet != null && (filter == null || filter.test(packet))) get().add(packet);
++                if (packet == null || this.filter != null && !this.filter.test(packet)) continue;
++                ((Set)this.get()).add(packet);
+             }
+         }
+-
+-        return get();
++        return (Set)this.get();
+     }
+ 
+-    public static class Builder extends SettingBuilder<Builder, Set<PacketType<? extends @NotNull Packet<?>>>, PacketListSetting> {
++    public static class Builder
++    extends Setting.SettingBuilder<Builder, Set<PacketType<? extends Packet<?>>>, PacketListSetting> {
+         private Predicate<PacketType<? extends @NotNull Packet<?>>> filter;
+ 
+         public Builder() {
+-            super(new ObjectOpenHashSet<>(0));
++            super(new ObjectOpenHashSet(0));
+         }
+ 
+         public Builder filter(Predicate<PacketType<? extends @NotNull Packet<?>>> filter) {
+@@ -102,16 +115,17 @@
+         }
+ 
+         public Builder clientbound() {
+-            return filter(type -> type.flow() == PacketFlow.CLIENTBOUND);
++            return this.filter(type -> type.flow() == PacketFlow.CLIENTBOUND);
+         }
+ 
+         public Builder serverbound() {
+-            return filter(type -> type.flow() == PacketFlow.SERVERBOUND);
++            return this.filter(type -> type.flow() == PacketFlow.SERVERBOUND);
+         }
+ 
+         @Override
+         public PacketListSetting build() {
+-            return new PacketListSetting(name, description, defaultValue, onChanged, onModuleActivated, filter, visible);
++            return new PacketListSetting(this.name, this.description, (Set)this.defaultValue, this.onChanged, this.onModuleActivated, this.filter, this.visible);
+         }
+     }
+ }
++

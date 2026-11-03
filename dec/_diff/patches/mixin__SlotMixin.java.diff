@@ -1,0 +1,48 @@
+--- upstream261/mixin/SlotMixin.java
++++ v1decompiled/mixin/SlotMixin.java
+@@ -1,18 +1,23 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.inventory.Slot
++ *  org.spongepowered.asm.mixin.Final
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Shadow
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.mixininterface.ISlot;
+ import net.minecraft.world.inventory.Slot;
+ import org.spongepowered.asm.mixin.Final;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Shadow;
++import radmin.client.mixininterface.ISlot;
+ 
+-@Mixin(Slot.class)
+-public abstract class SlotMixin implements ISlot {
++@Mixin(value={Slot.class})
++public abstract class SlotMixin
++implements ISlot {
+     @Shadow
+     public int index;
+     @Shadow
+@@ -21,11 +26,12 @@
+ 
+     @Override
+     public int meteor$getIndex() {
+-        return index;
++        return this.index;
+     }
+ 
+     @Override
+     public int meteor$getSlot() {
+-        return slot;
++        return this.slot;
+     }
+ }
++

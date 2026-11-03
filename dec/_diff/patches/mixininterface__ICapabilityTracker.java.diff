@@ -1,0 +1,20 @@
+--- upstream261/mixininterface/ICapabilityTracker.java
++++ v1decompiled/mixininterface/ICapabilityTracker.java
+@@ -1,12 +1,11 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ public interface ICapabilityTracker {
+-    boolean meteor$get();
++    public boolean meteor$get();
+ 
+-    void meteor$set(boolean state);
++    public void meteor$set(boolean var1);
+ }
++

@@ -1,0 +1,97 @@
+--- upstream261/commands/commands/VClipCommand.java
++++ v1decompiled/commands/commands/VClipCommand.java
+@@ -1,62 +1,56 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.arguments.DoubleArgumentType
++ *  com.mojang.brigadier.builder.LiteralArgumentBuilder
++ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
++ *  net.minecraft.network.protocol.Packet
++ *  net.minecraft.network.protocol.game.ServerboundMovePlayerPacket$Pos
++ *  net.minecraft.network.protocol.game.ServerboundMovePlayerPacket$StatusOnly
++ *  net.minecraft.network.protocol.game.ServerboundMoveVehiclePacket
++ *  net.minecraft.world.entity.Entity
+  */
+-
+-package meteordevelopment.meteorclient.commands.commands;
++package radmin.client.commands.commands;
+ 
+ import com.mojang.brigadier.arguments.DoubleArgumentType;
+ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+-import meteordevelopment.meteorclient.commands.Command;
+ import net.minecraft.client.multiplayer.ClientSuggestionProvider;
++import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+ import net.minecraft.network.protocol.game.ServerboundMoveVehiclePacket;
++import net.minecraft.world.entity.Entity;
++import radmin.client.commands.Command;
+ 
+-public class VClipCommand extends Command {
++public class VClipCommand
++extends Command {
+     public VClipCommand() {
+-        super("vclip", "Lets you clip through blocks vertically.");
++        super("vclip", "Lets you clip through blocks vertically.", new String[0]);
+     }
+ 
+     @Override
+     public void build(LiteralArgumentBuilder<ClientSuggestionProvider> builder) {
+-        builder.then(argument("blocks", DoubleArgumentType.doubleArg()).executes(context -> {
+-
+-            double blocks = context.getArgument("blocks", Double.class);
+-
+-            // Implementation of "PaperClip" aka "TPX" aka "VaultClip" into vclip
+-            // Allows you to teleport up to 200 blocks in one go (as you can send 20 move packets per tick)
+-            // Paper allows you to teleport 10 blocks for each move packet you send in that tick
+-            // Video explanation by LiveOverflow: https://www.youtube.com/watch?v=3HSnDsfkJT8
+-            int packetsRequired = (int) Math.ceil(Math.abs(blocks / 10));
+-
++        builder.then(VClipCommand.argument("blocks", DoubleArgumentType.doubleArg()).executes(context -> {
++            double blocks = (Double)context.getArgument("blocks", Double.class);
++            int packetsRequired = (int)Math.ceil(Math.abs(blocks / 10.0));
+             if (packetsRequired > 20) {
+-                // Wouldn't work on paper anyway.
+-                // Some servers don't have a vertical limit, so if it is more than 200 blocks, just use a "normal" tp
+-                // This makes it, so you don't get kicked for sending too many packets
+                 packetsRequired = 1;
+             }
+-
+-            if (mc.player.isPassenger()) {
+-                // Vehicle version
+-                // For each 10 blocks, send a vehicle move packet with no delta
+-                for (int packetNumber = 0; packetNumber < (packetsRequired - 1); packetNumber++) {
+-                    mc.player.connection.send(ServerboundMoveVehiclePacket.fromEntity(mc.player.getVehicle()));
++            if (VClipCommand.mc.player.isPassenger()) {
++                for (int packetNumber = 0; packetNumber < packetsRequired - 1; ++packetNumber) {
++                    VClipCommand.mc.player.connection.send((Packet)ServerboundMoveVehiclePacket.fromEntity((Entity)VClipCommand.mc.player.getVehicle()));
+                 }
+-                // Now send the final vehicle move packet
+-                mc.player.getVehicle().setPos(mc.player.getVehicle().getX(), mc.player.getVehicle().getY() + blocks, mc.player.getVehicle().getZ());
+-                mc.player.connection.send(ServerboundMoveVehiclePacket.fromEntity(mc.player.getVehicle()));
++                VClipCommand.mc.player.getVehicle().setPos(VClipCommand.mc.player.getVehicle().getX(), VClipCommand.mc.player.getVehicle().getY() + blocks, VClipCommand.mc.player.getVehicle().getZ());
++                VClipCommand.mc.player.connection.send((Packet)ServerboundMoveVehiclePacket.fromEntity((Entity)VClipCommand.mc.player.getVehicle()));
+             } else {
+-                // No vehicle version
+-                // For each 10 blocks, send a player move packet with no delta
+-                for (int packetNumber = 0; packetNumber < (packetsRequired - 1); packetNumber++) {
+-                    mc.player.connection.send(new ServerboundMovePlayerPacket.StatusOnly(true, mc.player.horizontalCollision));
++                for (int packetNumber = 0; packetNumber < packetsRequired - 1; ++packetNumber) {
++                    VClipCommand.mc.player.connection.send((Packet)new ServerboundMovePlayerPacket.StatusOnly(true, VClipCommand.mc.player.horizontalCollision));
+                 }
+-                // Now send the final player move packet
+-                mc.player.connection.send(new ServerboundMovePlayerPacket.Pos(mc.player.getX(), mc.player.getY() + blocks, mc.player.getZ(), true, mc.player.horizontalCollision));
+-                mc.player.setPos(mc.player.getX(), mc.player.getY() + blocks, mc.player.getZ());
++                VClipCommand.mc.player.connection.send((Packet)new ServerboundMovePlayerPacket.Pos(VClipCommand.mc.player.getX(), VClipCommand.mc.player.getY() + blocks, VClipCommand.mc.player.getZ(), true, VClipCommand.mc.player.horizontalCollision));
++                VClipCommand.mc.player.setPos(VClipCommand.mc.player.getX(), VClipCommand.mc.player.getY() + blocks, VClipCommand.mc.player.getZ());
+             }
+-
+-            return SINGLE_SUCCESS;
++            return 1;
+         }));
+     }
+ }
++

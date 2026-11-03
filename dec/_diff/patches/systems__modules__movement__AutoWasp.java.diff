@@ -1,0 +1,417 @@
+--- upstream261/systems/modules/movement/AutoWasp.java
++++ v1decompiled/systems/modules/movement/AutoWasp.java
+@@ -1,230 +1,238 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  java.lang.MatchException
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.ChatFormatting
++ *  net.minecraft.core.BlockPos
++ *  net.minecraft.core.Direction
++ *  net.minecraft.core.Position
++ *  net.minecraft.core.component.DataComponents
++ *  net.minecraft.network.chat.Component
++ *  net.minecraft.network.protocol.Packet
++ *  net.minecraft.network.protocol.common.ClientboundDisconnectPacket
++ *  net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket
++ *  net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket$Action
++ *  net.minecraft.world.entity.Entity
++ *  net.minecraft.world.entity.EquipmentSlot
++ *  net.minecraft.world.entity.player.Player
++ *  net.minecraft.world.level.Level
++ *  net.minecraft.world.phys.AABB
++ *  net.minecraft.world.phys.Vec3
++ *  org.joml.Vector3d
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules.movement;
+-
+-import meteordevelopment.meteorclient.events.entity.player.PlayerMoveEvent;
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.mixin.BlockBehaviourAccessor;
+-import meteordevelopment.meteorclient.mixin.DirectionAccessor;
+-import meteordevelopment.meteorclient.mixininterface.IVec3;
+-import meteordevelopment.meteorclient.settings.*;
+-import meteordevelopment.meteorclient.systems.friends.Friends;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.utils.entity.SortPriority;
+-import meteordevelopment.meteorclient.utils.entity.TargetUtils;
++package radmin.client.systems.modules.movement;
++
++import java.util.List;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.ChatFormatting;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
++import net.minecraft.core.Position;
+ import net.minecraft.core.component.DataComponents;
+ import net.minecraft.network.chat.Component;
++import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
+ import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.EquipmentSlot;
+ import net.minecraft.world.entity.player.Player;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.phys.AABB;
+ import net.minecraft.world.phys.Vec3;
+ import org.joml.Vector3d;
+-
+-public class AutoWasp extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<Double> horizontalSpeed = sgGeneral.add(new DoubleSetting.Builder()
+-        .name("horizontal-speed")
+-        .description("Horizontal elytra speed.")
+-        .defaultValue(2.0)
+-        .build()
+-    );
+-
+-    private final Setting<Double> verticalSpeed = sgGeneral.add(new DoubleSetting.Builder()
+-        .name("vertical-speed")
+-        .description("Vertical elytra speed.")
+-        .defaultValue(3.0)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> avoidLanding = sgGeneral.add(new BoolSetting.Builder()
+-        .name("avoid-landing")
+-        .description("Will try to avoid landing if your target is on the ground.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> predictMovement = sgGeneral.add(new BoolSetting.Builder()
+-        .name("predict-movement")
+-        .description("Tries to predict the targets position according to their movement.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> onlyFriends = sgGeneral.add(new BoolSetting.Builder()
+-        .name("only-friends")
+-        .description("Will only follow friends.")
+-        .defaultValue(false)
+-        .build()
+-    );
+-
+-    private final Setting<Action> action = sgGeneral.add(new EnumSetting.Builder<Action>()
+-        .name("action-on-target-loss")
+-        .description("What to do if you lose the target.")
+-        .defaultValue(Action.TOGGLE)
+-        .build()
+-    );
+-
+-    private final Setting<Vector3d> offset = sgGeneral.add(new Vector3dSetting.Builder()
+-        .name("offset")
+-        .description("How many blocks offset to wasp at from the target.")
+-        .defaultValue(0, 0, 0)
+-        .build()
+-    );
+-
++import radmin.client.events.entity.player.PlayerMoveEvent;
++import radmin.client.events.world.TickEvent;
++import radmin.client.mixin.BlockBehaviourAccessor;
++import radmin.client.mixin.DirectionAccessor;
++import radmin.client.mixininterface.IVec3;
++import radmin.client.settings.BoolSetting;
++import radmin.client.settings.DoubleSetting;
++import radmin.client.settings.EnumSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.settings.Vector3dSetting;
++import radmin.client.systems.friends.Friends;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.utils.entity.SortPriority;
++import radmin.client.utils.entity.TargetUtils;
++
++public class AutoWasp
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final Setting<Double> horizontalSpeed;
++    private final Setting<Double> verticalSpeed;
++    private final Setting<Boolean> avoidLanding;
++    private final Setting<Boolean> predictMovement;
++    private final Setting<Boolean> onlyFriends;
++    private final Setting<Action> action;
++    private final Setting<Vector3d> offset;
+     public Player target;
+-    private int jumpTimer = 0;
+-    private boolean incrementJumpTimer = false;
++    private int jumpTimer;
++    private boolean incrementJumpTimer;
+ 
+     public AutoWasp() {
+         super(Categories.Movement, "auto-wasp", "Wasps for you. Unable to traverse around blocks, assumes a clear straight line to the target.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.horizontalSpeed = this.sgGeneral.add(((DoubleSetting.Builder)((DoubleSetting.Builder)new DoubleSetting.Builder().name("horizontal-speed")).description("Horizontal elytra speed.")).defaultValue(2.0).build());
++        this.verticalSpeed = this.sgGeneral.add(((DoubleSetting.Builder)((DoubleSetting.Builder)new DoubleSetting.Builder().name("vertical-speed")).description("Vertical elytra speed.")).defaultValue(3.0).build());
++        this.avoidLanding = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("avoid-landing")).description("Will try to avoid landing if your target is on the ground.")).defaultValue(true)).build());
++        this.predictMovement = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("predict-movement")).description("Tries to predict the targets position according to their movement.")).defaultValue(true)).build());
++        this.onlyFriends = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("only-friends")).description("Will only follow friends.")).defaultValue(false)).build());
++        this.action = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("action-on-target-loss")).description("What to do if you lose the target.")).defaultValue(Action.TOGGLE)).build());
++        this.offset = this.sgGeneral.add(((Vector3dSetting.Builder)((Vector3dSetting.Builder)new Vector3dSetting.Builder().name("offset")).description("How many blocks offset to wasp at from the target.")).defaultValue(0.0, 0.0, 0.0).build());
++        this.jumpTimer = 0;
++        this.incrementJumpTimer = false;
+     }
+ 
+     @Override
+     public void onActivate() {
+-        if (target == null || target.isRemoved()) {
+-            target = (Player) TargetUtils.get(entity -> {
+-                if (!(entity instanceof Player player) || entity == mc.player) return false;
+-                if (player.isDeadOrDying() || player.getHealth() <= 0) return false;
+-                return !onlyFriends.get() || Friends.get().get(player) != null;
++        if (this.target == null || this.target.isRemoved()) {
++            this.target = (Player)TargetUtils.get(entity -> {
++                Player player;
++                block5: {
++                    block4: {
++                        if (!(entity instanceof Player)) break block4;
++                        player = (Player)entity;
++                        if (entity != this.mc.player) break block5;
++                    }
++                    return false;
++                }
++                if (player.isDeadOrDying() || player.getHealth() <= 0.0f) {
++                    return false;
++                }
++                return this.onlyFriends.get() == false || Friends.get().get(player) != null;
+             }, SortPriority.LowestDistance);
+-
+-            if (target == null) {
+-                error("No valid targets.");
+-                toggle();
++            if (this.target == null) {
++                this.error("No valid targets.", new Object[0]);
++                this.toggle();
+                 return;
+-            } else info(target.getName().getString() + " set as target.");
+-        }
+-
+-        jumpTimer = 0;
+-        incrementJumpTimer = false;
++            }
++            this.info(this.target.getName().getString() + " set as target.", new Object[0]);
++        }
++        this.jumpTimer = 0;
++        this.incrementJumpTimer = false;
+     }
+ 
+     @Override
+     public void onDeactivate() {
+-        target = null;
++        this.target = null;
+     }
+ 
+     @EventHandler
+     private void onTick(TickEvent.Pre event) {
+-        if (target.isRemoved()) {
+-            warning("Lost target!");
+-
+-            switch (action.get()) {
+-                case CHOOSE_NEW_TARGET -> onActivate();
+-                case TOGGLE -> toggle();
+-                case DISCONNECT ->
+-                    mc.player.connection.handleDisconnect(new ClientboundDisconnectPacket(Component.literal("%s[%sAuto Wasp%s] Lost target.".formatted(ChatFormatting.GRAY, ChatFormatting.BLUE, ChatFormatting.GRAY))));
+-            }
+-
+-            if (!isActive()) return;
+-        }
+-
+-        if (!(mc.player.getItemBySlot(EquipmentSlot.CHEST).has(DataComponents.GLIDER))) return;
+-
+-        if (incrementJumpTimer) {
+-            jumpTimer++;
+-        }
+-
+-        if (!mc.player.isFallFlying()) {
+-            if (!incrementJumpTimer) incrementJumpTimer = true;
+-
+-            if (mc.player.onGround() && incrementJumpTimer) {
+-                mc.player.jumpFromGround();
++        if (this.target.isRemoved()) {
++            this.warning("Lost target!", new Object[0]);
++            switch (this.action.get().ordinal()) {
++                case 1: {
++                    this.onActivate();
++                    break;
++                }
++                case 0: {
++                    this.toggle();
++                    break;
++                }
++                case 2: {
++                    this.mc.player.connection.handleDisconnect(new ClientboundDisconnectPacket((Component)Component.literal((String)"%s[%sAuto Wasp%s] Lost target.".formatted(ChatFormatting.GRAY, ChatFormatting.BLUE, ChatFormatting.GRAY))));
++                }
++            }
++            if (!this.isActive()) {
+                 return;
+             }
+-
+-            if (jumpTimer >= 4) {
+-                jumpTimer = 0;
+-                mc.player.setJumping(false);
+-                mc.player.setSprinting(true);
+-                mc.getConnection().send(new ServerboundPlayerCommandPacket(mc.player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
++        }
++        if (!this.mc.player.getItemBySlot(EquipmentSlot.CHEST).has(DataComponents.GLIDER)) {
++            return;
++        }
++        if (this.incrementJumpTimer) {
++            ++this.jumpTimer;
++        }
++        if (!this.mc.player.isFallFlying()) {
++            if (!this.incrementJumpTimer) {
++                this.incrementJumpTimer = true;
++            }
++            if (this.mc.player.onGround() && this.incrementJumpTimer) {
++                this.mc.player.jumpFromGround();
++                return;
++            }
++            if (this.jumpTimer >= 4) {
++                this.jumpTimer = 0;
++                this.mc.player.setJumping(false);
++                this.mc.player.setSprinting(true);
++                this.mc.getConnection().send((Packet)new ServerboundPlayerCommandPacket((Entity)this.mc.player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
+             }
+         } else {
+-            incrementJumpTimer = false;
+-            jumpTimer = 0;
++            this.incrementJumpTimer = false;
++            this.jumpTimer = 0;
+         }
+     }
+ 
+     @EventHandler
+     private void onMove(PlayerMoveEvent event) {
+-        if (!(mc.player.getItemBySlot(EquipmentSlot.CHEST).has(DataComponents.GLIDER))) return;
+-        if (!mc.player.isFallFlying()) return;
+-
+-        double xVel = 0, yVel = 0, zVel = 0;
+-
+-        Vec3 targetPos = target.position().add(offset.get().x, offset.get().y, offset.get().z);
+-
+-        if (predictMovement.get()) targetPos.add(Entity.collideBoundingBox(target, target.getDeltaMovement(),
+-            target.getBoundingBox(), mc.level, mc.level.getEntityCollisions(target, target.getBoundingBox().expandTowards(target.getDeltaMovement()))));
+-
+-        if (avoidLanding.get()) {
+-            double d = target.getBoundingBox().getXsize() / 2; // x length = z length for players
+-
+-            //get the block pos of the block underneath the corner of the targets bounding box
++        double yDist;
++        if (!this.mc.player.getItemBySlot(EquipmentSlot.CHEST).has(DataComponents.GLIDER)) {
++            return;
++        }
++        if (!this.mc.player.isFallFlying()) {
++            return;
++        }
++        double xVel = 0.0;
++        double yVel = 0.0;
++        double zVel = 0.0;
++        Vec3 targetPos = this.target.position().add(this.offset.get().x, this.offset.get().y, this.offset.get().z);
++        if (this.predictMovement.get().booleanValue()) {
++            targetPos.add(Entity.collideBoundingBox((Entity)this.target, (Vec3)this.target.getDeltaMovement(), (AABB)this.target.getBoundingBox(), (Level)this.mc.level, (List)this.mc.level.getEntityCollisions((Entity)this.target, this.target.getBoundingBox().expandTowards(this.target.getDeltaMovement()))));
++        }
++        if (this.avoidLanding.get().booleanValue()) {
++            double d = this.target.getBoundingBox().getXsize() / 2.0;
+             for (Direction dir : DirectionAccessor.meteor$getHorizontal()) {
+-                BlockPos pos = BlockPos.containing(targetPos.relative(dir, d).relative(dir.getClockWise(), d)).below();
+-                if (((BlockBehaviourAccessor) mc.level.getBlockState(pos).getBlock()).meteor$isHasCollision() && Math.abs(targetPos.y() - (pos.getY() + 1)) <= 0.25) {
+-                    targetPos = new Vec3(targetPos.x, pos.getY() + 1.25, targetPos.z);
+-                    break;
+-                }
+-            }
+-        }
+-
+-        double xDist = targetPos.x() - mc.player.getX();
+-        double zDist = targetPos.z() - mc.player.getZ();
+-
++                BlockPos pos = BlockPos.containing((Position)targetPos.relative(dir, d).relative(dir.getClockWise(), d)).below();
++                if (!((BlockBehaviourAccessor)this.mc.level.getBlockState(pos).getBlock()).meteor$isHasCollision() || !(Math.abs(targetPos.y() - (double)(pos.getY() + 1)) <= 0.25)) continue;
++                targetPos = new Vec3(targetPos.x, (double)pos.getY() + 1.25, targetPos.z);
++                break;
++            }
++        }
++        double xDist = targetPos.x() - this.mc.player.getX();
++        double zDist = targetPos.z() - this.mc.player.getZ();
+         double absX = Math.abs(xDist);
+         double absZ = Math.abs(zDist);
+-
+-        double diag = 0;
+-        if (absX > 1.0E-5F && absZ > 1.0E-5F) diag = 1 / Math.sqrt(absX * absX + absZ * absZ);
+-
+-        if (absX > 1.0E-5F) {
+-            if (absX < horizontalSpeed.get()) xVel = xDist;
+-            else xVel = horizontalSpeed.get() * Math.signum(xDist);
+-
+-            if (diag != 0) xVel *= (absX * diag);
+-        }
+-
+-        if (absZ > 1.0E-5F) {
+-            if (absZ < horizontalSpeed.get()) zVel = zDist;
+-            else zVel = horizontalSpeed.get() * Math.signum(zDist);
+-
+-            if (diag != 0) zVel *= (absZ * diag);
+-        }
+-
+-        double yDist = targetPos.y() - mc.player.getY();
+-        if (Math.abs(yDist) > 1.0E-5F) {
+-            if (Math.abs(yDist) < verticalSpeed.get()) yVel = yDist;
+-            else yVel = verticalSpeed.get() * Math.signum(yDist);
+-        }
+-
+-        ((IVec3) event.movement).meteor$set(xVel, yVel, zVel);
+-    }
+-
+-    public enum Action {
++        double diag = 0.0;
++        if (absX > (double)1.0E-5f && absZ > (double)1.0E-5f) {
++            diag = 1.0 / Math.sqrt(absX * absX + absZ * absZ);
++        }
++        if (absX > (double)1.0E-5f) {
++            xVel = absX < this.horizontalSpeed.get() ? xDist : this.horizontalSpeed.get() * Math.signum(xDist);
++            if (diag != 0.0) {
++                xVel *= absX * diag;
++            }
++        }
++        if (absZ > (double)1.0E-5f) {
++            zVel = absZ < this.horizontalSpeed.get() ? zDist : this.horizontalSpeed.get() * Math.signum(zDist);
++            if (diag != 0.0) {
++                zVel *= absZ * diag;
++            }
++        }
++        if (Math.abs(yDist = targetPos.y() - this.mc.player.getY()) > (double)1.0E-5f) {
++            yVel = Math.abs(yDist) < this.verticalSpeed.get() ? yDist : this.verticalSpeed.get() * Math.signum(yDist);
++        }
++        ((IVec3)event.movement).meteor$set(xVel, yVel, zVel);
++    }
++
++    public static enum Action {
+         TOGGLE,
+         CHOOSE_NEW_TARGET,
+         DISCONNECT;
+ 
+-        @Override
++
+         public String toString() {
+-            return switch (this) {
+-                case TOGGLE -> "Toggle module";
+-                case CHOOSE_NEW_TARGET -> "Choose new target";
+-                case DISCONNECT -> "Disconnect";
++            return switch (this.ordinal()) {
++                default -> throw new MatchException(null, null);
++                case 0 -> "Toggle module";
++                case 1 -> "Choose new target";
++                case 2 -> "Disconnect";
+             };
+         }
+     }
+ }
++

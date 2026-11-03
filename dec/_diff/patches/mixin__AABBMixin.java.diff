@@ -1,0 +1,48 @@
+--- upstream261/mixin/AABBMixin.java
++++ v1decompiled/mixin/AABBMixin.java
+@@ -1,19 +1,25 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.phys.AABB
++ *  org.spongepowered.asm.mixin.Final
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Mutable
++ *  org.spongepowered.asm.mixin.Shadow
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.mixininterface.IAABB;
+ import net.minecraft.world.phys.AABB;
+ import org.spongepowered.asm.mixin.Final;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Mutable;
+ import org.spongepowered.asm.mixin.Shadow;
++import radmin.client.mixininterface.IAABB;
+ 
+-@Mixin(AABB.class)
+-public abstract class AABBMixin implements IAABB {
++@Mixin(value={AABB.class})
++public abstract class AABBMixin
++implements IAABB {
+     @Shadow
+     @Final
+     @Mutable
+@@ -26,7 +32,6 @@
+     @Final
+     @Mutable
+     public double minZ;
+-
+     @Shadow
+     @Final
+     @Mutable
+@@ -60,3 +65,4 @@
+         this.maxZ = Math.max(z1, z2);
+     }
+ }
++

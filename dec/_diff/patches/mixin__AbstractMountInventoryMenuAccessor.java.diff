@@ -1,0 +1,32 @@
+--- upstream261/mixin/AbstractMountInventoryMenuAccessor.java
++++ v1decompiled/mixin/AbstractMountInventoryMenuAccessor.java
+@@ -1,17 +1,22 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.entity.LivingEntity
++ *  net.minecraft.world.inventory.AbstractMountInventoryMenu
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.world.entity.LivingEntity;
+ import net.minecraft.world.inventory.AbstractMountInventoryMenu;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(AbstractMountInventoryMenu.class)
++@Mixin(value={AbstractMountInventoryMenu.class})
+ public interface AbstractMountInventoryMenuAccessor {
+-    @Accessor("mount")
+-    LivingEntity meteor$getMount();
++    @Accessor(value="mount")
++    public LivingEntity meteor$getMount();
+ }
++

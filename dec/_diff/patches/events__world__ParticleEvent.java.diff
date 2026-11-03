@@ -1,0 +1,35 @@
+--- upstream261/events/world/ParticleEvent.java
++++ v1decompiled/events/world/ParticleEvent.java
+@@ -1,21 +1,23 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.particles.ParticleOptions
+  */
++package radmin.client.events.world;
+ 
+-package meteordevelopment.meteorclient.events.world;
++import net.minecraft.core.particles.ParticleOptions;
++import radmin.client.events.Cancellable;
+ 
+-import meteordevelopment.meteorclient.events.Cancellable;
+-import net.minecraft.core.particles.ParticleOptions;
+-
+-public class ParticleEvent extends Cancellable {
++public class ParticleEvent
++extends Cancellable {
+     private static final ParticleEvent INSTANCE = new ParticleEvent();
+-
+     public ParticleOptions particle;
+ 
+     public static ParticleEvent get(ParticleOptions particle) {
+         INSTANCE.setCancelled(false);
+-        INSTANCE.particle = particle;
++        ParticleEvent.INSTANCE.particle = particle;
+         return INSTANCE;
+     }
+ }
++

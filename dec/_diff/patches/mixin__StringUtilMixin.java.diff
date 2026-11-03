@@ -1,0 +1,39 @@
+--- upstream261/mixin/StringUtilMixin.java
++++ v1decompiled/mixin/StringUtilMixin.java
+@@ -1,21 +1,26 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.util.StringUtil
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.injection.At
++ *  org.spongepowered.asm.mixin.injection.ModifyArg
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.misc.BetterChat;
+ import net.minecraft.util.StringUtil;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.injection.At;
+ import org.spongepowered.asm.mixin.injection.ModifyArg;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.misc.BetterChat;
+ 
+-@Mixin(StringUtil.class)
++@Mixin(value={StringUtil.class})
+ public abstract class StringUtilMixin {
+-    @ModifyArg(method = "trimChatMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/StringUtil;truncateStringIfNecessary(Ljava/lang/String;IZ)Ljava/lang/String;"), index = 1)
+-    private static int injected(int maxLength) { // this method is only used in one place, to truncate chat messages, so it's fine to do this
+-        return (Modules.get().get(BetterChat.class).isInfiniteChatBox() ? Integer.MAX_VALUE : maxLength);
++    @ModifyArg(method={"trimChatMessage"}, at=@At(value="INVOKE", target="Lnet/minecraft/util/StringUtil;truncateStringIfNecessary(Ljava/lang/String;IZ)Ljava/lang/String;"), index=1)
++    private static int injected(int maxLength) {
++        return Modules.get().get(BetterChat.class).isInfiniteChatBox() ? Integer.MAX_VALUE : maxLength;
+     }
+ }
++

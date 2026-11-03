@@ -1,0 +1,32 @@
+--- upstream261/mixin/ConnectionAccessor.java
++++ v1decompiled/mixin/ConnectionAccessor.java
+@@ -1,17 +1,22 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  io.netty.channel.Channel
++ *  net.minecraft.network.Connection
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import io.netty.channel.Channel;
+ import net.minecraft.network.Connection;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(Connection.class)
++@Mixin(value={Connection.class})
+ public interface ConnectionAccessor {
+-    @Accessor("channel")
+-    Channel meteor$getChannel();
++    @Accessor(value="channel")
++    public Channel meteor$getChannel();
+ }
++

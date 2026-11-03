@@ -1,0 +1,286 @@
+--- upstream261/systems/modules/render/ItemPhysics.java
++++ v1decompiled/systems/modules/render/ItemPhysics.java
+@@ -1,21 +1,25 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.vertex.PoseStack
++ *  com.mojang.math.Axis
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.client.renderer.item.ItemStackRenderState$LayerRenderState
++ *  net.minecraft.client.renderer.texture.OverlayTexture
++ *  net.minecraft.client.resources.model.cuboid.ItemTransform
++ *  net.minecraft.client.resources.model.geometry.BakedQuad
++ *  net.minecraft.util.RandomSource
++ *  net.minecraft.world.entity.item.ItemEntity
++ *  org.joml.Quaternionfc
++ *  org.joml.Vector3f
++ *  org.joml.Vector3fc
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules.render;
++package radmin.client.systems.modules.render;
+ 
+ import com.mojang.blaze3d.vertex.PoseStack;
+ import com.mojang.math.Axis;
+-import meteordevelopment.meteorclient.events.render.ApplyTransformationEvent;
+-import meteordevelopment.meteorclient.events.render.RenderItemEntityEvent;
+-import meteordevelopment.meteorclient.mixin.ItemStackRenderStateAccessor;
+-import meteordevelopment.meteorclient.mixin.LayerRenderStateAccessor;
+-import meteordevelopment.meteorclient.settings.BoolSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
++import java.util.List;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.client.renderer.item.ItemStackRenderState;
+ import net.minecraft.client.renderer.texture.OverlayTexture;
+@@ -23,108 +27,96 @@
+ import net.minecraft.client.resources.model.geometry.BakedQuad;
+ import net.minecraft.util.RandomSource;
+ import net.minecraft.world.entity.item.ItemEntity;
++import org.joml.Quaternionfc;
+ import org.joml.Vector3f;
+ import org.joml.Vector3fc;
++import radmin.client.events.render.ApplyTransformationEvent;
++import radmin.client.events.render.RenderItemEntityEvent;
++import radmin.client.mixin.ItemStackRenderStateAccessor;
++import radmin.client.mixin.LayerRenderStateAccessor;
++import radmin.client.settings.BoolSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
+ 
+-import java.util.List;
+-
+-public class ItemPhysics extends Module {
+-    private static final float PIXEL_SIZE = 1f / 16f;
+-
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<Boolean> randomRotation = sgGeneral.add(new BoolSetting.Builder()
+-        .name("random-rotation")
+-        .description("Adds a random rotation to every item.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private final RandomSource random = RandomSource.createThreadLocalInstance();
++public class ItemPhysics
++extends Module {
++    private static final float PIXEL_SIZE = 0.0625f;
++    private final SettingGroup sgGeneral;
++    private final Setting<Boolean> randomRotation;
++    private final RandomSource random;
+     private boolean skipTransformation;
+ 
+     public ItemPhysics() {
+         super(Categories.Render, "item-physics", "Applies physics to items on the ground.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.randomRotation = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("random-rotation")).description("Adds a random rotation to every item.")).defaultValue(true)).build());
++        this.random = RandomSource.createThreadLocalInstance();
+     }
+ 
+     @EventHandler
+     private void onRenderItemEntity(RenderItemEntityEvent event) {
+         event.cancel();
+-
+-        if (event.renderState.item.isEmpty() || event.itemEntity == null)
++        if (event.renderState.item.isEmpty() || event.itemEntity == null) {
+             return;
+-
++        }
+         PoseStack matrices = event.matrixStack;
+-
+-        random.setSeed(event.itemEntity.getId() * 89748956L);
+-
+-        for (int i = 0; i < ((ItemStackRenderStateAccessor) event.renderState.item).meteor$getActiveLayerCount(); i++) {
+-            ItemStackRenderState.LayerRenderState layer = ((ItemStackRenderStateAccessor) event.renderState.item).meteor$getLayers()[i];
+-            ModelInfo info = getInfo(layer.prepareQuadList());
+-
++        this.random.setSeed((long)event.itemEntity.getId() * 89748956L);
++        for (int i = 0; i < ((ItemStackRenderStateAccessor)event.renderState.item).meteor$getActiveLayerCount(); ++i) {
++            ItemStackRenderState.LayerRenderState layer = ((ItemStackRenderStateAccessor)event.renderState.item).meteor$getLayers()[i];
++            ModelInfo info = this.getInfo(layer.prepareQuadList());
+             matrices.pushPose();
+-            applyTransformation(matrices, ((LayerRenderStateAccessor) layer).meteor$getTransform());
+-            matrices.translate(0, info.offsetY, 0);
+-            offsetInWater(matrices, event.itemEntity);
+-
++            this.applyTransformation(matrices, ((LayerRenderStateAccessor)layer).meteor$getTransform());
++            matrices.translate(0.0f, info.offsetY, 0.0f);
++            this.offsetInWater(matrices, event.itemEntity);
+             if (info.flat) {
+-                matrices.mulPose(Axis.XP.rotationDegrees(90));
+-                matrices.translate(0, 0, info.offsetZ);
++                matrices.mulPose((Quaternionfc)Axis.XP.rotationDegrees(90.0f));
++                matrices.translate(0.0f, 0.0f, info.offsetZ);
+             }
+-
+-            if (randomRotation.get()) {
+-                var axis = Axis.YP;
+-                var x = 0.5f;
+-                var y = 0.0f;
+-                var z = 0.5f;
+-
++            if (this.randomRotation.get().booleanValue()) {
++                Axis axis = Axis.YP;
++                float x = 0.5f;
++                float y = 0.0f;
++                float z = 0.5f;
+                 if (info.flat) {
+                     axis = Axis.ZP;
+                     y = 0.5f;
+                     z = 0.0f;
+                 }
+-
+-                float degrees = (random.nextFloat() * 2 - 1) * 90;
+-
++                float degrees = (this.random.nextFloat() * 2.0f - 1.0f) * 90.0f;
+                 matrices.translate(x, y, z);
+-                matrices.mulPose(axis.rotationDegrees(degrees));
++                matrices.mulPose((Quaternionfc)axis.rotationDegrees(degrees));
+                 matrices.translate(-x, -y, -z);
+             }
+-
+-            renderLayer(event, info);
+-
++            this.renderLayer(event, info);
+             matrices.popPose();
+         }
+     }
+ 
+     @EventHandler
+     private void onApplyTransformation(ApplyTransformationEvent event) {
+-        if (skipTransformation)
++        if (this.skipTransformation) {
+             event.cancel();
++        }
+     }
+ 
+     private void renderLayer(RenderItemEntityEvent event, ModelInfo info) {
+         PoseStack matrices = event.matrixStack;
+-        skipTransformation = true;
+-
+-        for (int j = 0; j < event.renderState.count; j++) {
++        this.skipTransformation = true;
++        for (int j = 0; j < event.renderState.count; ++j) {
+             matrices.pushPose();
+-
+             if (j > 0) {
+-                float x = (random.nextFloat() * 2 - 1) * 0.25f;
+-                float z = (random.nextFloat() * 2 - 1) * 0.25f;
+-                translate(matrices, info, x, 0, z);
++                float x = (this.random.nextFloat() * 2.0f - 1.0f) * 0.25f;
++                float z = (this.random.nextFloat() * 2.0f - 1.0f) * 0.25f;
++                this.translate(matrices, info, x, 0.0f, z);
+             }
+-
+             event.renderState.item.submit(matrices, event.renderCommandQueue, event.light, OverlayTexture.NO_OVERLAY, event.renderState.outlineColor);
+-
+             matrices.popPose();
+-
+-            float y = Math.max(random.nextFloat() * PIXEL_SIZE, PIXEL_SIZE / 2f);
+-            translate(matrices, info, 0, y, 0);
++            float y = Math.max(this.random.nextFloat() * 0.0625f, 0.03125f);
++            this.translate(matrices, info, 0.0f, y, 0.0f);
+         }
+-
+-        skipTransformation = false;
++        this.skipTransformation = false;
+     }
+ 
+     private void translate(PoseStack matrices, ModelInfo info, float x, float y, float z) {
+@@ -133,33 +125,29 @@
+             y = z;
+             z = -temp;
+         }
+-
+         matrices.translate(x, y, z);
+     }
+ 
+     private void applyTransformation(PoseStack matrices, ItemTransform transform) {
+-        transform = new ItemTransform(
+-            transform.rotation(),
+-            new Vector3f(transform.translation().x(), 0, transform.translation().z()),
+-            transform.scale()
+-        );
+-
++        transform = new ItemTransform(transform.rotation(), (Vector3fc)new Vector3f(transform.translation().x(), 0.0f, transform.translation().z()), transform.scale());
+         transform.apply(false, matrices.last());
+     }
+ 
+     private void offsetInWater(PoseStack matrices, ItemEntity entity) {
+         if (entity.isInWater()) {
+-            matrices.translate(0, 0.333f, 0);
++            matrices.translate(0.0f, 0.333f, 0.0f);
+         }
+     }
+ 
+     private ModelInfo getInfo(List<BakedQuad> quads) {
+-        float minX = Float.MAX_VALUE, maxX = Float.MIN_VALUE;
+-        float minY = Float.MAX_VALUE, maxY = Float.MIN_VALUE;
+-        float minZ = Float.MAX_VALUE, maxZ = Float.MIN_VALUE;
+-
++        float minX = Float.MAX_VALUE;
++        float maxX = Float.MIN_VALUE;
++        float minY = Float.MAX_VALUE;
++        float maxY = Float.MIN_VALUE;
++        float minZ = Float.MAX_VALUE;
++        float maxZ = Float.MIN_VALUE;
+         for (BakedQuad quad : quads) {
+-            for (int i = 0; i < 4; i++) {
++            for (int i = 0; i < 4; ++i) {
+                 Vector3fc vec = quad.position(i);
+                 minY = Math.min(minY, vec.y());
+                 maxY = Math.max(maxY, vec.y());
+@@ -169,24 +157,32 @@
+                 maxX = Math.max(maxX, vec.x());
+             }
+         }
+-
+-        if (minX == Float.MAX_VALUE) minX = 0;
+-        if (minY == Float.MAX_VALUE) minY = 0;
+-        if (minZ == Float.MAX_VALUE) minZ = 0;
+-
+-        if (maxX == Float.MIN_VALUE) maxX = 1;
+-        if (maxY == Float.MIN_VALUE) maxY = 1;
+-        if (maxZ == Float.MIN_VALUE) maxZ = 1;
+-
++        if (minX == Float.MAX_VALUE) {
++            minX = 0.0f;
++        }
++        if (minY == Float.MAX_VALUE) {
++            minY = 0.0f;
++        }
++        if (minZ == Float.MAX_VALUE) {
++            minZ = 0.0f;
++        }
++        if (maxX == Float.MIN_VALUE) {
++            maxX = 1.0f;
++        }
++        if (maxY == Float.MIN_VALUE) {
++            maxY = 1.0f;
++        }
++        if (maxZ == Float.MIN_VALUE) {
++            maxZ = 1.0f;
++        }
+         float x = maxX - minX;
+         float y = maxY - minY;
+         float z = maxZ - minZ;
+-
+-        boolean flat = (x > PIXEL_SIZE && y > PIXEL_SIZE && z <= PIXEL_SIZE);
+-
++        boolean flat = x > 0.0625f && y > 0.0625f && z <= 0.0625f;
+         return new ModelInfo(flat, 0.5f - minY, -maxZ);
+     }
+ 
+     record ModelInfo(boolean flat, float offsetY, float offsetZ) {
+     }
+ }
++

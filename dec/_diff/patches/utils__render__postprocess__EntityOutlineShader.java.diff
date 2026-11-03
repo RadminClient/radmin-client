@@ -1,0 +1,62 @@
+--- upstream261/utils/render/postprocess/EntityOutlineShader.java
++++ v1decompiled/utils/render/postprocess/EntityOutlineShader.java
+@@ -1,12 +1,21 @@
+-package meteordevelopment.meteorclient.utils.render.postprocess;
++/*
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.entity.Entity
++ */
++package radmin.client.utils.render.postprocess;
+ 
+-import meteordevelopment.meteorclient.renderer.MeshRenderer;
+-import meteordevelopment.meteorclient.renderer.MeteorRenderPipelines;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.render.ESP;
+ import net.minecraft.world.entity.Entity;
++import radmin.client.renderer.MeshRenderer;
++import radmin.client.renderer.MeteorRenderPipelines;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.render.ESP;
++import radmin.client.utils.render.postprocess.EntityShader;
++import radmin.client.utils.render.postprocess.OutlineUniforms;
+ 
+-public class EntityOutlineShader extends EntityShader {
++public class EntityOutlineShader
++extends EntityShader {
+     private static ESP esp;
+ 
+     public EntityOutlineShader() {
+@@ -15,23 +24,23 @@
+ 
+     @Override
+     protected boolean shouldDraw() {
+-        if (esp == null) esp = Modules.get().get(ESP.class);
++        if (esp == null) {
++            esp = Modules.get().get(ESP.class);
++        }
+         return esp.isShader();
+     }
+ 
+     @Override
+     public boolean shouldDraw(Entity entity) {
+-        if (!shouldDraw()) return false;
++        if (!this.shouldDraw()) {
++            return false;
++        }
+         return !esp.shouldSkip(entity);
+     }
+ 
+     @Override
+     protected void setupPass(MeshRenderer renderer) {
+-        renderer.uniform("OutlineData", OutlineUniforms.write(
+-            esp.outlineWidth.get(),
+-            esp.fillOpacity.get().floatValue(),
+-            esp.shapeMode.get().ordinal(),
+-            esp.glowMultiplier.get().floatValue()
+-        ));
++        renderer.uniform("OutlineData", OutlineUniforms.write(EntityOutlineShader.esp.outlineWidth.get(), EntityOutlineShader.esp.fillOpacity.get().floatValue(), EntityOutlineShader.esp.shapeMode.get().ordinal(), EntityOutlineShader.esp.glowMultiplier.get().floatValue()));
+     }
+ }
++

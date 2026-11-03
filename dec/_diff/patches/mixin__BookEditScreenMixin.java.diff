@@ -1,0 +1,223 @@
+--- upstream261/mixin/BookEditScreenMixin.java
++++ v1decompiled/mixin/BookEditScreenMixin.java
+@@ -1,16 +1,49 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  it.unimi.dsi.fastutil.io.FastByteArrayOutputStream
++ *  net.minecraft.client.gui.components.Button$Builder
++ *  net.minecraft.client.gui.components.events.GuiEventListener
++ *  net.minecraft.client.gui.screens.Screen
++ *  net.minecraft.client.gui.screens.inventory.BookEditScreen
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.ListTag
++ *  net.minecraft.nbt.NbtAccounter
++ *  net.minecraft.nbt.NbtIo
++ *  net.minecraft.nbt.StringTag
++ *  net.minecraft.nbt.Tag
++ *  net.minecraft.network.chat.Component
++ *  org.lwjgl.glfw.GLFW
++ *  org.spongepowered.asm.mixin.Final
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Shadow
++ *  org.spongepowered.asm.mixin.injection.At
++ *  org.spongepowered.asm.mixin.injection.Inject
++ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import it.unimi.dsi.fastutil.io.FastByteArrayOutputStream;
+-import meteordevelopment.meteorclient.MeteorClient;
++import java.io.ByteArrayInputStream;
++import java.io.DataInputStream;
++import java.io.DataOutput;
++import java.io.DataOutputStream;
++import java.io.IOException;
++import java.io.InputStream;
++import java.io.OutputStream;
++import java.util.Base64;
++import java.util.List;
+ import net.minecraft.client.gui.components.Button;
++import net.minecraft.client.gui.components.events.GuiEventListener;
+ import net.minecraft.client.gui.screens.Screen;
+ import net.minecraft.client.gui.screens.inventory.BookEditScreen;
+-import net.minecraft.nbt.*;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.ListTag;
++import net.minecraft.nbt.NbtAccounter;
++import net.minecraft.nbt.NbtIo;
++import net.minecraft.nbt.StringTag;
++import net.minecraft.nbt.Tag;
+ import net.minecraft.network.chat.Component;
+ import org.lwjgl.glfw.GLFW;
+ import org.spongepowered.asm.mixin.Final;
+@@ -19,18 +52,11 @@
+ import org.spongepowered.asm.mixin.injection.At;
+ import org.spongepowered.asm.mixin.injection.Inject;
+ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
++import radmin.client.MeteorClient;
+ 
+-import java.io.ByteArrayInputStream;
+-import java.io.DataInputStream;
+-import java.io.DataOutputStream;
+-import java.io.IOException;
+-import java.util.Base64;
+-import java.util.List;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-@Mixin(BookEditScreen.class)
+-public abstract class BookEditScreenMixin extends Screen {
++@Mixin(value={BookEditScreen.class})
++public abstract class BookEditScreenMixin
++extends Screen {
+     @Shadow
+     @Final
+     private List<String> pages;
+@@ -50,82 +76,71 @@
+         super(title);
+     }
+ 
+-    @Inject(method = "init", at = @At("TAIL"))
++    @Inject(method={"init"}, at={@At(value="TAIL")})
+     private void onInit(CallbackInfo ci) {
+-        addRenderableWidget(
+-            new Button.Builder(Component.literal("Copy"), _ -> {
+-                ListTag listTag = new ListTag();
+-                pages.stream().map(StringTag::valueOf).forEach(listTag::add);
+-
+-                CompoundTag tag = new CompoundTag();
+-                tag.put("pages", listTag);
+-                tag.putInt("currentPage", currentPage);
+-
+-                FastByteArrayOutputStream bytes = new FastByteArrayOutputStream();
+-                DataOutputStream out = new DataOutputStream(bytes);
+-                try {
+-                    NbtIo.write(tag, out);
+-                } catch (IOException e) {
+-                    MeteorClient.LOG.error("Error writing the book to the output stream", e);
++        this.addRenderableWidget((GuiEventListener)new Button.Builder((Component)Component.literal((String)"Copy"), button -> {
++            ListTag listTag = new ListTag();
++            this.pages.stream().map(StringTag::valueOf).forEach(arg_0 -> listTag.add(arg_0));
++            CompoundTag tag = new CompoundTag();
++            tag.put("pages", (Tag)listTag);
++            tag.putInt("currentPage", this.currentPage);
++            FastByteArrayOutputStream bytes = new FastByteArrayOutputStream();
++            DataOutputStream out = new DataOutputStream((OutputStream)bytes);
++            try {
++                NbtIo.write((CompoundTag)tag, (DataOutput)out);
++            }
++            catch (IOException e) {
++                MeteorClient.LOG.error("Error writing the book to the output stream", (Throwable)e);
++            }
++            try {
++                GLFW.glfwSetClipboardString((long)MeteorClient.mc.getWindow().handle(), (CharSequence)Base64.getEncoder().encodeToString(bytes.array));
++            }
++            catch (OutOfMemoryError exception) {
++                GLFW.glfwSetClipboardString((long)MeteorClient.mc.getWindow().handle(), (CharSequence)exception.toString());
++            }
++        }).pos(4, 4).size(120, 20).build());
++        this.addRenderableWidget((GuiEventListener)new Button.Builder((Component)Component.literal((String)"Paste"), button -> {
++            byte[] bytes;
++            String clipboard = GLFW.glfwGetClipboardString((long)MeteorClient.mc.getWindow().handle());
++            if (clipboard == null) {
++                return;
++            }
++            try {
++                bytes = Base64.getDecoder().decode(clipboard);
++            }
++            catch (IllegalArgumentException illegalArgumentException) {
++                return;
++            }
++            DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes));
++            try {
++                CompoundTag tag = NbtIo.readCompressed((InputStream)in, (NbtAccounter)NbtAccounter.unlimitedHeap());
++                ListTag listTag = tag.getListOrEmpty("pages").copy();
++                this.pages.clear();
++                for (int i = 0; i < listTag.size(); ++i) {
++                    this.pages.add(listTag.getStringOr(i, ""));
+                 }
+-
+-                try {
+-                    GLFW.glfwSetClipboardString(mc.getWindow().handle(), Base64.getEncoder().encodeToString(bytes.array));
+-                } catch (OutOfMemoryError exception) {
+-                    GLFW.glfwSetClipboardString(mc.getWindow().handle(), exception.toString());
++                if (this.pages.isEmpty()) {
++                    this.pages.add("");
+                 }
+-            })
+-                .pos(4, 4)
+-                .size(120, 20)
+-                .build()
+-        );
+-
+-        addRenderableWidget(
+-            new Button.Builder(Component.literal("Paste"), _ -> {
+-                String clipboard = GLFW.glfwGetClipboardString(mc.getWindow().handle());
+-                if (clipboard == null) return;
+-
+-                byte[] bytes;
+-                try {
+-                    bytes = Base64.getDecoder().decode(clipboard);
+-                } catch (IllegalArgumentException _) {
+-                    return;
+-                }
+-                DataInputStream in = new DataInputStream(new ByteArrayInputStream(bytes));
+-
+-                try {
+-                    CompoundTag tag = NbtIo.readCompressed(in, NbtAccounter.unlimitedHeap());
+-
+-                    ListTag listTag = tag.getListOrEmpty("pages").copy();
+-
+-                    pages.clear();
+-                    for (int i = 0; i < listTag.size(); ++i) {
+-                        pages.add(listTag.getStringOr(i, ""));
+-                    }
+-
+-                    if (pages.isEmpty()) {
+-                        pages.add("");
+-                    }
+-
+-                    currentPage = tag.getIntOr("currentPage", 0);
+-
+-                    updatePageContent();
+-                } catch (IOException e) {
+-                    MeteorClient.LOG.error("Error reading the data from your clipboard", e);
+-                }
+-            })
+-                .pos(4, 4 + 20 + 2)
+-                .size(120, 20)
+-                .build()
+-        );
++                this.currentPage = tag.getIntOr("currentPage", 0);
++                this.updatePageContent();
++            }
++            catch (IOException e) {
++                MeteorClient.LOG.error("Error reading the data from your clipboard", (Throwable)e);
++            }
++        }).pos(4, 26).size(120, 20).build());
+     }
+ 
+-    @Override
+     public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+-        if (verticalAmount == 0) return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+-
+-        if (verticalAmount < 0) this.pageForward(); // scroll down
+-        else this.pageBack();                       // scroll up
++        if (verticalAmount == 0.0) {
++            return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
++        }
++        if (verticalAmount < 0.0) {
++            this.pageForward();
++        } else {
++            this.pageBack();
++        }
+         return true;
+     }
+ }
++

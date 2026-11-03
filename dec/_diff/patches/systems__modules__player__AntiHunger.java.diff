@@ -1,0 +1,127 @@
+--- upstream261/systems/modules/player/AntiHunger.java
++++ v1decompiled/systems/modules/player/AntiHunger.java
+@@ -1,74 +1,79 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.network.protocol.Packet
++ *  net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
++ *  net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket
++ *  net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket$Action
+  */
++package radmin.client.systems.modules.player;
+ 
+-package meteordevelopment.meteorclient.systems.modules.player;
+-
+-import meteordevelopment.meteorclient.events.entity.player.SendMovementPacketsEvent;
+-import meteordevelopment.meteorclient.events.packets.PacketEvent;
+-import meteordevelopment.meteorclient.mixin.ServerboundMovePlayerPacketAccessor;
+-import meteordevelopment.meteorclient.settings.BoolSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+ import meteordevelopment.orbit.EventHandler;
++import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+ import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
++import radmin.client.events.entity.player.SendMovementPacketsEvent;
++import radmin.client.events.packets.PacketEvent;
++import radmin.client.mixin.ServerboundMovePlayerPacketAccessor;
++import radmin.client.settings.BoolSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
+ 
+-public class AntiHunger extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<Boolean> sprint = sgGeneral.add(new BoolSetting.Builder()
+-        .name("sprint")
+-        .description("Spoofs sprinting packets.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> onGround = sgGeneral.add(new BoolSetting.Builder()
+-        .name("on-ground")
+-        .description("Spoofs the onGround flag.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private boolean lastOnGround, ignorePacket;
++public class AntiHunger
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final Setting<Boolean> sprint;
++    private final Setting<Boolean> onGround;
++    private boolean lastOnGround;
++    private boolean ignorePacket;
+ 
+     public AntiHunger() {
+         super(Categories.Player, "anti-hunger", "Reduces (does NOT remove) hunger consumption.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.sprint = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("sprint")).description("Spoofs sprinting packets.")).defaultValue(true)).build());
++        this.onGround = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("on-ground")).description("Spoofs the onGround flag.")).defaultValue(true)).build());
+     }
+ 
+     @Override
+     public void onActivate() {
+-        lastOnGround = mc.player.onGround();
++        this.lastOnGround = this.mc.player.onGround();
+     }
+ 
+     @EventHandler
+     private void onSendPacket(PacketEvent.Send event) {
+-        if (ignorePacket && event.packet instanceof ServerboundMovePlayerPacket) {
+-            ignorePacket = false;
++        ServerboundPlayerCommandPacket packet;
++        if (this.ignorePacket && event.packet instanceof ServerboundMovePlayerPacket) {
++            this.ignorePacket = false;
+             return;
+         }
+-
+-        if (mc.player.isPassenger() || mc.player.isInWater() || mc.player.isUnderWater()) return;
+-
+-        if (event.packet instanceof ServerboundPlayerCommandPacket packet && sprint.get()) {
+-            if (packet.getAction() == ServerboundPlayerCommandPacket.Action.START_SPRINTING) event.cancel();
++        if (this.mc.player.isPassenger() || this.mc.player.isInWater() || this.mc.player.isUnderWater()) {
++            return;
+         }
+-
+-        if (event.packet instanceof ServerboundMovePlayerPacket packet && onGround.get() && mc.player.onGround() && mc.player.fallDistance <= 0.0 && !mc.gameMode.isDestroying()) {
+-            ((ServerboundMovePlayerPacketAccessor) packet).meteor$setOnGround(false);
++        Packet<?> packet2 = event.packet;
++        if (packet2 instanceof ServerboundPlayerCommandPacket) {
++            packet = (ServerboundPlayerCommandPacket)packet2;
++            if (this.sprint.get().booleanValue() && packet.getAction() == ServerboundPlayerCommandPacket.Action.START_SPRINTING) {
++                event.cancel();
++            }
++        }
++        if ((packet2 = event.packet) instanceof ServerboundMovePlayerPacket) {
++            packet = (ServerboundMovePlayerPacket)packet2;
++            if (this.onGround.get().booleanValue() && this.mc.player.onGround() && this.mc.player.fallDistance <= 0.0 && !this.mc.gameMode.isDestroying()) {
++                ((ServerboundMovePlayerPacketAccessor)packet).meteor$setOnGround(false);
++            }
+         }
+     }
+ 
+     @EventHandler
+     private void onTick(SendMovementPacketsEvent.Pre event) {
+-        if (mc.player.onGround() && !lastOnGround && onGround.get()) {
+-            ignorePacket = true; // prevents you from not taking fall damage
++        if (this.mc.player.onGround() && !this.lastOnGround && this.onGround.get().booleanValue()) {
++            this.ignorePacket = true;
+         }
+-
+-        lastOnGround = mc.player.onGround();
++        this.lastOnGround = this.mc.player.onGround();
+     }
+ }
++

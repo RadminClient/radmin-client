@@ -1,0 +1,62 @@
+--- upstream261/renderer/text/FontInfo.java
++++ v1decompiled/renderer/text/FontInfo.java
+@@ -1,27 +1,30 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.renderer.text;
++package radmin.client.renderer.text;
+ 
+ public record FontInfo(String family, Type type) {
+     @Override
+     public String toString() {
+-        return family + " " + type;
++        return this.family + " " + String.valueOf((Object)this.type);
+     }
+ 
+     public boolean equals(FontInfo info) {
+-        if (this == info) return true;
+-        if (info == null || family == null || type == null) return false;
+-        return family.equals(info.family) && type == info.type;
++        if (this == info) {
++            return true;
++        }
++        if (info == null || this.family == null || this.type == null) {
++            return false;
++        }
++        return this.family.equals(info.family) && this.type == info.type;
+     }
+ 
+-    public enum Type {
++    public static enum Type {
+         Regular,
+         Bold,
+         Italic,
+         BoldItalic;
++
+ 
+         public static Type fromString(String str) {
+             return switch (str) {
+@@ -32,14 +35,14 @@
+             };
+         }
+ 
+-        @Override
+         public String toString() {
+-            return switch (this) {
+-                case Bold -> "Bold";
+-                case Italic -> "Italic";
+-                case BoldItalic -> "Bold Italic";
++            return switch (this.ordinal()) {
++                case 1 -> "Bold";
++                case 2 -> "Italic";
++                case 3 -> "Bold Italic";
+                 default -> "Regular";
+             };
+         }
+     }
+ }
++

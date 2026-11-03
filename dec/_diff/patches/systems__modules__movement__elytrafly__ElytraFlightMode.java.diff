@@ -1,0 +1,351 @@
+--- upstream261/systems/modules/movement/elytrafly/ElytraFlightMode.java
++++ v1decompiled/systems/modules/movement/elytrafly/ElytraFlightMode.java
+@@ -1,206 +1,211 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.Minecraft
++ *  net.minecraft.network.protocol.Packet
++ *  net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket
++ *  net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket$Action
++ *  net.minecraft.world.InteractionHand
++ *  net.minecraft.world.entity.Entity
++ *  net.minecraft.world.entity.EquipmentSlot
++ *  net.minecraft.world.entity.player.Player
++ *  net.minecraft.world.item.ItemStack
++ *  net.minecraft.world.item.Items
++ *  net.minecraft.world.phys.Vec3
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules.movement.elytrafly;
+-
+-import meteordevelopment.meteorclient.events.entity.player.PlayerMoveEvent;
+-import meteordevelopment.meteorclient.events.packets.PacketEvent;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.utils.player.FindItemResult;
+-import meteordevelopment.meteorclient.utils.player.InvUtils;
+-import meteordevelopment.meteorclient.utils.player.PlayerUtils;
++package radmin.client.systems.modules.movement.elytrafly;
++
+ import net.minecraft.client.Minecraft;
++import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+ import net.minecraft.world.InteractionHand;
++import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.EquipmentSlot;
++import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.item.Items;
+ import net.minecraft.world.phys.Vec3;
++import radmin.client.events.entity.player.PlayerMoveEvent;
++import radmin.client.events.packets.PacketEvent;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.movement.elytrafly.ElytraFlightModes;
++import radmin.client.systems.modules.movement.elytrafly.ElytraFly;
++import radmin.client.utils.player.FindItemResult;
++import radmin.client.utils.player.InvUtils;
++import radmin.client.utils.player.PlayerUtils;
+ 
+ public class ElytraFlightMode {
+     protected final Minecraft mc;
+-    protected final ElytraFly elytraFly;
++    protected final ElytraFly elytraFly = Modules.get().get(ElytraFly.class);
+     private final ElytraFlightModes type;
+-
+     protected boolean lastJumpPressed;
+     protected boolean incrementJumpTimer;
+     protected boolean lastForwardPressed;
+     protected int jumpTimer;
+-    protected double velX, velY, velZ;
++    protected double velX;
++    protected double velY;
++    protected double velZ;
+     protected double ticksLeft;
+-    protected Vec3 forward, right;
++    protected Vec3 forward;
++    protected Vec3 right;
+     protected double acceleration;
+ 
+     public ElytraFlightMode(ElytraFlightModes type) {
+-        this.elytraFly = Modules.get().get(ElytraFly.class);
+         this.mc = Minecraft.getInstance();
+         this.type = type;
+     }
+ 
+     public void onTick() {
+-        if (elytraFly.autoReplenish.get()) {
+-            FindItemResult fireworks = InvUtils.find(Items.FIREWORK_ROCKET);
+-
+-            if (fireworks.found() && !fireworks.isHotbar()) {
+-                InvUtils.move().from(fireworks.slot()).toHotbar(elytraFly.replenishSlot.get() - 1);
+-            }
+-        }
+-
+-        if (elytraFly.replace.get()) {
+-            ItemStack chestStack = mc.player.getItemBySlot(EquipmentSlot.CHEST);
+-
+-            if (chestStack.getItem() == Items.ELYTRA) {
+-                if (chestStack.getMaxDamage() - chestStack.getDamageValue() <= elytraFly.replaceDurability.get()) {
+-                    FindItemResult elytra = InvUtils.find(stack -> stack.getMaxDamage() - stack.getDamageValue() > elytraFly.replaceDurability.get() && stack.getItem() == Items.ELYTRA);
+-
+-                    InvUtils.move().from(elytra.slot()).toArmor(2);
++        ItemStack chestStack;
++        FindItemResult fireworks;
++        if (this.elytraFly.autoReplenish.get().booleanValue() && (fireworks = InvUtils.find(Items.FIREWORK_ROCKET)).found() && !fireworks.isHotbar()) {
++            InvUtils.move().from(fireworks.slot()).toHotbar(this.elytraFly.replenishSlot.get() - 1);
++        }
++        if (this.elytraFly.replace.get().booleanValue() && (chestStack = this.mc.player.getItemBySlot(EquipmentSlot.CHEST)).getItem() == Items.ELYTRA && chestStack.getMaxDamage() - chestStack.getDamageValue() <= this.elytraFly.replaceDurability.get()) {
++            FindItemResult elytra = InvUtils.find(stack -> stack.getMaxDamage() - stack.getDamageValue() > this.elytraFly.replaceDurability.get() && stack.getItem() == Items.ELYTRA);
++            InvUtils.move().from(elytra.slot()).toArmor(2);
++        }
++    }
++
++    public void onPreTick() {
++    }
++
++    public void onPacketSend(PacketEvent.Send event) {
++    }
++
++    public void onPacketReceive(PacketEvent.Receive event) {
++    }
++
++    public void onPlayerMove() {
++    }
++
++    public void onActivate() {
++        this.lastJumpPressed = false;
++        this.jumpTimer = 0;
++        this.ticksLeft = 0.0;
++        this.acceleration = 0.0;
++    }
++
++    public void onDeactivate() {
++    }
++
++    public void autoTakeoff() {
++        if (this.incrementJumpTimer) {
++            ++this.jumpTimer;
++        }
++        boolean jumpPressed = this.mc.options.keyJump.isDown();
++        if (this.elytraFly.autoTakeOff.get().booleanValue() && this.elytraFly.flightMode.get() != ElytraFlightModes.Pitch40 && this.elytraFly.flightMode.get() != ElytraFlightModes.Bounce || !this.elytraFly.manualTakeoff.get().booleanValue() && this.elytraFly.flightMode.get() == ElytraFlightModes.Bounce && jumpPressed) {
++            if (!this.lastJumpPressed && !this.mc.player.isFallFlying()) {
++                this.jumpTimer = 0;
++                this.incrementJumpTimer = true;
++            }
++            if (this.jumpTimer >= 8) {
++                this.jumpTimer = 0;
++                this.incrementJumpTimer = false;
++                this.mc.player.setJumping(false);
++                this.mc.player.setSprinting(true);
++                this.mc.player.jumpFromGround();
++                this.mc.getConnection().send((Packet)new ServerboundPlayerCommandPacket((Entity)this.mc.player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
++            }
++        }
++        this.lastJumpPressed = jumpPressed;
++    }
++
++    public void handleAutopilot() {
++        if (!this.mc.player.isFallFlying()) {
++            return;
++        }
++        if (this.elytraFly.autoPilot.get().booleanValue() && this.mc.player.getY() > this.elytraFly.autoPilotMinimumHeight.get() && this.elytraFly.flightMode.get() != ElytraFlightModes.Bounce) {
++            this.mc.options.keyUp.setDown(true);
++            this.lastForwardPressed = true;
++        }
++        if (this.elytraFly.useFireworks.get().booleanValue()) {
++            if (this.ticksLeft <= 0.0) {
++                this.ticksLeft = this.elytraFly.autoPilotFireworkDelay.get() * 20.0;
++                FindItemResult itemResult = InvUtils.findInHotbar(Items.FIREWORK_ROCKET);
++                if (!itemResult.found()) {
++                    return;
+                 }
+-            }
+-        }
+-    }
+-
+-    public void onPreTick() {
+-    }
+-
+-    public void onPacketSend(PacketEvent.Send event) {
+-    }
+-
+-    public void onPacketReceive(PacketEvent.Receive event) {
+-    }
+-
+-    public void onPlayerMove() {
+-    }
+-
+-    public void onActivate() {
+-        lastJumpPressed = false;
+-        jumpTimer = 0;
+-        ticksLeft = 0;
+-        acceleration = 0;
+-    }
+-
+-    public void onDeactivate() {
+-    }
+-
+-    public void autoTakeoff() {
+-        if (incrementJumpTimer) jumpTimer++;
+-
+-        boolean jumpPressed = mc.options.keyJump.isDown();
+-
+-        if ((elytraFly.autoTakeOff.get() && elytraFly.flightMode.get() != ElytraFlightModes.Pitch40 && elytraFly.flightMode.get() != ElytraFlightModes.Bounce) ||
+-            (!elytraFly.manualTakeoff.get() && elytraFly.flightMode.get() == ElytraFlightModes.Bounce) && jumpPressed) {
+-            if (!lastJumpPressed && !mc.player.isFallFlying()) {
+-                jumpTimer = 0;
+-                incrementJumpTimer = true;
+-            }
+-
+-            if (jumpTimer >= 8) {
+-                jumpTimer = 0;
+-                incrementJumpTimer = false;
+-                mc.player.setJumping(false);
+-                mc.player.setSprinting(true);
+-                mc.player.jumpFromGround();
+-                mc.getConnection().send(new ServerboundPlayerCommandPacket(mc.player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
+-            }
+-        }
+-
+-        lastJumpPressed = jumpPressed;
+-    }
+-
+-    public void handleAutopilot() {
+-        if (!mc.player.isFallFlying()) return;
+-
+-        if (elytraFly.autoPilot.get() && mc.player.getY() > elytraFly.autoPilotMinimumHeight.get() && elytraFly.flightMode.get() != ElytraFlightModes.Bounce) {
+-            mc.options.keyUp.setDown(true);
+-            lastForwardPressed = true;
+-        }
+-
+-        if (elytraFly.useFireworks.get()) {
+-            if (ticksLeft <= 0) {
+-                ticksLeft = elytraFly.autoPilotFireworkDelay.get() * 20;
+-
+-                FindItemResult itemResult = InvUtils.findInHotbar(Items.FIREWORK_ROCKET);
+-                if (!itemResult.found()) return;
+-
+                 if (itemResult.isOffhand()) {
+-                    mc.gameMode.useItem(mc.player, InteractionHand.OFF_HAND);
+-                    mc.player.swing(InteractionHand.OFF_HAND);
++                    this.mc.gameMode.useItem((Player)this.mc.player, InteractionHand.OFF_HAND);
++                    this.mc.player.swing(InteractionHand.OFF_HAND);
+                 } else {
+                     InvUtils.swap(itemResult.slot(), true);
+-
+-                    mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
+-                    mc.player.swing(InteractionHand.MAIN_HAND);
+-
++                    this.mc.gameMode.useItem((Player)this.mc.player, InteractionHand.MAIN_HAND);
++                    this.mc.player.swing(InteractionHand.MAIN_HAND);
+                     InvUtils.swapBack();
+                 }
+             }
+-            ticksLeft--;
++            this.ticksLeft -= 1.0;
+         }
+     }
+ 
+     public void handleHorizontalSpeed(PlayerMoveEvent event) {
+         boolean a = false;
+         boolean b = false;
+-
+-        if (mc.options.keyUp.isDown()) {
+-            velX += forward.x * getSpeed() * 10;
+-            velZ += forward.z * getSpeed() * 10;
++        if (this.mc.options.keyUp.isDown()) {
++            this.velX += this.forward.x * this.getSpeed() * 10.0;
++            this.velZ += this.forward.z * this.getSpeed() * 10.0;
+             a = true;
+-        } else if (mc.options.keyDown.isDown()) {
+-            velX -= forward.x * getSpeed() * 10;
+-            velZ -= forward.z * getSpeed() * 10;
++        } else if (this.mc.options.keyDown.isDown()) {
++            this.velX -= this.forward.x * this.getSpeed() * 10.0;
++            this.velZ -= this.forward.z * this.getSpeed() * 10.0;
+             a = true;
+         }
+-
+-        if (mc.options.keyRight.isDown()) {
+-            velX += right.x * getSpeed() * 10;
+-            velZ += right.z * getSpeed() * 10;
++        if (this.mc.options.keyRight.isDown()) {
++            this.velX += this.right.x * this.getSpeed() * 10.0;
++            this.velZ += this.right.z * this.getSpeed() * 10.0;
+             b = true;
+-        } else if (mc.options.keyLeft.isDown()) {
+-            velX -= right.x * getSpeed() * 10;
+-            velZ -= right.z * getSpeed() * 10;
++        } else if (this.mc.options.keyLeft.isDown()) {
++            this.velX -= this.right.x * this.getSpeed() * 10.0;
++            this.velZ -= this.right.z * this.getSpeed() * 10.0;
+             b = true;
+         }
+-
+         if (a && b) {
+-            double diagonal = 1 / Math.sqrt(2);
+-            velX *= diagonal;
+-            velZ *= diagonal;
++            double diagonal = 1.0 / Math.sqrt(2.0);
++            this.velX *= diagonal;
++            this.velZ *= diagonal;
+         }
+     }
+ 
+     public void handleVerticalSpeed(PlayerMoveEvent event) {
+-        if (mc.options.keyJump.isDown()) velY += 0.5 * elytraFly.verticalSpeed.get();
+-        else if (mc.options.keyShift.isDown()) velY -= 0.5 * elytraFly.verticalSpeed.get();
++        if (this.mc.options.keyJump.isDown()) {
++            this.velY += 0.5 * this.elytraFly.verticalSpeed.get();
++        } else if (this.mc.options.keyShift.isDown()) {
++            this.velY -= 0.5 * this.elytraFly.verticalSpeed.get();
++        }
+     }
+ 
+     public void handleFallMultiplier() {
+-        if (velY < 0) velY *= elytraFly.fallMultiplier.get();
+-        else if (velY > 0) velY = 0;
++        if (this.velY < 0.0) {
++            this.velY *= this.elytraFly.fallMultiplier.get().doubleValue();
++        } else if (this.velY > 0.0) {
++            this.velY = 0.0;
++        }
+     }
+ 
+     public void handleAcceleration() {
+-        if (elytraFly.acceleration.get()) {
+-            if (!PlayerUtils.isMoving()) acceleration = 0;
+-            acceleration = Math.min(
+-                acceleration + elytraFly.accelerationMin.get() + elytraFly.accelerationStep.get() * .1,
+-                elytraFly.horizontalSpeed.get()
+-            );
++        if (this.elytraFly.acceleration.get().booleanValue()) {
++            if (!PlayerUtils.isMoving()) {
++                this.acceleration = 0.0;
++            }
++            this.acceleration = Math.min(this.acceleration + this.elytraFly.accelerationMin.get() + this.elytraFly.accelerationStep.get() * 0.1, this.elytraFly.horizontalSpeed.get());
+         } else {
+-            acceleration = 0;
++            this.acceleration = 0.0;
+         }
+     }
+ 
+     public void zeroAcceleration() {
+-        acceleration = 0;
++        this.acceleration = 0.0;
+     }
+ 
+     protected double getSpeed() {
+-        return elytraFly.acceleration.get() ? acceleration : elytraFly.horizontalSpeed.get();
++        return this.elytraFly.acceleration.get() != false ? this.acceleration : this.elytraFly.horizontalSpeed.get();
+     }
+ 
+     public String getHudString() {
+-        return type.name();
++        return this.type.name();
+     }
+ }
++

@@ -1,0 +1,36 @@
+--- upstream261/mixin/ItemStackRenderStateAccessor.java
++++ v1decompiled/mixin/ItemStackRenderStateAccessor.java
+@@ -1,19 +1,24 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.renderer.item.ItemStackRenderState
++ *  net.minecraft.client.renderer.item.ItemStackRenderState$LayerRenderState
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.client.renderer.item.ItemStackRenderState;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(ItemStackRenderState.class)
++@Mixin(value={ItemStackRenderState.class})
+ public interface ItemStackRenderStateAccessor {
+-    @Accessor("activeLayerCount")
+-    int meteor$getActiveLayerCount();
++    @Accessor(value="activeLayerCount")
++    public int meteor$getActiveLayerCount();
+ 
+-    @Accessor("layers")
+-    ItemStackRenderState.LayerRenderState[] meteor$getLayers();
++    @Accessor(value="layers")
++    public ItemStackRenderState.LayerRenderState[] meteor$getLayers();
+ }
++

@@ -1,0 +1,19 @@
+--- upstream261/utils/player/Safety.java
++++ v1decompiled/utils/player/Safety.java
+@@ -1,11 +1,11 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.utils.player;
++package radmin.client.utils.player;
+ 
+ public enum Safety {
+     Safe,
+-    Suicide
++    Suicide;
++
+ }
++

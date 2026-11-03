@@ -1,0 +1,42 @@
+--- upstream261/mixin/MultiPlayerGameModeAccessor.java
++++ v1decompiled/mixin/MultiPlayerGameModeAccessor.java
+@@ -1,23 +1,28 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.multiplayer.MultiPlayerGameMode
++ *  net.minecraft.core.BlockPos
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+ import net.minecraft.core.BlockPos;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(MultiPlayerGameMode.class)
++@Mixin(value={MultiPlayerGameMode.class})
+ public interface MultiPlayerGameModeAccessor {
+-    @Accessor("destroyProgress")
+-    float meteor$getBreakingProgress();
++    @Accessor(value="destroyProgress")
++    public float meteor$getBreakingProgress();
+ 
+-    @Accessor("destroyProgress")
+-    void meteor$setDestroyProgress(float progress);
++    @Accessor(value="destroyProgress")
++    public void meteor$setDestroyProgress(float var1);
+ 
+-    @Accessor("destroyBlockPos")
+-    BlockPos meteor$getCurrentBreakingBlockPos();
++    @Accessor(value="destroyBlockPos")
++    public BlockPos meteor$getCurrentBreakingBlockPos();
+ }
++

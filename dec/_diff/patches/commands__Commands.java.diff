@@ -1,0 +1,234 @@
+--- upstream261/commands/Commands.java
++++ v1decompiled/commands/Commands.java
+@@ -1,76 +1,120 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.CommandDispatcher
++ *  com.mojang.brigadier.exceptions.CommandSyntaxException
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.client.multiplayer.ClientPacketListener
++ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
++ *  net.minecraft.commands.CommandBuildContext
++ *  net.minecraft.core.HolderLookup$Provider
++ *  net.minecraft.world.flag.FeatureFlagSet
+  */
+-
+-package meteordevelopment.meteorclient.commands;
++package radmin.client.commands;
+ 
+ import com.mojang.brigadier.CommandDispatcher;
+ import com.mojang.brigadier.exceptions.CommandSyntaxException;
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.commands.commands.*;
+-import meteordevelopment.meteorclient.events.game.GameJoinedEvent;
+-import meteordevelopment.meteorclient.pathing.PathManagers;
+-import meteordevelopment.meteorclient.utils.PostInit;
++import java.util.ArrayList;
++import java.util.Comparator;
++import java.util.List;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.client.multiplayer.ClientPacketListener;
+ import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+ import net.minecraft.commands.CommandBuildContext;
+-
+-import java.util.ArrayList;
+-import java.util.Comparator;
+-import java.util.List;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
++import net.minecraft.core.HolderLookup;
++import net.minecraft.world.flag.FeatureFlagSet;
++import radmin.client.MeteorClient;
++import radmin.client.commands.Command;
++import radmin.client.commands.commands.BindCommand;
++import radmin.client.commands.commands.BindsCommand;
++import radmin.client.commands.commands.CommandsCommand;
++import radmin.client.commands.commands.DamageCommand;
++import radmin.client.commands.commands.DisconnectCommand;
++import radmin.client.commands.commands.DismountCommand;
++import radmin.client.commands.commands.DropCommand;
++import radmin.client.commands.commands.EnchantCommand;
++import radmin.client.commands.commands.EnderChestCommand;
++import radmin.client.commands.commands.FakePlayerCommand;
++import radmin.client.commands.commands.FovCommand;
++import radmin.client.commands.commands.FriendsCommand;
++import radmin.client.commands.commands.GamemodeCommand;
++import radmin.client.commands.commands.GiveCommand;
++import radmin.client.commands.commands.HClipCommand;
++import radmin.client.commands.commands.HelpCommand;
++import radmin.client.commands.commands.InputCommand;
++import radmin.client.commands.commands.InventoryCommand;
++import radmin.client.commands.commands.LocateCommand;
++import radmin.client.commands.commands.MacroCommand;
++import radmin.client.commands.commands.ModulesCommand;
++import radmin.client.commands.commands.NameHistoryCommand;
++import radmin.client.commands.commands.NbtCommand;
++import radmin.client.commands.commands.NotebotCommand;
++import radmin.client.commands.commands.PeekCommand;
++import radmin.client.commands.commands.ProfilesCommand;
++import radmin.client.commands.commands.ReloadCommand;
++import radmin.client.commands.commands.ResetCommand;
++import radmin.client.commands.commands.RotationCommand;
++import radmin.client.commands.commands.SaveMapCommand;
++import radmin.client.commands.commands.SayCommand;
++import radmin.client.commands.commands.ServerCommand;
++import radmin.client.commands.commands.SettingCommand;
++import radmin.client.commands.commands.SpectateCommand;
++import radmin.client.commands.commands.SwarmCommand;
++import radmin.client.commands.commands.ToggleCommand;
++import radmin.client.commands.commands.VClipCommand;
++import radmin.client.commands.commands.WaspCommand;
++import radmin.client.commands.commands.WaypointCommand;
++import radmin.client.events.game.GameJoinedEvent;
++import radmin.client.pathing.PathManagers;
++import radmin.client.utils.PostInit;
+ 
+ public class Commands {
+-    public static final List<Command> COMMANDS = new ArrayList<>();
+-    public static CommandDispatcher<ClientSuggestionProvider> DISPATCHER = new CommandDispatcher<>();
++    public static final List<Command> COMMANDS = new ArrayList<Command>();
++    public static CommandDispatcher<ClientSuggestionProvider> DISPATCHER = new CommandDispatcher();
+ 
+-    @PostInit(dependencies = PathManagers.class)
++    @PostInit(dependencies={PathManagers.class})
+     public static void init() {
+-        add(new VClipCommand());
+-        add(new HClipCommand());
+-        add(new DismountCommand());
+-        add(new DisconnectCommand());
+-        add(new DamageCommand());
+-        add(new DropCommand());
+-        add(new EnchantCommand());
+-        add(new FakePlayerCommand());
+-        add(new FriendsCommand());
+-        add(new CommandsCommand());
+-        add(new InventoryCommand());
+-        add(new NbtCommand());
+-        add(new NotebotCommand());
+-        add(new PeekCommand());
+-        add(new EnderChestCommand());
+-        add(new ProfilesCommand());
+-        add(new ReloadCommand());
+-        add(new ResetCommand());
+-        add(new SayCommand());
+-        add(new ServerCommand());
+-        add(new SwarmCommand());
+-        add(new ToggleCommand());
+-        add(new SettingCommand());
+-        add(new SpectateCommand());
+-        add(new GamemodeCommand());
+-        add(new SaveMapCommand());
+-        add(new MacroCommand());
+-        add(new ModulesCommand());
+-        add(new BindsCommand());
+-        add(new GiveCommand());
+-        add(new NameHistoryCommand());
+-        add(new BindCommand());
+-        add(new FovCommand());
+-        add(new RotationCommand());
+-        add(new WaypointCommand());
+-        add(new InputCommand());
+-        add(new WaspCommand());
+-        add(new LocateCommand());
+-        add(new HelpCommand());
+-
++        Commands.add(new VClipCommand());
++        Commands.add(new HClipCommand());
++        Commands.add(new DismountCommand());
++        Commands.add(new DisconnectCommand());
++        Commands.add(new DamageCommand());
++        Commands.add(new DropCommand());
++        Commands.add(new EnchantCommand());
++        Commands.add(new FakePlayerCommand());
++        Commands.add(new FriendsCommand());
++        Commands.add(new CommandsCommand());
++        Commands.add(new InventoryCommand());
++        Commands.add(new NbtCommand());
++        Commands.add(new NotebotCommand());
++        Commands.add(new PeekCommand());
++        Commands.add(new EnderChestCommand());
++        Commands.add(new ProfilesCommand());
++        Commands.add(new ReloadCommand());
++        Commands.add(new ResetCommand());
++        Commands.add(new SayCommand());
++        Commands.add(new ServerCommand());
++        Commands.add(new SwarmCommand());
++        Commands.add(new ToggleCommand());
++        Commands.add(new SettingCommand());
++        Commands.add(new SpectateCommand());
++        Commands.add(new GamemodeCommand());
++        Commands.add(new SaveMapCommand());
++        Commands.add(new MacroCommand());
++        Commands.add(new ModulesCommand());
++        Commands.add(new BindsCommand());
++        Commands.add(new GiveCommand());
++        Commands.add(new NameHistoryCommand());
++        Commands.add(new BindCommand());
++        Commands.add(new FovCommand());
++        Commands.add(new RotationCommand());
++        Commands.add(new WaypointCommand());
++        Commands.add(new InputCommand());
++        Commands.add(new WaspCommand());
++        Commands.add(new LocateCommand());
++        Commands.add(new HelpCommand());
+         COMMANDS.sort(Comparator.comparing(Command::getName));
+-
+         MeteorClient.EVENT_BUS.subscribe(Commands.class);
+     }
+ 
+@@ -80,44 +124,25 @@
+     }
+ 
+     public static void dispatch(String message) throws CommandSyntaxException {
+-        DISPATCHER.execute(message, mc.getConnection().getSuggestionsProvider());
++        DISPATCHER.execute(message, (Object)MeteorClient.mc.getConnection().getSuggestionsProvider());
+     }
+ 
+     public static Command get(String name) {
+         for (Command command : COMMANDS) {
+-            if (command.getName().equals(name)) {
+-                return command;
+-            }
++            if (!command.getName().equals(name)) continue;
++            return command;
+         }
+-
+         return null;
+     }
+ 
+-    /**
+-     * Argument types that rely on Minecraft registries access those registries through a {@link CommandBuildContext}
+-     * object. Since dynamic registries are specific to each server, we need to make a new CommandBuildContext object
+-     * every time we join a server.
+-     * <p>
+-     * The command tree and by extension the {@link CommandDispatcher} also have to be rebuilt because:
+-     * <ol>
+-     * <li>Argument types that require registries use a registry wrapper object that is created and stored in the
+-     *     argument type objects when the command tree is built.
+-     * <li>Registry entries and keys are compared using referential equality. Even if the data encoded is the same,
+-     *     registry wrapper objects' dynamic data becomes stale after joining another server.
+-     * <li>The CommandDispatcher's node merging only adds missing children, it cannot replace stale argument type
+-     *     objects.
+-     * </ol>
+-     *
+-     * @author Crosby
+-     */
+     @EventHandler
+     private static void onJoin(GameJoinedEvent event) {
+-        ClientPacketListener networkHandler = mc.getConnection();
+-        Command.REGISTRY_ACCESS = CommandBuildContext.simple(networkHandler.registryAccess(), networkHandler.enabledFeatures());
+-
+-        DISPATCHER = new CommandDispatcher<>();
++        ClientPacketListener networkHandler = MeteorClient.mc.getConnection();
++        Command.REGISTRY_ACCESS = CommandBuildContext.simple((HolderLookup.Provider)networkHandler.registryAccess(), (FeatureFlagSet)networkHandler.enabledFeatures());
++        DISPATCHER = new CommandDispatcher();
+         for (Command command : COMMANDS) {
+             command.registerTo(DISPATCHER);
+         }
+     }
+ }
++

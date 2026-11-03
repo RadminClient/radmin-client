@@ -1,0 +1,274 @@
+--- upstream261/gui/widgets/input/WBlockPosEdit.java
++++ v1decompiled/gui/widgets/input/WBlockPosEdit.java
+@@ -1,36 +1,40 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.client.gui.screens.Screen
++ *  net.minecraft.core.BlockPos
++ *  net.minecraft.core.Vec3i
++ *  net.minecraft.world.phys.HitResult$Type
+  */
++package radmin.client.gui.widgets.input;
+ 
+-package meteordevelopment.meteorclient.gui.widgets.input;
+-
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.events.entity.player.InteractBlockEvent;
+-import meteordevelopment.meteorclient.events.entity.player.StartBreakingBlockEvent;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.render.marker.Marker;
+-import meteordevelopment.meteorclient.utils.Utils;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.client.gui.screens.Screen;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.core.Vec3i;
+ import net.minecraft.world.phys.HitResult;
++import radmin.client.MeteorClient;
++import radmin.client.events.entity.player.InteractBlockEvent;
++import radmin.client.events.entity.player.StartBreakingBlockEvent;
++import radmin.client.gui.widgets.containers.WHorizontalList;
++import radmin.client.gui.widgets.input.WTextBox;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.render.marker.Marker;
++import radmin.client.utils.Utils;
+ 
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class WBlockPosEdit extends WHorizontalList {
++public class WBlockPosEdit
++extends WHorizontalList {
+     public Runnable action;
+     public Runnable actionOnRelease;
+-
+-    private WTextBox textBoxX, textBoxY, textBoxZ;
+-
++    private WTextBox textBoxX;
++    private WTextBox textBoxY;
++    private WTextBox textBoxZ;
+     private Screen previousScreen;
+-
+     private BlockPos value;
+     private BlockPos lastValue;
+-
+     private boolean clicking;
+ 
+     public WBlockPosEdit(BlockPos value) {
+@@ -39,82 +43,78 @@
+ 
+     @Override
+     public void init() {
+-        addTextBox();
+-
++        this.addTextBox();
+         if (Utils.canUpdate()) {
+-            WButton click = add(theme.button("Click")).expandX().widget();
++            WButton click = this.add(this.theme.button("Click")).expandX().widget();
+             click.action = () -> {
+                 String sb = "Click!\nRight click to pick a new position.\nLeft click to cancel.";
+-                Modules.get().get(Marker.class).info(sb);
+-
+-                clicking = true;
+-                MeteorClient.EVENT_BUS.subscribe(this);
+-                previousScreen = mc.screen;
+-                mc.setScreen(null);
++                Modules.get().get(Marker.class).info(sb, new Object[0]);
++                this.clicking = true;
++                MeteorClient.EVENT_BUS.subscribe((Object)this);
++                this.previousScreen = MeteorClient.mc.screen;
++                MeteorClient.mc.setScreen(null);
+             };
+-
+-            WButton here = add(theme.confirmedButton("Set Here", "Confirm")).expandX().widget();
++            WButton here = this.add(this.theme.confirmedButton("Set Here", "Confirm")).expandX().widget();
+             here.action = () -> {
+-                lastValue = value;
+-                set(new BlockPos(mc.player.blockPosition()));
+-                newValueCheck();
+-
+-                clear();
+-                init();
++                this.lastValue = this.value;
++                this.set(new BlockPos((Vec3i)MeteorClient.mc.player.blockPosition()));
++                this.newValueCheck();
++                this.clear();
++                this.init();
+             };
+         }
+     }
+ 
+     @EventHandler
+     private void onStartBreakingBlock(StartBreakingBlockEvent event) {
+-        if (clicking) {
+-            clicking = false;
++        if (this.clicking) {
++            this.clicking = false;
+             event.cancel();
+-            MeteorClient.EVENT_BUS.unsubscribe(this);
+-            mc.setScreen(previousScreen);
++            MeteorClient.EVENT_BUS.unsubscribe((Object)this);
++            MeteorClient.mc.setScreen(this.previousScreen);
+         }
+     }
+ 
+     @EventHandler
+     private void onInteractBlock(InteractBlockEvent event) {
+-        if (clicking) {
+-            if (event.result.getType() == HitResult.Type.MISS) return;
+-            lastValue = value;
+-            set(event.result.getBlockPos());
+-            newValueCheck();
+-
+-            clear();
+-            init();
+-
+-            clicking = false;
++        if (this.clicking) {
++            if (event.result.getType() == HitResult.Type.MISS) {
++                return;
++            }
++            this.lastValue = this.value;
++            this.set(event.result.getBlockPos());
++            this.newValueCheck();
++            this.clear();
++            this.init();
++            this.clicking = false;
+             event.cancel();
+-            MeteorClient.EVENT_BUS.unsubscribe(this);
+-            mc.setScreen(previousScreen);
++            MeteorClient.EVENT_BUS.unsubscribe((Object)this);
++            MeteorClient.mc.setScreen(this.previousScreen);
+         }
+     }
+ 
+     private boolean filter(String text, char c) {
+         boolean good;
+         boolean validate = true;
+-
+         if (c == '-' && text.isEmpty()) {
+             good = true;
+             validate = false;
+-        } else good = Character.isDigit(c);
+-
++        } else {
++            good = Character.isDigit(c);
++        }
+         if (good && validate) {
+             try {
+                 Integer.parseInt(text + c);
+-            } catch (NumberFormatException _) {
++            }
++            catch (NumberFormatException numberFormatException) {
+                 good = false;
+             }
+         }
+-
+         return good;
+     }
+ 
+     public BlockPos get() {
+-        return value;
++        return this.value;
+     }
+ 
+     public void set(BlockPos value) {
+@@ -122,51 +122,62 @@
+     }
+ 
+     private void addTextBox() {
+-        textBoxX = add(theme.textBox(Integer.toString(value.getX()), this::filter)).minWidth(75).widget();
+-        textBoxY = add(theme.textBox(Integer.toString(value.getY()), this::filter)).minWidth(75).widget();
+-        textBoxZ = add(theme.textBox(Integer.toString(value.getZ()), this::filter)).minWidth(75).widget();
+-
+-        textBoxX.actionOnUnfocused = () -> {
+-            lastValue = value;
+-            if (textBoxX.get().isEmpty()) set(new BlockPos(0, 0, 0));
+-            else {
++        this.textBoxX = this.add(this.theme.textBox(Integer.toString(this.value.getX()), this::filter)).minWidth(75.0).widget();
++        this.textBoxY = this.add(this.theme.textBox(Integer.toString(this.value.getY()), this::filter)).minWidth(75.0).widget();
++        this.textBoxZ = this.add(this.theme.textBox(Integer.toString(this.value.getZ()), this::filter)).minWidth(75.0).widget();
++        this.textBoxX.actionOnUnfocused = () -> {
++            this.lastValue = this.value;
++            if (this.textBoxX.get().isEmpty()) {
++                this.set(new BlockPos(0, 0, 0));
++            } else {
+                 try {
+-                    set(new BlockPos(Integer.parseInt(textBoxX.get()), value.getY(), value.getZ()));
+-                } catch (NumberFormatException _) {
++                    this.set(new BlockPos(Integer.parseInt(this.textBoxX.get()), this.value.getY(), this.value.getZ()));
++                }
++                catch (NumberFormatException numberFormatException) {
++                    // empty catch block
+                 }
+             }
+-            newValueCheck();
++            this.newValueCheck();
+         };
+-
+-        textBoxY.actionOnUnfocused = () -> {
+-            lastValue = value;
+-            if (textBoxY.get().isEmpty()) set(new BlockPos(0, 0, 0));
+-            else {
++        this.textBoxY.actionOnUnfocused = () -> {
++            this.lastValue = this.value;
++            if (this.textBoxY.get().isEmpty()) {
++                this.set(new BlockPos(0, 0, 0));
++            } else {
+                 try {
+-                    set(new BlockPos(value.getX(), Integer.parseInt(textBoxY.get()), value.getZ()));
+-                } catch (NumberFormatException _) {
++                    this.set(new BlockPos(this.value.getX(), Integer.parseInt(this.textBoxY.get()), this.value.getZ()));
++                }
++                catch (NumberFormatException numberFormatException) {
++                    // empty catch block
+                 }
+             }
+-            newValueCheck();
++            this.newValueCheck();
+         };
+-
+-        textBoxZ.actionOnUnfocused = () -> {
+-            lastValue = value;
+-            if (textBoxZ.get().isEmpty()) set(new BlockPos(0, 0, 0));
+-            else {
++        this.textBoxZ.actionOnUnfocused = () -> {
++            this.lastValue = this.value;
++            if (this.textBoxZ.get().isEmpty()) {
++                this.set(new BlockPos(0, 0, 0));
++            } else {
+                 try {
+-                    set(new BlockPos(value.getX(), value.getY(), Integer.parseInt(textBoxZ.get())));
+-                } catch (NumberFormatException _) {
++                    this.set(new BlockPos(this.value.getX(), this.value.getY(), Integer.parseInt(this.textBoxZ.get())));
++                }
++                catch (NumberFormatException numberFormatException) {
++                    // empty catch block
+                 }
+             }
+-            newValueCheck();
++            this.newValueCheck();
+         };
+     }
+ 
+     private void newValueCheck() {
+-        if (value != lastValue) {
+-            if (action != null) action.run();
+-            if (actionOnRelease != null) actionOnRelease.run();
++        if (this.value != this.lastValue) {
++            if (this.action != null) {
++                this.action.run();
++            }
++            if (this.actionOnRelease != null) {
++                this.actionOnRelease.run();
++            }
+         }
+     }
+ }
++

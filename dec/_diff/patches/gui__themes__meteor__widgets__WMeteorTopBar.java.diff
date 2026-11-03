@@ -1,0 +1,36 @@
+--- upstream261/gui/themes/meteor/widgets/WMeteorTopBar.java
++++ v1decompiled/gui/themes/meteor/widgets/WMeteorTopBar.java
+@@ -1,22 +1,23 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.themes.meteor.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.themes.meteor.widgets;
++import radmin.client.gui.themes.meteor.MeteorWidget;
++import radmin.client.gui.widgets.WTopBar;
++import radmin.client.utils.render.color.Color;
+ 
+-import meteordevelopment.meteorclient.gui.themes.meteor.MeteorWidget;
+-import meteordevelopment.meteorclient.gui.widgets.WTopBar;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
+-
+-public class WMeteorTopBar extends WTopBar implements MeteorWidget {
++public class WMeteorTopBar
++extends WTopBar
++implements MeteorWidget {
+     @Override
+     protected Color getButtonColor(boolean pressed, boolean hovered) {
+-        return theme().backgroundColor.get(pressed, hovered);
++        return this.theme().backgroundColor.get(pressed, hovered);
+     }
+ 
+     @Override
+     protected Color getNameColor() {
+-        return theme().textColor.get();
++        return this.theme().textColor.get();
+     }
+ }
++

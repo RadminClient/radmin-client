@@ -1,0 +1,95 @@
+--- upstream261/pathing/IPathManager.java
++++ v1decompiled/pathing/IPathManager.java
+@@ -1,58 +1,61 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.BlockPos
++ *  net.minecraft.world.entity.Entity
++ *  net.minecraft.world.level.block.Block
+  */
+-
+-package meteordevelopment.meteorclient.pathing;
+-
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.Settings;
+-import net.minecraft.world.level.block.Block;
+-import net.minecraft.world.entity.Entity;
+-import net.minecraft.core.BlockPos;
++package radmin.client.pathing;
+ 
+ import java.util.function.Predicate;
++import net.minecraft.core.BlockPos;
++import net.minecraft.world.entity.Entity;
++import net.minecraft.world.level.block.Block;
++import radmin.client.settings.Setting;
++import radmin.client.settings.Settings;
+ 
+ public interface IPathManager {
+-    String getName();
++    public String getName();
+ 
+-    boolean isPathing();
++    public boolean isPathing();
+ 
+-    void pause();
++    public void pause();
+ 
+-    void resume();
++    public void resume();
+ 
+-    void stop();
++    public void stop();
+ 
+-    default void moveTo(BlockPos pos) {
+-        moveTo(pos, false);
++    default public void moveTo(BlockPos pos) {
++        this.moveTo(pos, false);
+     }
+ 
+-    void moveTo(BlockPos pos, boolean ignoreY);
++    public void moveTo(BlockPos var1, boolean var2);
+ 
+-    void moveInDirection(float yaw);
++    public void moveInDirection(float var1);
+ 
+-    void mine(Block... blocks);
++    public void mine(Block ... var1);
+ 
+-    void follow(Predicate<Entity> entity);
++    public void follow(Predicate<Entity> var1);
+ 
+-    float getTargetYaw();
++    public float getTargetYaw();
+ 
+-    float getTargetPitch();
++    public float getTargetPitch();
+ 
+-    ISettings getSettings();
++    public ISettings getSettings();
+ 
+-    interface ISettings {
+-        Settings get();
++    public static interface ISettings {
++        public Settings get();
+ 
+-        Setting<Boolean> getWalkOnWater();
++        public Setting<Boolean> getWalkOnWater();
+ 
+-        Setting<Boolean> getWalkOnLava();
++        public Setting<Boolean> getWalkOnLava();
+ 
+-        Setting<Boolean> getStep();
++        public Setting<Boolean> getStep();
+ 
+-        Setting<Boolean> getNoFall();
++        public Setting<Boolean> getNoFall();
+ 
+-        void save();
++        public void save();
+     }
+ }
++

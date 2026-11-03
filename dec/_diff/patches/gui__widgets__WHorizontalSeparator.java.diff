@@ -1,0 +1,35 @@
+--- upstream261/gui/widgets/WHorizontalSeparator.java
++++ v1decompiled/gui/widgets/WHorizontalSeparator.java
+@@ -1,11 +1,12 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.widgets;
++import radmin.client.gui.widgets.WWidget;
+ 
+-public abstract class WHorizontalSeparator extends WWidget {
++public abstract class WHorizontalSeparator
++extends WWidget {
+     protected String text;
+     protected double textWidth;
+ 
+@@ -15,9 +16,11 @@
+ 
+     @Override
+     protected void onCalculateSize() {
+-        if (text != null) textWidth = theme.textWidth(text);
+-
+-        width = 1;
+-        height = text != null ? theme.textHeight() : theme.scale(3);
++        if (this.text != null) {
++            this.textWidth = this.theme.textWidth(this.text);
++        }
++        this.width = 1.0;
++        this.height = this.text != null ? this.theme.textHeight() : this.theme.scale(3.0);
+     }
+ }
++

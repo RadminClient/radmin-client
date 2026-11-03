@@ -1,0 +1,39 @@
+--- upstream261/mixin/ServerboundMovePlayerPacketAccessor.java
++++ v1decompiled/mixin/ServerboundMovePlayerPacketAccessor.java
+@@ -1,22 +1,27 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Mutable
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Mutable;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(ServerboundMovePlayerPacket.class)
++@Mixin(value={ServerboundMovePlayerPacket.class})
+ public interface ServerboundMovePlayerPacketAccessor {
+     @Mutable
+-    @Accessor("y")
+-    void meteor$setY(double y);
++    @Accessor(value="y")
++    public void meteor$setY(double var1);
+ 
+     @Mutable
+-    @Accessor("onGround")
+-    void meteor$setOnGround(boolean onGround);
++    @Accessor(value="onGround")
++    public void meteor$setOnGround(boolean var1);
+ }
++

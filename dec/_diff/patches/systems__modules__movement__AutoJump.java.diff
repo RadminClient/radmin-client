@@ -1,0 +1,134 @@
+--- upstream261/systems/modules/movement/AutoJump.java
++++ v1decompiled/systems/modules/movement/AutoJump.java
+@@ -1,74 +1,79 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  java.lang.MatchException
++ *  meteordevelopment.orbit.EventHandler
+  */
++package radmin.client.systems.modules.movement;
+ 
+-package meteordevelopment.meteorclient.systems.modules.movement;
++import meteordevelopment.orbit.EventHandler;
++import radmin.client.events.world.TickEvent;
++import radmin.client.mixininterface.IVec3;
++import radmin.client.settings.DoubleSetting;
++import radmin.client.settings.EnumSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
+ 
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.mixininterface.IVec3;
+-import meteordevelopment.meteorclient.settings.DoubleSetting;
+-import meteordevelopment.meteorclient.settings.EnumSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.orbit.EventHandler;
+-
+-public class AutoJump extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
+-        .name("mode")
+-        .description("The method of jumping.")
+-        .defaultValue(Mode.Jump)
+-        .build()
+-    );
+-
+-    private final Setting<JumpWhen> jumpIf = sgGeneral.add(new EnumSetting.Builder<JumpWhen>()
+-        .name("jump-if")
+-        .description("Jump if.")
+-        .defaultValue(JumpWhen.Always)
+-        .build()
+-    );
+-
+-    private final Setting<Double> velocityHeight = sgGeneral.add(new DoubleSetting.Builder()
+-        .name("velocity-height")
+-        .description("The distance that velocity mode moves you.")
+-        .defaultValue(0.25)
+-        .min(0)
+-        .sliderMax(2)
+-        .build()
+-    );
++public class AutoJump
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final Setting<Mode> mode;
++    private final Setting<JumpWhen> jumpIf;
++    private final Setting<Double> velocityHeight;
+ 
+     public AutoJump() {
+         super(Categories.Movement, "auto-jump", "Automatically jumps.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.mode = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("mode")).description("The method of jumping.")).defaultValue(Mode.Jump)).build());
++        this.jumpIf = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("jump-if")).description("Jump if.")).defaultValue(JumpWhen.Always)).build());
++        this.velocityHeight = this.sgGeneral.add(((DoubleSetting.Builder)((DoubleSetting.Builder)new DoubleSetting.Builder().name("velocity-height")).description("The distance that velocity mode moves you.")).defaultValue(0.25).min(0.0).sliderMax(2.0).build());
+     }
+ 
+     private boolean jump() {
+-        return switch (jumpIf.get()) {
+-            case Sprinting -> mc.player.isSprinting() && (mc.player.zza != 0 || mc.player.xxa != 0);
+-            case Walking -> mc.player.zza != 0 || mc.player.xxa != 0;
+-            case Always -> true;
++        return switch (this.jumpIf.get().ordinal()) {
++            default -> throw new MatchException(null, null);
++            case 0 -> {
++                if (this.mc.player.isSprinting() && (this.mc.player.zza != 0.0f || this.mc.player.xxa != 0.0f)) {
++                    yield true;
++                }
++                yield false;
++            }
++            case 1 -> {
++                if (this.mc.player.zza != 0.0f || this.mc.player.xxa != 0.0f) {
++                    yield true;
++                }
++                yield false;
++            }
++            case 2 -> true;
+         };
+     }
+ 
+     @EventHandler
+     private void onTick(TickEvent.Pre event) {
+-        if (!mc.player.onGround() || mc.player.isShiftKeyDown() || !jump()) return;
+-
+-        if (mode.get() == Mode.Jump) mc.player.jumpFromGround();
+-        else ((IVec3) mc.player.getDeltaMovement()).meteor$setY(velocityHeight.get());
++        if (!this.mc.player.onGround() || this.mc.player.isShiftKeyDown() || !this.jump()) {
++            return;
++        }
++        if (this.mode.get() == Mode.Jump) {
++            this.mc.player.jumpFromGround();
++        } else {
++            ((IVec3)this.mc.player.getDeltaMovement()).meteor$setY(this.velocityHeight.get());
++        }
+     }
+ 
+-    public enum JumpWhen {
++    public static enum Mode {
++        Jump,
++        LowHop;
++
++    }
++
++    public static enum JumpWhen {
+         Sprinting,
+         Walking,
+-        Always
+-    }
++        Always;
+ 
+-    public enum Mode {
+-        Jump,
+-        LowHop
+     }
+ }
++

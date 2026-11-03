@@ -1,0 +1,30 @@
+--- upstream261/mixin/ReloadStateAccessor.java
++++ v1decompiled/mixin/ReloadStateAccessor.java
+@@ -1,16 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.ResourceLoadStateTracker$ReloadState
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.client.ResourceLoadStateTracker;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(ResourceLoadStateTracker.ReloadState.class)
++@Mixin(value={ResourceLoadStateTracker.ReloadState.class})
+ public interface ReloadStateAccessor {
+-    @Accessor("finished")
+-    boolean meteor$isFinished();
++    @Accessor(value="finished")
++    public boolean meteor$isFinished();
+ }
++

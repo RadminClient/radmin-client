@@ -1,0 +1,23 @@
+--- upstream261/gui/utils/CharFilter.java
++++ v1decompiled/gui/utils/CharFilter.java
+@@ -1,14 +1,13 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.gui.utils;
++package radmin.client.gui.utils;
+ 
+ public interface CharFilter {
+-    boolean filter(String text, char c);
++    public boolean filter(String var1, char var2);
+ 
+-    default boolean filter(String text, int i) {
+-        return filter(text, (char) i);
++    default public boolean filter(String text, int i) {
++        return this.filter(text, (char)i);
+     }
+ }
++

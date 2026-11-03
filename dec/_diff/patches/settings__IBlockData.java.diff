@@ -1,0 +1,34 @@
+--- upstream261/settings/IBlockData.java
++++ v1decompiled/settings/IBlockData.java
+@@ -1,17 +1,19 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.level.block.Block
+  */
++package radmin.client.settings;
+ 
+-package meteordevelopment.meteorclient.settings;
++import net.minecraft.world.level.block.Block;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WidgetScreen;
++import radmin.client.settings.BlockDataSetting;
++import radmin.client.utils.misc.ICopyable;
++import radmin.client.utils.misc.ISerializable;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WidgetScreen;
+-import meteordevelopment.meteorclient.utils.misc.IChangeable;
+-import meteordevelopment.meteorclient.utils.misc.ICopyable;
+-import meteordevelopment.meteorclient.utils.misc.ISerializable;
+-import net.minecraft.world.level.block.Block;
++public interface IBlockData<T extends ICopyable<T> & ISerializable<T> & IBlockData<T>> {
++    public WidgetScreen createScreen(GuiTheme var1, Block var2, BlockDataSetting<T> var3);
++}
+ 
+-public interface IBlockData<T extends ICopyable<T> & ISerializable<T> & IChangeable & IBlockData<T>> {
+-    WidgetScreen createScreen(GuiTheme theme, Block block, BlockDataSetting<T> setting);
+-}

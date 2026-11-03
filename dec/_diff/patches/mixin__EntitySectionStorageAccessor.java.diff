@@ -1,0 +1,41 @@
+--- upstream261/mixin/EntitySectionStorageAccessor.java
++++ v1decompiled/mixin/EntitySectionStorageAccessor.java
+@@ -1,9 +1,16 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  it.unimi.dsi.fastutil.longs.Long2ObjectMap
++ *  it.unimi.dsi.fastutil.longs.LongSortedSet
++ *  net.minecraft.world.level.entity.EntityAccess
++ *  net.minecraft.world.level.entity.EntitySection
++ *  net.minecraft.world.level.entity.EntitySectionStorage
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+ import it.unimi.dsi.fastutil.longs.LongSortedSet;
+@@ -13,11 +20,12 @@
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(EntitySectionStorage.class)
++@Mixin(value={EntitySectionStorage.class})
+ public interface EntitySectionStorageAccessor {
+-    @Accessor("sectionIds")
+-    LongSortedSet meteor$getSectionIds();
++    @Accessor(value="sectionIds")
++    public LongSortedSet meteor$getSectionIds();
+ 
+-    @Accessor("sections")
+-    <T extends EntityAccess> Long2ObjectMap<EntitySection<T>> meteor$getSections();
++    @Accessor(value="sections")
++    public <T extends EntityAccess> Long2ObjectMap<EntitySection<T>> meteor$getSections();
+ }
++

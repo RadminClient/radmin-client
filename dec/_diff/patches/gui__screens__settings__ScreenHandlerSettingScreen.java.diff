@@ -1,0 +1,58 @@
+--- upstream261/gui/screens/settings/ScreenHandlerSettingScreen.java
++++ v1decompiled/gui/screens/settings/ScreenHandlerSettingScreen.java
+@@ -1,37 +1,39 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.registries.BuiltInRegistries
++ *  net.minecraft.world.inventory.MenuType
+  */
++package radmin.client.gui.screens.settings;
+ 
+-package meteordevelopment.meteorclient.gui.screens.settings;
+-
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.screens.settings.base.CollectionListSettingScreen;
+-import meteordevelopment.meteorclient.gui.widgets.WWidget;
+-import meteordevelopment.meteorclient.settings.Setting;
++import java.util.Collection;
++import java.util.List;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.world.inventory.MenuType;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.screens.settings.base.CollectionListSettingScreen;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.settings.Setting;
+ 
+-import java.util.List;
+-
+-public class ScreenHandlerSettingScreen extends CollectionListSettingScreen<MenuType<?>> {
++public class ScreenHandlerSettingScreen
++extends CollectionListSettingScreen<MenuType<?>> {
+     public ScreenHandlerSettingScreen(GuiTheme theme, Setting<List<MenuType<?>>> setting) {
+-        super(theme, "Select Screen Handlers", setting, setting.get(), BuiltInRegistries.MENU);
++        super(theme, "Select Screen Handlers", setting, (Collection)setting.get(), BuiltInRegistries.MENU);
+     }
+ 
+     @Override
+     protected WWidget getValueWidget(MenuType<?> value) {
+-        return theme.label(getName(value));
++        return this.theme.label(ScreenHandlerSettingScreen.getName(value));
+     }
+ 
+     @Override
+     protected String[] getValueNames(MenuType<?> type) {
+-        return new String[]{
+-            getName(type)
+-        };
++        return new String[]{ScreenHandlerSettingScreen.getName(type)};
+     }
+ 
+     private static String getName(MenuType<?> type) {
+         return BuiltInRegistries.MENU.getKey(type).toString();
+     }
+ }
++

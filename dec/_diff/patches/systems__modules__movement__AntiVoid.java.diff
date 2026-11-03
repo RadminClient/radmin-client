@@ -1,0 +1,117 @@
+--- upstream261/systems/modules/movement/AntiVoid.java
++++ v1decompiled/systems/modules/movement/AntiVoid.java
+@@ -1,72 +1,75 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
+  */
++package radmin.client.systems.modules.movement;
+ 
+-package meteordevelopment.meteorclient.systems.modules.movement;
++import meteordevelopment.orbit.EventHandler;
++import radmin.client.events.world.TickEvent;
++import radmin.client.settings.EnumSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.movement.Flight;
++import radmin.client.utils.Utils;
+ 
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.settings.EnumSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.utils.Utils;
+-import meteordevelopment.orbit.EventHandler;
+-
+-public class AntiVoid extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
+-        .name("mode")
+-        .description("The method to prevent you from falling into the void.")
+-        .defaultValue(Mode.Jump)
+-        .onChanged(_ -> onActivate())
+-        .build()
+-    );
+-
+-    private boolean wasFlightEnabled, hasRun;
++public class AntiVoid
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final Setting<Mode> mode;
++    private boolean wasFlightEnabled;
++    private boolean hasRun;
+ 
+     public AntiVoid() {
+         super(Categories.Movement, "anti-void", "Attempts to prevent you from falling into the void.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.mode = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("mode")).description("The method to prevent you from falling into the void.")).defaultValue(Mode.Jump)).onChanged(mode -> this.onActivate())).build());
+     }
+ 
+     @Override
+     public void onActivate() {
+-        if (mode.get() == Mode.Flight) wasFlightEnabled = Modules.get().isActive(Flight.class);
++        if (this.mode.get() == Mode.Flight) {
++            this.wasFlightEnabled = Modules.get().isActive(Flight.class);
++        }
+     }
+ 
+     @Override
+     public void onDeactivate() {
+-        if (!wasFlightEnabled && mode.get() == Mode.Flight && Utils.canUpdate()) {
++        if (!this.wasFlightEnabled && this.mode.get() == Mode.Flight && Utils.canUpdate()) {
+             Modules.get().get(Flight.class).disable();
+         }
+     }
+ 
+     @EventHandler
+     private void onPreTick(TickEvent.Pre event) {
+-        int minY = mc.level.getMinY();
+-
+-        if (mc.player.getY() > minY || mc.player.getY() < minY - 15) {
+-            if (hasRun && mode.get() == Mode.Flight) {
++        int minY = this.mc.level.getMinY();
++        if (this.mc.player.getY() > (double)minY || this.mc.player.getY() < (double)(minY - 15)) {
++            if (this.hasRun && this.mode.get() == Mode.Flight) {
+                 Modules.get().get(Flight.class).disable();
+-                hasRun = false;
++                this.hasRun = false;
+             }
+             return;
+         }
+-
+-        switch (mode.get()) {
+-            case Flight -> {
++        switch (this.mode.get().ordinal()) {
++            case 0: {
+                 Modules.get().get(Flight.class).enable();
+-                hasRun = true;
++                this.hasRun = true;
++                break;
+             }
+-            case Jump -> mc.player.jumpFromGround();
++            case 1: {
++                this.mc.player.jumpFromGround();
++            }
+         }
+     }
+ 
+-    public enum Mode {
++    public static enum Mode {
+         Flight,
+-        Jump
++        Jump;
++
+     }
+ }
++

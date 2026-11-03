@@ -1,0 +1,25 @@
+--- upstream261/events/entity/player/JumpVelocityMultiplierEvent.java
++++ v1decompiled/events/entity/player/JumpVelocityMultiplierEvent.java
+@@ -1,17 +1,15 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.events.entity.player;
++package radmin.client.events.entity.player;
+ 
+ public class JumpVelocityMultiplierEvent {
+     private static final JumpVelocityMultiplierEvent INSTANCE = new JumpVelocityMultiplierEvent();
+-
+-    public float multiplier = 1;
++    public float multiplier = 1.0f;
+ 
+     public static JumpVelocityMultiplierEvent get() {
+-        INSTANCE.multiplier = 1;
++        JumpVelocityMultiplierEvent.INSTANCE.multiplier = 1.0f;
+         return INSTANCE;
+     }
+ }
++

@@ -1,0 +1,44 @@
+--- upstream261/gui/themes/meteor/widgets/WMeteorAccount.java
++++ v1decompiled/gui/themes/meteor/widgets/WMeteorAccount.java
+@@ -1,28 +1,29 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.themes.meteor.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.themes.meteor.widgets;
++import radmin.client.gui.WidgetScreen;
++import radmin.client.gui.themes.meteor.MeteorWidget;
++import radmin.client.gui.widgets.WAccount;
++import radmin.client.systems.accounts.Account;
++import radmin.client.utils.render.color.Color;
+ 
+-import meteordevelopment.meteorclient.gui.WidgetScreen;
+-import meteordevelopment.meteorclient.gui.themes.meteor.MeteorWidget;
+-import meteordevelopment.meteorclient.gui.widgets.WAccount;
+-import meteordevelopment.meteorclient.systems.accounts.Account;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
+-
+-public class WMeteorAccount extends WAccount implements MeteorWidget {
++public class WMeteorAccount
++extends WAccount
++implements MeteorWidget {
+     public WMeteorAccount(WidgetScreen screen, Account<?> account) {
+         super(screen, account);
+     }
+ 
+     @Override
+     protected Color loggedInColor() {
+-        return theme().loggedInColor.get();
++        return this.theme().loggedInColor.get();
+     }
+ 
+     @Override
+     protected Color accountTypeColor() {
+-        return theme().textSecondaryColor.get();
++        return this.theme().textSecondaryColor.get();
+     }
+ }
++

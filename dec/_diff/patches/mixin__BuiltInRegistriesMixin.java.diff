@@ -1,0 +1,36 @@
+--- upstream261/mixin/BuiltInRegistriesMixin.java
++++ v1decompiled/mixin/BuiltInRegistriesMixin.java
+@@ -1,21 +1,24 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.registries.BuiltInRegistries
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.injection.At
++ *  org.spongepowered.asm.mixin.injection.Redirect
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
++import java.util.function.Supplier;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.injection.At;
+ import org.spongepowered.asm.mixin.injection.Redirect;
+ 
+-import java.util.function.Supplier;
+-
+-@Mixin(BuiltInRegistries.class)
++@Mixin(value={BuiltInRegistries.class})
+ public abstract class BuiltInRegistriesMixin {
+-    @Redirect(method = "internalRegister(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/WritableRegistry;Lnet/minecraft/core/registries/BuiltInRegistries$RegistryBootstrap;)Lnet/minecraft/core/WritableRegistry;", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/Bootstrap;checkBootstrapCalled(Ljava/util/function/Supplier;)V"))
++    @Redirect(method={"internalRegister(Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/core/WritableRegistry;Lnet/minecraft/core/registries/BuiltInRegistries$RegistryBootstrap;)Lnet/minecraft/core/WritableRegistry;"}, at=@At(value="INVOKE", target="Lnet/minecraft/server/Bootstrap;checkBootstrapCalled(Ljava/util/function/Supplier;)V"))
+     private static void ignoreBootstrap(Supplier<String> location) {
+-        // nothing
+     }
+ }
++

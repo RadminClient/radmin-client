@@ -1,0 +1,1215 @@
+--- upstream261/gui/widgets/input/WTextBox.java
++++ v1decompiled/gui/widgets/input/WTextBox.java
+@@ -1,53 +1,54 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.platform.MacosUtil
++ *  it.unimi.dsi.fastutil.doubles.DoubleArrayList
++ *  it.unimi.dsi.fastutil.doubles.DoubleList
++ *  net.minecraft.client.input.CharacterEvent
++ *  net.minecraft.client.input.KeyEvent
++ *  net.minecraft.client.input.MouseButtonEvent
++ *  net.minecraft.util.Mth
++ *  org.apache.commons.lang3.SystemUtils
+  */
+-
+-package meteordevelopment.meteorclient.gui.widgets.input;
++package radmin.client.gui.widgets.input;
+ 
+ import com.mojang.blaze3d.platform.MacosUtil;
+ import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
+ import it.unimi.dsi.fastutil.doubles.DoubleList;
+-import meteordevelopment.meteorclient.gui.GuiKeyEvents;
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.gui.utils.Cell;
+-import meteordevelopment.meteorclient.gui.utils.CharFilter;
+-import meteordevelopment.meteorclient.gui.widgets.WWidget;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WContainer;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
++import java.lang.reflect.InvocationTargetException;
++import java.util.List;
+ import net.minecraft.client.input.CharacterEvent;
+ import net.minecraft.client.input.KeyEvent;
+ import net.minecraft.client.input.MouseButtonEvent;
+ import net.minecraft.util.Mth;
+ import org.apache.commons.lang3.SystemUtils;
+-
+-import java.lang.reflect.InvocationTargetException;
+-import java.util.List;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-import static org.lwjgl.glfw.GLFW.*;
+-
+-public abstract class WTextBox extends WWidget {
++import radmin.client.MeteorClient;
++import radmin.client.gui.GuiKeyEvents;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.utils.Cell;
++import radmin.client.gui.utils.CharFilter;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.gui.widgets.containers.WContainer;
++import radmin.client.utils.render.color.Color;
++
++public abstract class WTextBox
++extends WWidget {
+     private static final Renderer DEFAULT_RENDERER = (renderer, x, y, text, color) -> renderer.text(text, x, y, color, false);
+-
+     public Runnable action;
+     public Runnable actionOnUnfocused;
+-
+     protected String text;
+     protected String placeholder;
+     protected CharFilter filter;
+-
+     protected final Renderer renderer;
+-
+     protected DoubleList textWidths = new DoubleArrayList();
+-
+     protected int cursor;
+     protected double textStart;
+-
+-    protected boolean selecting, doubleClick;
+-    protected int selectionStart, selectionEnd;
++    protected boolean selecting;
++    protected boolean doubleClick;
++    protected int selectionStart;
++    protected int selectionEnd;
+     private int preSelectionCursor;
+-
+     private List<String> completions;
+     private int completionsStart;
+     private WContainer completionsW;
+@@ -60,685 +61,607 @@
+         this.text = text;
+         this.placeholder = placeholder;
+         this.filter = filter;
+-
+         try {
+-            this.renderer = renderer != null ? renderer.getDeclaredConstructor().newInstance() : DEFAULT_RENDERER;
+-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+-                 NoSuchMethodException e) {
++            this.renderer = renderer != null ? renderer.getDeclaredConstructor(new Class[0]).newInstance(new Object[0]) : DEFAULT_RENDERER;
++        }
++        catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+             throw new RuntimeException(e);
+         }
+     }
+ 
+     protected abstract WContainer createCompletionsRootWidget();
+ 
+-    protected abstract <T extends WWidget & ICompletionItem> T createCompletionsValueWidth(String completion, boolean selected);
++    protected abstract <T extends WWidget> T createCompletionsValueWidth(String var1, boolean var2);
+ 
+     @Override
+     protected void onCalculateSize() {
+-        double pad = pad();
+-        double s = theme.textHeight();
+-
+-        width = pad + s + pad;
+-        height = pad + s + pad;
+-
+-        calculateTextWidths();
+-
+-        if (completionsW != null) completionsW.calculateSize();
++        double pad = this.pad();
++        double s = this.theme.textHeight();
++        this.width = pad + s + pad;
++        this.height = pad + s + pad;
++        this.calculateTextWidths();
++        if (this.completionsW != null) {
++            this.completionsW.calculateSize();
++        }
+     }
+ 
+     @Override
+     public void calculateWidgetPositions() {
+         super.calculateWidgetPositions();
+-
+-        if (completionsW != null) {
+-            completionsW.x = x;
+-            completionsW.y = y + height;
+-            completionsW.calculateWidgetPositions();
++        if (this.completionsW != null) {
++            this.completionsW.x = this.x;
++            this.completionsW.y = this.y + this.height;
++            this.completionsW.calculateWidgetPositions();
+         }
+     }
+ 
+     @Override
+     public void move(double deltaX, double deltaY) {
+         super.move(deltaX, deltaY);
+-        if (completionsW != null) completionsW.move(deltaX, deltaY);
++        if (this.completionsW != null) {
++            this.completionsW.move(deltaX, deltaY);
++        }
+     }
+ 
+     protected double maxTextWidth() {
+-        return width - pad() * 2;
++        return this.width - this.pad() * 2.0;
+     }
+ 
+     @Override
+     public boolean onMouseClicked(MouseButtonEvent click, boolean doubled) {
+-        if (mouseOver) {
+-            if (click.button() == GLFW_MOUSE_BUTTON_RIGHT) {
+-                if (!text.isEmpty()) {
+-                    text = "";
+-                    cursor = 0;
+-                    selectionStart = 0;
+-                    selectionEnd = 0;
+-
+-                    runAction();
+-                }
+-            } else if (click.button() == GLFW_MOUSE_BUTTON_LEFT) {
+-                selecting = true;
+-
+-                double overflowWidth = getOverflowWidthForRender();
+-                double relativeMouseX = click.x() - x + overflowWidth;
+-                double pad = pad();
+-
++        if (this.mouseOver) {
++            if (click.button() == 1) {
++                if (!this.text.isEmpty()) {
++                    this.text = "";
++                    this.cursor = 0;
++                    this.selectionStart = 0;
++                    this.selectionEnd = 0;
++                    this.runAction();
++                }
++            } else if (click.button() == 0) {
++                this.selecting = true;
++                double overflowWidth = this.getOverflowWidthForRender();
++                double relativeMouseX = click.x() - this.x + overflowWidth;
++                double pad = this.pad();
+                 double smallestDifference = Double.MAX_VALUE;
+-
+-                cursor = text.length();
+-
+-                for (int i = 0; i < textWidths.size(); i++) {
+-                    double difference = Math.abs(textWidths.getDouble(i) + pad - relativeMouseX);
+-
+-                    if (difference < smallestDifference) {
+-                        smallestDifference = difference;
+-                        cursor = i;
+-                    }
+-                }
+-
+-                if (doubled && cursor == preSelectionCursor) {
+-                    doubleClick = true;
+-                    resetSelection();
+-
+-                    selectionStart = (cursor - countToNextSpace(true));
+-                    selectionEnd = cursor = (cursor + countToNextSpace(false));
+-
++                this.cursor = this.text.length();
++                for (int i = 0; i < this.textWidths.size(); ++i) {
++                    double difference = Math.abs(this.textWidths.getDouble(i) + pad - relativeMouseX);
++                    if (!(difference < smallestDifference)) continue;
++                    smallestDifference = difference;
++                    this.cursor = i;
++                }
++                if (doubled && this.cursor == this.preSelectionCursor) {
++                    this.doubleClick = true;
++                    this.resetSelection();
++                    this.selectionStart = this.cursor - this.countToNextSpace(true);
++                    this.selectionEnd = this.cursor += this.countToNextSpace(false);
+                     return true;
+                 }
+-
+-                preSelectionCursor = cursor;
+-                resetSelection();
+-                cursorChanged();
+-            }
+-
+-            setFocused(true);
+-            return true;
+-        }
+-
+-        if (focused) setFocused(false);
+-
++                this.preSelectionCursor = this.cursor;
++                this.resetSelection();
++                this.cursorChanged();
++            }
++            this.setFocused(true);
++            return true;
++        }
++        if (this.focused) {
++            this.setFocused(false);
++        }
+         return false;
+     }
+ 
+     @Override
+     public void onMouseMoved(double mouseX, double mouseY, double lastMouseX, double lastMouseY) {
+-        if (!selecting) return;
+-
+-        double overflowWidth = getOverflowWidthForRender();
+-        double relativeMouseX = mouseX - x + overflowWidth;
+-        double pad = pad();
+-
++        if (!this.selecting) {
++            return;
++        }
++        double overflowWidth = this.getOverflowWidthForRender();
++        double relativeMouseX = mouseX - this.x + overflowWidth;
++        double pad = this.pad();
+         double smallestDifference = Double.MAX_VALUE;
+-
+         int best = 0;
+-        for (int i = 0; i < textWidths.size(); i++) {
+-            double difference = Math.abs(textWidths.getDouble(i) + pad - relativeMouseX);
+-
+-            if (difference < smallestDifference) {
+-                best = i;
+-                smallestDifference = difference;
+-                if (!doubleClick) {
+-                    if (i < preSelectionCursor) {
+-                        selectionStart = i;
+-                        cursor = i;
+-                    } else if (i > preSelectionCursor) {
+-                        selectionEnd = i;
+-                        cursor = i;
+-                    } else {
+-                        cursor = preSelectionCursor;
+-                        resetSelection();
+-                    }
+-                }
+-            }
+-        }
+-
+-        // double click selection will select by whole words
+-        if (doubleClick) {
+-            if (best < selectionStart) {
+-                selectionStart = best - countToNextSpace(true, best);
+-                cursor = selectionStart;
+-            } else if (best > selectionEnd) {
+-                selectionEnd = best + countToNextSpace(false, best);
+-                cursor = selectionEnd;
+-            } else {
+-                if (cursor == selectionStart) {
+-                    int nextRight = countToNextSpace(false);
+-                    if (best > cursor + nextRight) {
+-                        selectionStart = cursor = cursor + nextRight + 1;
+-                        if (selectionStart <= preSelectionCursor && selectionStart + countToNextSpace(false) >= preSelectionCursor) {
+-                            cursor = selectionEnd;
+-                        }
+-                    }
+-                } else if (cursor == selectionEnd) {
+-                    int nextLeft = countToNextSpace(true);
+-                    if (best < cursor - nextLeft) {
+-                        selectionEnd = cursor = cursor - nextLeft - 1;
+-                    }
+-                }
++        for (int i = 0; i < this.textWidths.size(); ++i) {
++            double difference = Math.abs(this.textWidths.getDouble(i) + pad - relativeMouseX);
++            if (!(difference < smallestDifference)) continue;
++            best = i;
++            smallestDifference = difference;
++            if (this.doubleClick) continue;
++            if (i < this.preSelectionCursor) {
++                this.selectionStart = i;
++                this.cursor = i;
++                continue;
++            }
++            if (i > this.preSelectionCursor) {
++                this.selectionEnd = i;
++                this.cursor = i;
++                continue;
++            }
++            this.cursor = this.preSelectionCursor;
++            this.resetSelection();
++        }
++        if (this.doubleClick) {
++            int nextLeft;
++            if (best < this.selectionStart) {
++                this.cursor = this.selectionStart = best - this.countToNextSpace(true, best);
++            } else if (best > this.selectionEnd) {
++                this.cursor = this.selectionEnd = best + this.countToNextSpace(false, best);
++            } else if (this.cursor == this.selectionStart) {
++                int nextRight = this.countToNextSpace(false);
++                if (best > this.cursor + nextRight) {
++                    this.selectionStart = this.cursor = this.cursor + nextRight + 1;
++                    if (this.selectionStart <= this.preSelectionCursor && this.selectionStart + this.countToNextSpace(false) >= this.preSelectionCursor) {
++                        this.cursor = this.selectionEnd;
++                    }
++                }
++            } else if (this.cursor == this.selectionEnd && best < this.cursor - (nextLeft = this.countToNextSpace(true))) {
++                this.selectionEnd = this.cursor = this.cursor - nextLeft - 1;
+             }
+         }
+     }
+ 
+     @Override
+     public boolean onMouseReleased(MouseButtonEvent click) {
+-        selecting = false;
+-        doubleClick = false;
+-
+-        if (selectionStart < preSelectionCursor && preSelectionCursor == selectionEnd) {
+-            cursor = selectionStart;
+-        } else if (selectionEnd > preSelectionCursor && preSelectionCursor == selectionStart) {
+-            cursor = selectionEnd;
+-        }
+-
++        this.selecting = false;
++        this.doubleClick = false;
++        if (this.selectionStart < this.preSelectionCursor && this.preSelectionCursor == this.selectionEnd) {
++            this.cursor = this.selectionStart;
++        } else if (this.selectionEnd > this.preSelectionCursor && this.preSelectionCursor == this.selectionStart) {
++            this.cursor = this.selectionEnd;
++        }
+         return false;
+     }
+ 
+     @Override
+     public boolean onKeyPressed(KeyEvent input) {
+-        if (!focused) return false;
+-
+-        boolean control = MacosUtil.IS_MACOS ? input.modifiers() == GLFW_MOD_SUPER : input.modifiers() == GLFW_MOD_CONTROL;
+-
+-        if (control && input.key() == GLFW_KEY_C) {
+-            if (cursor != selectionStart || cursor != selectionEnd) {
+-                mc.keyboardHandler.setClipboard(text.substring(selectionStart, selectionEnd));
+-            }
+-            return true;
+-        } else if (control && input.key() == GLFW_KEY_X) {
+-            if (cursor != selectionStart || cursor != selectionEnd) {
+-                mc.keyboardHandler.setClipboard(text.substring(selectionStart, selectionEnd));
+-                clearSelection();
+-            }
+-
+-            return true;
+-        } else if (control && input.key() == GLFW_KEY_A) {
+-            cursor = text.length();
+-            selectionStart = 0;
+-            selectionEnd = cursor;
+-        } else if (input.modifiers() == ((MacosUtil.IS_MACOS ? GLFW_MOD_SUPER : GLFW_MOD_CONTROL) | GLFW_MOD_SHIFT) && input.key() == GLFW_KEY_A) {
+-            resetSelection();
+-        } else if (input.key() == GLFW_KEY_ENTER || input.key() == GLFW_KEY_KP_ENTER) {
+-            setFocused(false);
+-
+-            if (actionOnUnfocused != null) actionOnUnfocused.run();
+-            return true;
+-        } else if (input.key() == GLFW_KEY_TAB && completionsW != null) {
+-            String completion = ((ICompletionItem) completionsW.cells.get(getSelectedCompletion()).widget()).getCompletion();
+-
+-            StringBuilder sb = new StringBuilder(text.length() + completion.length() + 1);
+-            String a = text.substring(0, cursor);
+-            sb.append(a);
+-
+-            for (int i = 0; i < completion.length() - 1; i++) {
+-                if (a.endsWith(completion.substring(0, completion.length() - i - 1))) {
++        boolean control;
++        if (!this.focused) {
++            return false;
++        }
++        boolean bl = MacosUtil.IS_MACOS ? input.modifiers() == 8 : (control = input.modifiers() == 2);
++        if (control && input.key() == 67) {
++            if (this.cursor != this.selectionStart || this.cursor != this.selectionEnd) {
++                MeteorClient.mc.keyboardHandler.setClipboard(this.text.substring(this.selectionStart, this.selectionEnd));
++            }
++            return true;
++        }
++        if (control && input.key() == 88) {
++            if (this.cursor != this.selectionStart || this.cursor != this.selectionEnd) {
++                MeteorClient.mc.keyboardHandler.setClipboard(this.text.substring(this.selectionStart, this.selectionEnd));
++                this.clearSelection();
++            }
++            return true;
++        }
++        if (control && input.key() == 65) {
++            this.cursor = this.text.length();
++            this.selectionStart = 0;
++            this.selectionEnd = this.cursor;
++        } else if (input.modifiers() == ((MacosUtil.IS_MACOS ? 8 : 2) | 1) && input.key() == 65) {
++            this.resetSelection();
++        } else {
++            if (input.key() == 257 || input.key() == 335) {
++                this.setFocused(false);
++                if (this.actionOnUnfocused != null) {
++                    this.actionOnUnfocused.run();
++                }
++                return true;
++            }
++            if (input.key() == 258 && this.completionsW != null) {
++                String completion = ((ICompletionItem)this.completionsW.cells.get(this.getSelectedCompletion()).widget()).getCompletion();
++                StringBuilder sb = new StringBuilder(this.text.length() + completion.length() + 1);
++                String a = this.text.substring(0, this.cursor);
++                sb.append(a);
++                for (int i = 0; i < completion.length() - 1; ++i) {
++                    if (!a.endsWith(completion.substring(0, completion.length() - i - 1))) continue;
+                     completion = completion.substring(completion.length() - i - 1);
+                     break;
+                 }
+-            }
+-
+-            sb.append(completion);
+-            if (completion.endsWith("(")) sb.append(')');
+-
+-            sb.append(text, cursor, text.length());
+-
+-            text = sb.toString();
+-            cursor += completion.length();
+-            resetSelection();
+-            runAction();
+-
+-            return true;
+-        }
+-
+-        return onKeyRepeated(input);
++                sb.append(completion);
++                if (completion.endsWith("(")) {
++                    sb.append(')');
++                }
++                sb.append(this.text, this.cursor, this.text.length());
++                this.text = sb.toString();
++                this.cursor += completion.length();
++                this.resetSelection();
++                this.runAction();
++                return true;
++            }
++        }
++        return this.onKeyRepeated(input);
+     }
+ 
+     @Override
+     public boolean onKeyRepeated(KeyEvent input) {
+-        if (!focused) return false;
+-
+-        boolean control = MacosUtil.IS_MACOS ? input.modifiers() == GLFW_MOD_SUPER : input.modifiers() == GLFW_MOD_CONTROL;
+-        boolean shift = input.modifiers() == GLFW_MOD_SHIFT;
+-        boolean controlShift = input.modifiers() == ((SystemUtils.IS_OS_WINDOWS ? GLFW_MOD_ALT : MacosUtil.IS_MACOS ? GLFW_MOD_SUPER : GLFW_MOD_CONTROL) | GLFW_MOD_SHIFT);
+-        boolean altShift = input.modifiers() == ((SystemUtils.IS_OS_WINDOWS ? GLFW_MOD_CONTROL : GLFW_MOD_ALT) | GLFW_MOD_SHIFT);
+-
+-        if (control && input.key() == GLFW_KEY_V) {
+-            clearSelection();
+-
+-            String preText = text;
+-            String clipboard = mc.keyboardHandler.getClipboard();
++        boolean altShift;
++        if (!this.focused) {
++            return false;
++        }
++        boolean control = MacosUtil.IS_MACOS ? input.modifiers() == 8 : input.modifiers() == 2;
++        boolean shift = input.modifiers() == 1;
++        boolean controlShift = input.modifiers() == ((SystemUtils.IS_OS_WINDOWS ? 4 : (MacosUtil.IS_MACOS ? 8 : 2)) | 1);
++        boolean bl = altShift = input.modifiers() == ((SystemUtils.IS_OS_WINDOWS ? 2 : 4) | 1);
++        if (control && input.key() == 86) {
++            this.clearSelection();
++            String preText = this.text;
++            String clipboard = MeteorClient.mc.keyboardHandler.getClipboard();
+             int addedChars = 0;
+-
+-            StringBuilder sb = new StringBuilder(text.length() + clipboard.length());
+-            sb.append(text);
+-
+-            for (int i = 0; i < clipboard.length(); i++) {
++            StringBuilder sb = new StringBuilder(this.text.length() + clipboard.length());
++            sb.append(this.text);
++            for (int i = 0; i < clipboard.length(); ++i) {
+                 char c = clipboard.charAt(i);
+-                if (filter.filter(sb.toString(), c)) {
+-                    sb.insert(cursor + addedChars, c);
+-                    addedChars++;
+-                }
+-            }
+-
+-            text = sb.toString();
+-            cursor += addedChars;
+-            resetSelection();
+-
+-            if (!text.equals(preText)) runAction();
+-            return true;
+-        } else if (input.key() == GLFW_KEY_BACKSPACE) {
+-            if (cursor > 0 && cursor == selectionStart && cursor == selectionEnd) {
+-                String preText = text;
+-
+-                int count = (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? GLFW_MOD_ALT : MacosUtil.IS_MACOS ? GLFW_MOD_SUPER : GLFW_MOD_CONTROL))
+-                    ? cursor
+-                    : (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? GLFW_MOD_CONTROL : GLFW_MOD_ALT))
+-                      ? countToNextSpace(true)
+-                      : 1;
+-
+-                text = text.substring(0, cursor - count) + text.substring(cursor);
+-                cursor -= count;
+-                resetSelection();
+-
+-                if (!text.equals(preText)) runAction();
+-            } else if (cursor != selectionStart || cursor != selectionEnd) {
+-                clearSelection();
+-            }
+-
+-            return true;
+-        } else if (input.key() == GLFW_KEY_DELETE) {
+-            if (cursor == selectionStart && cursor == selectionEnd) {
+-                if (cursor < text.length()) {
+-                    String preText = text;
+-
+-                    int count = input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? GLFW_MOD_ALT : MacosUtil.IS_MACOS ? GLFW_MOD_SUPER : GLFW_MOD_CONTROL)
+-                        ? text.length() - cursor
+-                        : (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? GLFW_MOD_CONTROL : GLFW_MOD_ALT))
+-                          ? countToNextSpace(false)
+-                          : 1;
+-
+-                    text = text.substring(0, cursor) + text.substring(cursor + count);
+-
+-                    if (!text.equals(preText)) runAction();
++                if (!this.filter.filter(sb.toString(), c)) continue;
++                sb.insert(this.cursor + addedChars, c);
++                ++addedChars;
++            }
++            this.text = sb.toString();
++            this.cursor += addedChars;
++            this.resetSelection();
++            if (!this.text.equals(preText)) {
++                this.runAction();
++            }
++            return true;
++        }
++        if (input.key() == 259) {
++            if (this.cursor > 0 && this.cursor == this.selectionStart && this.cursor == this.selectionEnd) {
++                String preText = this.text;
++                int count = input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? 4 : (MacosUtil.IS_MACOS ? 8 : 2)) ? this.cursor : (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? 2 : 4) ? this.countToNextSpace(true) : 1);
++                this.text = this.text.substring(0, this.cursor - count) + this.text.substring(this.cursor);
++                this.cursor -= count;
++                this.resetSelection();
++                if (!this.text.equals(preText)) {
++                    this.runAction();
++                }
++            } else if (this.cursor != this.selectionStart || this.cursor != this.selectionEnd) {
++                this.clearSelection();
++            }
++            return true;
++        }
++        if (input.key() == 261) {
++            if (this.cursor == this.selectionStart && this.cursor == this.selectionEnd) {
++                if (this.cursor < this.text.length()) {
++                    String preText = this.text;
++                    int count = input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? 4 : (MacosUtil.IS_MACOS ? 8 : 2)) ? this.text.length() - this.cursor : (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? 2 : 4) ? this.countToNextSpace(false) : 1);
++                    this.text = this.text.substring(0, this.cursor) + this.text.substring(this.cursor + count);
++                    if (!this.text.equals(preText)) {
++                        this.runAction();
++                    }
+                 }
+             } else {
+-                clearSelection();
+-            }
+-            return true;
+-        } else if (input.key() == GLFW_KEY_LEFT) {
+-            if (cursor > 0) {
+-                // sets the cursor to just after the next leftmost space
+-                if (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? GLFW_MOD_CONTROL : GLFW_MOD_ALT)) {
+-                    cursor -= countToNextSpace(true);
+-                    resetSelection();
+-                }
+-                // sets the cursor to the beginning of the text box
+-                else if (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? GLFW_MOD_ALT : MacosUtil.IS_MACOS ? GLFW_MOD_SUPER : GLFW_MOD_CONTROL)) {
+-                    cursor = 0;
+-                    resetSelection();
+-                }
+-                // sets the selection to just after the next leftmost space
+-                else if (altShift) {
+-                    if (cursor == selectionEnd && cursor != selectionStart) {
+-                        cursor -= countToNextSpace(true);
+-                        if (cursor >= selectionStart) selectionEnd = cursor;
+-                        else {
+-                            selectionEnd = selectionStart;
+-                            selectionStart = cursor;
++                this.clearSelection();
++            }
++            return true;
++        }
++        if (input.key() == 263) {
++            if (this.cursor > 0) {
++                if (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? 2 : 4)) {
++                    this.cursor -= this.countToNextSpace(true);
++                    this.resetSelection();
++                } else if (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? 4 : (MacosUtil.IS_MACOS ? 8 : 2))) {
++                    this.cursor = 0;
++                    this.resetSelection();
++                } else if (altShift) {
++                    if (this.cursor == this.selectionEnd && this.cursor != this.selectionStart) {
++                        this.cursor -= this.countToNextSpace(true);
++                        if (this.cursor >= this.selectionStart) {
++                            this.selectionEnd = this.cursor;
++                        } else {
++                            this.selectionEnd = this.selectionStart;
++                            this.selectionStart = this.cursor;
+                         }
+                     } else {
+-                        cursor -= countToNextSpace(true);
+-                        selectionStart = cursor;
+-                    }
+-                }
+-                // sets the selection to the beginning of the text box
+-                else if (controlShift) {
+-                    if (cursor == selectionEnd && cursor != selectionStart) {
+-                        selectionEnd = selectionStart;
+-                    }
+-                    selectionStart = 0;
+-
+-                    cursor = 0;
+-                }
+-                // moves the selection one character to the left
+-                else if (shift) {
+-                    if (cursor == selectionEnd && cursor != selectionStart) {
+-                        selectionEnd = cursor - 1;
++                        this.cursor -= this.countToNextSpace(true);
++                        this.selectionStart = this.cursor;
++                    }
++                } else if (controlShift) {
++                    if (this.cursor == this.selectionEnd && this.cursor != this.selectionStart) {
++                        this.selectionEnd = this.selectionStart;
++                    }
++                    this.selectionStart = 0;
++                    this.cursor = 0;
++                } else if (shift) {
++                    if (this.cursor == this.selectionEnd && this.cursor != this.selectionStart) {
++                        this.selectionEnd = this.cursor - 1;
+                     } else {
+-                        selectionStart = cursor - 1;
+-                    }
+-
+-                    cursor--;
+-                }
+-                // moves the cursor one character to the left
+-                else {
+-                    if (cursor == selectionEnd && cursor != selectionStart) {
+-                        cursor = selectionStart;
+-                    } else if (!(cursor == selectionStart && cursor != selectionEnd)) {
+-                        cursor--;
+-                    }
+-
+-                    resetSelection();
+-                }
+-
+-                cursorChanged();
+-            } else if (selectionStart != selectionEnd && selectionStart == 0 && input.modifiers() == 0) {
+-                cursor = 0;
+-                resetSelection();
+-                cursorChanged();
+-            }
+-
+-            return true;
+-        } else if (input.key() == GLFW_KEY_RIGHT) {
+-            if (cursor < text.length()) {
+-                // sets the cursor to just before the next rightmost space
+-                if (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? GLFW_MOD_CONTROL : GLFW_MOD_ALT)) {
+-                    cursor += countToNextSpace(false);
+-                    resetSelection();
+-                }
+-                // sets the cursor to the end of the text box
+-                else if (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? GLFW_MOD_ALT : MacosUtil.IS_MACOS ? GLFW_MOD_SUPER : GLFW_MOD_CONTROL)) {
+-                    cursor = text.length();
+-                    resetSelection();
+-                }
+-                // sets the selection to just before the next rightmost space
+-                else if (altShift) {
+-                    if (cursor == selectionStart && cursor != selectionEnd) {
+-                        cursor += countToNextSpace(false);
+-                        if (cursor <= selectionEnd) selectionStart = cursor;
+-                        else {
+-                            selectionStart = selectionEnd;
+-                            selectionEnd = cursor;
++                        this.selectionStart = this.cursor - 1;
++                    }
++                    --this.cursor;
++                } else {
++                    if (this.cursor == this.selectionEnd && this.cursor != this.selectionStart) {
++                        this.cursor = this.selectionStart;
++                    } else if (this.cursor != this.selectionStart || this.cursor == this.selectionEnd) {
++                        --this.cursor;
++                    }
++                    this.resetSelection();
++                }
++                this.cursorChanged();
++            } else if (this.selectionStart != this.selectionEnd && this.selectionStart == 0 && input.modifiers() == 0) {
++                this.cursor = 0;
++                this.resetSelection();
++                this.cursorChanged();
++            }
++            return true;
++        }
++        if (input.key() == 262) {
++            if (this.cursor < this.text.length()) {
++                if (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? 2 : 4)) {
++                    this.cursor += this.countToNextSpace(false);
++                    this.resetSelection();
++                } else if (input.modifiers() == (SystemUtils.IS_OS_WINDOWS ? 4 : (MacosUtil.IS_MACOS ? 8 : 2))) {
++                    this.cursor = this.text.length();
++                    this.resetSelection();
++                } else if (altShift) {
++                    if (this.cursor == this.selectionStart && this.cursor != this.selectionEnd) {
++                        this.cursor += this.countToNextSpace(false);
++                        if (this.cursor <= this.selectionEnd) {
++                            this.selectionStart = this.cursor;
++                        } else {
++                            this.selectionStart = this.selectionEnd;
++                            this.selectionEnd = this.cursor;
+                         }
+                     } else {
+-                        cursor += countToNextSpace(false);
+-                        selectionEnd = cursor;
+-                    }
+-                }
+-                // sets the selection to the end of the text box
+-                else if (controlShift) {
+-                    if (cursor == selectionStart && cursor != selectionEnd) {
+-                        selectionStart = selectionEnd;
+-                    }
+-                    cursor = text.length();
+-                    selectionEnd = cursor;
+-                }
+-                // moves the selection one character to the right
+-                else if (shift) {
+-                    if (cursor == selectionStart && cursor != selectionEnd) {
+-                        selectionStart = cursor + 1;
++                        this.cursor += this.countToNextSpace(false);
++                        this.selectionEnd = this.cursor;
++                    }
++                } else if (controlShift) {
++                    if (this.cursor == this.selectionStart && this.cursor != this.selectionEnd) {
++                        this.selectionStart = this.selectionEnd;
++                    }
++                    this.selectionEnd = this.cursor = this.text.length();
++                } else if (shift) {
++                    if (this.cursor == this.selectionStart && this.cursor != this.selectionEnd) {
++                        this.selectionStart = this.cursor + 1;
+                     } else {
+-                        selectionEnd = cursor + 1;
+-                    }
+-
+-                    cursor++;
+-                }
+-                // moves the cursor one character to the right
+-                else {
+-                    if (cursor == selectionStart && cursor != selectionEnd) {
+-                        cursor = selectionEnd;
+-                    } else if (!(cursor == selectionEnd && cursor != selectionStart)) {
+-                        cursor++;
+-                    }
+-
+-                    resetSelection();
+-                }
+-
+-                cursorChanged();
+-            } else if (selectionStart != selectionEnd && selectionEnd == text.length() && input.modifiers() == 0) {
+-                cursor = text.length();
+-                resetSelection();
+-                cursorChanged();
+-            }
+-
+-            return true;
+-        } else if (input.key() == GLFW_KEY_DOWN && completionsW != null) {
+-            int currentI = getSelectedCompletion();
+-
+-            if (currentI == Math.min(5, completions.size() - 1)) {
+-                if (completionsStart + 6 < completions.size()) {
+-                    completionsStart++;
+-                    createCompletions(completionsStart + currentI);
++                        this.selectionEnd = this.cursor + 1;
++                    }
++                    ++this.cursor;
++                } else {
++                    if (this.cursor == this.selectionStart && this.cursor != this.selectionEnd) {
++                        this.cursor = this.selectionEnd;
++                    } else if (this.cursor != this.selectionEnd || this.cursor == this.selectionStart) {
++                        ++this.cursor;
++                    }
++                    this.resetSelection();
++                }
++                this.cursorChanged();
++            } else if (this.selectionStart != this.selectionEnd && this.selectionEnd == this.text.length() && input.modifiers() == 0) {
++                this.cursor = this.text.length();
++                this.resetSelection();
++                this.cursorChanged();
++            }
++            return true;
++        }
++        if (input.key() == 264 && this.completionsW != null) {
++            int currentI = this.getSelectedCompletion();
++            if (currentI == Math.min(5, this.completions.size() - 1)) {
++                if (this.completionsStart + 6 < this.completions.size()) {
++                    ++this.completionsStart;
++                    this.createCompletions(this.completionsStart + currentI);
+                 }
+             } else {
+-                ((ICompletionItem) completionsW.cells.get(currentI).widget()).setSelected(false);
+-                ((ICompletionItem) completionsW.cells.get(currentI + 1).widget()).setSelected(true);
+-            }
+-
+-            return true;
+-        } else if (input.key() == GLFW_KEY_UP && completionsW != null) {
+-            int currentI = getSelectedCompletion();
+-
++                ((ICompletionItem)this.completionsW.cells.get(currentI).widget()).setSelected(false);
++                ((ICompletionItem)this.completionsW.cells.get(currentI + 1).widget()).setSelected(true);
++            }
++            return true;
++        }
++        if (input.key() == 265 && this.completionsW != null) {
++            int currentI = this.getSelectedCompletion();
+             if (currentI == 0) {
+-                if (completionsStart > 0) {
+-                    completionsStart--;
+-                    createCompletions(completionsStart + currentI);
++                if (this.completionsStart > 0) {
++                    --this.completionsStart;
++                    this.createCompletions(this.completionsStart + currentI);
+                 }
+             } else {
+-                ((ICompletionItem) completionsW.cells.get(currentI).widget()).setSelected(false);
+-                ((ICompletionItem) completionsW.cells.get(currentI - 1).widget()).setSelected(true);
+-            }
+-
+-            return true;
+-        }
+-
++                ((ICompletionItem)this.completionsW.cells.get(currentI).widget()).setSelected(false);
++                ((ICompletionItem)this.completionsW.cells.get(currentI - 1).widget()).setSelected(true);
++            }
++            return true;
++        }
+         return false;
+     }
+ 
+     private int getSelectedCompletion() {
+-        for (int i = 0; i < completionsW.cells.size(); i++) {
+-            ICompletionItem item = (ICompletionItem) completionsW.cells.get(i).widget();
++        for (int i = 0; i < this.completionsW.cells.size(); ++i) {
++            ICompletionItem item = (ICompletionItem)this.completionsW.cells.get(i).widget();
+             if (!item.isSelected()) continue;
+-
+             return i;
+         }
+-
+         return -1;
+     }
+ 
+     @Override
+     public boolean onCharTyped(CharacterEvent input) {
+-        if (!focused) return false;
+-
+-        if (filter.filter(text, input.codepoint())) {
+-            clearSelection();
+-
+-            text = text.substring(0, cursor) + input.codepointAsString() + text.substring(cursor);
+-
+-            cursor++;
+-            resetSelection();
+-
+-            runAction();
+-            return true;
+-        }
+-
++        if (!this.focused) {
++            return false;
++        }
++        if (this.filter.filter(this.text, input.codepoint())) {
++            this.clearSelection();
++            this.text = this.text.substring(0, this.cursor) + input.codepointAsString() + this.text.substring(this.cursor);
++            ++this.cursor;
++            this.resetSelection();
++            this.runAction();
++            return true;
++        }
+         return false;
+     }
+ 
+     @Override
+     public boolean render(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        if (isFocused()) GuiKeyEvents.canUseKeys = false;
+-
+-        if (completionsW != null && focused) {
++        if (this.isFocused()) {
++            GuiKeyEvents.canUseKeys = false;
++        }
++        if (this.completionsW != null && this.focused) {
+             renderer.absolutePost(() -> {
+                 renderer.beginRender();
+-                completionsW.render(renderer, mouseX, mouseY, delta);
++                this.completionsW.render(renderer, mouseX, mouseY, delta);
+                 renderer.endRender();
+             });
+         }
+-
+         return super.render(renderer, mouseX, mouseY, delta);
+     }
+ 
+     private void clearSelection() {
+-        if (selectionStart == selectionEnd) return;
+-
+-        String preText = text;
+-
+-        text = text.substring(0, selectionStart) + text.substring(selectionEnd);
+-
+-        cursor = selectionStart;
+-        selectionEnd = cursor;
+-
+-        if (!text.equals(preText)) runAction();
++        if (this.selectionStart == this.selectionEnd) {
++            return;
++        }
++        String preText = this.text;
++        this.text = this.text.substring(0, this.selectionStart) + this.text.substring(this.selectionEnd);
++        this.selectionEnd = this.cursor = this.selectionStart;
++        if (!this.text.equals(preText)) {
++            this.runAction();
++        }
+     }
+ 
+     private void resetSelection() {
+-        selectionStart = cursor;
+-        selectionEnd = cursor;
++        this.selectionStart = this.cursor;
++        this.selectionEnd = this.cursor;
+     }
+ 
+     private int countToNextSpace(boolean toLeft) {
+-        return countToNextSpace(toLeft, cursor);
++        return this.countToNextSpace(toLeft, this.cursor);
+     }
+ 
+     private int countToNextSpace(boolean toLeft, int startPos) {
+         int count = 0;
+         boolean hadNonSpace = false;
+-
+-        for (int i = startPos; toLeft ? i >= 0 : i < text.length(); i += toLeft ? -1 : 1) {
++        int i = startPos;
++        while (toLeft ? i >= 0 : i < this.text.length()) {
+             int j = i;
+-            if (toLeft) j--;
+-
+-            if (j >= text.length()) continue;
+-            if (j < 0) break;
+-
+-            if (hadNonSpace && Character.isWhitespace(text.charAt(j))) break;
+-            else if (!Character.isWhitespace(text.charAt(j))) hadNonSpace = true;
+-
+-            count++;
+-        }
+-
++            if (toLeft) {
++                --j;
++            }
++            if (j < this.text.length()) {
++                if (j < 0 || hadNonSpace && Character.isWhitespace(this.text.charAt(j))) break;
++                if (!Character.isWhitespace(this.text.charAt(j))) {
++                    hadNonSpace = true;
++                }
++                ++count;
++            }
++            i += toLeft ? -1 : 1;
++        }
+         return count;
+     }
+ 
+     private void calculateTextWidths() {
+-        textWidths.clear();
+-
+-        for (int i = 0; i <= text.length(); i++) {
+-            textWidths.add(theme.textWidth(text, i, false));
++        this.textWidths.clear();
++        for (int i = 0; i <= this.text.length(); ++i) {
++            this.textWidths.add(this.theme.textWidth(this.text, i, false));
+         }
+     }
+ 
+     private void runAction() {
+-        calculateTextWidths();
+-        cursorChanged();
+-
+-        if (action != null) action.run();
++        this.calculateTextWidths();
++        this.cursorChanged();
++        if (this.action != null) {
++            this.action.run();
++        }
+     }
+ 
+     private double textWidth() {
+-        return textWidths.isEmpty() ? 0 : textWidths.getDouble(textWidths.size() - 1);
++        return this.textWidths.isEmpty() ? 0.0 : this.textWidths.getDouble(this.textWidths.size() - 1);
+     }
+ 
+     private void cursorChanged() {
+-        double cursor = getCursorTextWidth(-2);
+-        if (cursor < textStart) {
+-            textStart -= textStart - cursor;
+-        }
+-
+-        cursor = getCursorTextWidth(2);
+-        if (cursor > textStart + maxTextWidth()) {
+-            textStart += cursor - (textStart + maxTextWidth());
+-        }
+-
+-        textStart = Mth.clamp(textStart, 0, Math.max(textWidth() - maxTextWidth(), 0));
+-
+-        onCursorChanged();
+-
+-        // Completions
+-        completions = renderer.getCompletions(text, this.cursor);
+-        completionsStart = 0;
+-        completionsW = null;
+-        if (completions != null && !completions.isEmpty()) createCompletions(0);
++        double cursor = this.getCursorTextWidth(-2);
++        if (cursor < this.textStart) {
++            this.textStart -= this.textStart - cursor;
++        }
++        if ((cursor = this.getCursorTextWidth(2)) > this.textStart + this.maxTextWidth()) {
++            this.textStart += cursor - (this.textStart + this.maxTextWidth());
++        }
++        this.textStart = Mth.clamp((double)this.textStart, (double)0.0, (double)Math.max(this.textWidth() - this.maxTextWidth(), 0.0));
++        this.onCursorChanged();
++        this.completions = this.renderer.getCompletions(this.text, this.cursor);
++        this.completionsStart = 0;
++        this.completionsW = null;
++        if (this.completions != null && !this.completions.isEmpty()) {
++            this.createCompletions(0);
++        }
+     }
+ 
+     protected void onCursorChanged() {
+     }
+ 
+     private void createCompletions(int selected) {
+-        completionsW = createCompletionsRootWidget();
+-        completionsW.theme = theme;
+-
+-        int max = Math.min(completions.size(), completionsStart + 6);
+-        for (int i = completionsStart; i < max; i++) {
+-            WWidget widget = createCompletionsValueWidth(completions.get(i), i == selected);
+-            widget.theme = theme;
+-
+-            Cell<?> cell = completionsW.add(widget).expandX().padHorizontal(4);
+-            if (i == max - 1) cell.padBottom(4);
+-        }
+-
+-        completionsW.calculateSize();
+-        completionsW.x = Math.clamp(x - pad() * 2 + getTextWidth(cursor) - getOverflowWidthForRender(), x, x + width - completionsW.width);
+-        completionsW.y = y + height;
+-        completionsW.calculateWidgetPositions();
++        this.completionsW = this.createCompletionsRootWidget();
++        this.completionsW.theme = this.theme;
++        int max = Math.min(this.completions.size(), this.completionsStart + 6);
++        for (int i = this.completionsStart; i < max; ++i) {
++            Object widget = this.createCompletionsValueWidth(this.completions.get(i), i == selected);
++            ((WWidget)widget).theme = this.theme;
++            Cell cell = this.completionsW.add(widget).expandX().padHorizontal(4.0);
++            if (i != max - 1) continue;
++            cell.padBottom(4.0);
++        }
++        this.completionsW.calculateSize();
++        this.completionsW.x = Math.clamp((double)(this.x - this.pad() * 2.0 + this.getTextWidth(this.cursor) - this.getOverflowWidthForRender()), (double)this.x, (double)(this.x + this.width - this.completionsW.width));
++        this.completionsW.y = this.y + this.height;
++        this.completionsW.calculateWidgetPositions();
+     }
+ 
+     protected double getTextWidth(int pos) {
+-        if (textWidths.isEmpty()) return 0;
+-
+-        if (pos < 0) pos = 0;
+-        else if (pos >= textWidths.size()) pos = textWidths.size() - 1;
+-
+-        return textWidths.getDouble(pos);
++        if (this.textWidths.isEmpty()) {
++            return 0.0;
++        }
++        if (pos < 0) {
++            pos = 0;
++        } else if (pos >= this.textWidths.size()) {
++            pos = this.textWidths.size() - 1;
++        }
++        return this.textWidths.getDouble(pos);
+     }
+ 
+     protected double getCursorTextWidth(int offset) {
+-        return getTextWidth(cursor + offset);
++        return this.getTextWidth(this.cursor + offset);
+     }
+ 
+     protected double getOverflowWidthForRender() {
+-        return textStart;
++        return this.textStart;
+     }
+ 
+     public String get() {
+-        return text;
++        return this.text;
+     }
+ 
+     public void set(String text) {
+         this.text = text;
+-
+-        cursor = Mth.clamp(cursor, 0, text.length());
+-        selectionStart = cursor;
+-        selectionEnd = cursor;
+-
+-        calculateTextWidths();
+-        cursorChanged();
++        this.selectionStart = this.cursor = Mth.clamp((int)this.cursor, (int)0, (int)text.length());
++        this.selectionEnd = this.cursor;
++        this.calculateTextWidths();
++        this.cursorChanged();
+     }
+ 
+     @Override
+     public void setFocused(boolean focused) {
+-        if (this.focused && !focused && actionOnUnfocused != null) actionOnUnfocused.run();
+-
++        if (this.focused && !focused && this.actionOnUnfocused != null) {
++            this.actionOnUnfocused.run();
++        }
+         boolean wasJustFocused = focused && !this.focused;
+-
+         this.focused = focused;
+-
+-        resetSelection();
+-
+-        if (wasJustFocused) onCursorChanged();
++        this.resetSelection();
++        if (wasJustFocused) {
++            this.onCursorChanged();
++        }
+     }
+ 
+     public void setCursorMax() {
+-        cursor = text.length();
+-    }
+-
+-    public interface Renderer {
+-        void render(GuiRenderer renderer, double x, double y, String text, Color color);
+-
+-        default List<String> getCompletions(String text, int position) {
++        this.cursor = this.text.length();
++    }
++
++    public static interface Renderer {
++        public void render(GuiRenderer var1, double var2, double var4, String var6, Color var7);
++
++        default public List<String> getCompletions(String text, int position) {
+             return null;
+         }
+     }
+ 
+-    public interface ICompletionItem {
+-        boolean isSelected();
+-
+-        void setSelected(boolean selected);
+-
+-        String getCompletion();
++    public static interface ICompletionItem {
++        public boolean isSelected();
++
++        public void setSelected(boolean var1);
++
++        public String getCompletion();
+     }
+ }
++

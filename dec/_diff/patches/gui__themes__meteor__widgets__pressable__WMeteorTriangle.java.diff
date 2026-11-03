@@ -1,0 +1,30 @@
+--- upstream261/gui/themes/meteor/widgets/pressable/WMeteorTriangle.java
++++ v1decompiled/gui/themes/meteor/widgets/pressable/WMeteorTriangle.java
+@@ -1,17 +1,18 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.themes.meteor.widgets.pressable;
+ 
+-package meteordevelopment.meteorclient.gui.themes.meteor.widgets.pressable;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.themes.meteor.MeteorWidget;
++import radmin.client.gui.widgets.pressable.WTriangle;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.gui.themes.meteor.MeteorWidget;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WTriangle;
+-
+-public class WMeteorTriangle extends WTriangle implements MeteorWidget {
++public class WMeteorTriangle
++extends WTriangle
++implements MeteorWidget {
+     @Override
+     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        renderer.rotatedQuad(x, y, width, height, rotation, GuiRenderer.TRIANGLE, theme().backgroundColor.get(pressed, mouseOver));
++        renderer.rotatedQuad(this.x, this.y, this.width, this.height, this.rotation, GuiRenderer.TRIANGLE, this.theme().backgroundColor.get(this.pressed, this.mouseOver));
+     }
+ }
++

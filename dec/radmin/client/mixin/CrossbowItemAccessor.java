@@ -1,0 +1,24 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.world.item.CrossbowItem
+ *  net.minecraft.world.item.component.ChargedProjectiles
+ *  org.spongepowered.asm.mixin.Mixin
+ *  org.spongepowered.asm.mixin.gen.Invoker
+ */
+package radmin.client.mixin;
+
+import net.minecraft.world.item.CrossbowItem;
+import net.minecraft.world.item.component.ChargedProjectiles;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Invoker;
+
+@Mixin(value={CrossbowItem.class})
+public interface CrossbowItemAccessor {
+    @Invoker(value="getShootingPower")
+    public static float meteor$getSpeed(ChargedProjectiles itemStack) {
+        return 0.0f;
+    }
+}
+

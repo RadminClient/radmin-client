@@ -1,0 +1,59 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  meteordevelopment.orbit.EventHandler
+ *  net.minecraft.core.BlockPos
+ *  net.minecraft.world.entity.player.Player
+ */
+package radmin.client.systems.modules.render;
+
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import radmin.client.events.render.Render3DEvent;
+import radmin.client.events.world.TickEvent;
+import radmin.client.renderer.ShapeMode;
+import radmin.client.settings.ColorSetting;
+import radmin.client.settings.EnumSetting;
+import radmin.client.settings.Setting;
+import radmin.client.settings.SettingGroup;
+import radmin.client.systems.modules.Categories;
+import radmin.client.systems.modules.Module;
+import radmin.client.utils.entity.EntityUtils;
+import radmin.client.utils.entity.SortPriority;
+import radmin.client.utils.entity.TargetUtils;
+import radmin.client.utils.render.color.Color;
+import radmin.client.utils.render.color.SettingColor;
+
+public class CityESP
+extends Module {
+    private final SettingGroup sgRender;
+    private final Setting<ShapeMode> shapeMode;
+    private final Setting<SettingColor> sideColor;
+    private final Setting<SettingColor> lineColor;
+    private BlockPos target;
+
+    public CityESP() {
+        super(Categories.Render, "city-esp", "Displays blocks that can be broken in order to city another player.");
+        this.sgRender = this.settings.createGroup("Render");
+        this.shapeMode = this.sgRender.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("shape-mode")).description("How the shapes are rendered.")).defaultValue(ShapeMode.Both)).build());
+        this.sideColor = this.sgRender.add(((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("side-color")).description("The side color of the rendering.")).defaultValue(new SettingColor(225, 0, 0, 75)).build());
+        this.lineColor = this.sgRender.add(((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("line-color")).description("The line color of the rendering.")).defaultValue(new SettingColor(225, 0, 0, 255)).build());
+    }
+
+    @EventHandler
+    private void onTick(TickEvent.Post event) {
+        Player targetEntity = TargetUtils.getPlayerTarget(this.mc.player.blockInteractionRange() + 2.0, SortPriority.LowestDistance);
+        this.target = TargetUtils.isBadTarget(targetEntity, this.mc.player.blockInteractionRange() + 2.0) ? null : EntityUtils.getCityBlock(targetEntity);
+    }
+
+    @EventHandler
+    private void onRender(Render3DEvent event) {
+        if (this.target == null) {
+            return;
+        }
+        event.renderer.box(this.target, (Color)this.sideColor.get(), (Color)this.lineColor.get(), this.shapeMode.get(), 0);
+    }
+}
+

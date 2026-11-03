@@ -1,0 +1,154 @@
+--- upstream261/gui/tabs/builtin/FriendsTab.java
++++ v1decompiled/gui/tabs/builtin/FriendsTab.java
+@@ -1,28 +1,29 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.screens.Screen
+  */
++package radmin.client.gui.tabs.builtin;
+ 
+-package meteordevelopment.meteorclient.gui.tabs.builtin;
++import net.minecraft.client.gui.screens.Screen;
++import radmin.client.MeteorClient;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.tabs.Tab;
++import radmin.client.gui.tabs.TabScreen;
++import radmin.client.gui.tabs.WindowTabScreen;
++import radmin.client.gui.widgets.containers.WHorizontalList;
++import radmin.client.gui.widgets.containers.WTable;
++import radmin.client.gui.widgets.input.WTextBox;
++import radmin.client.gui.widgets.pressable.WMinus;
++import radmin.client.gui.widgets.pressable.WPlus;
++import radmin.client.systems.friends.Friend;
++import radmin.client.systems.friends.Friends;
++import radmin.client.utils.misc.NbtUtils;
++import radmin.client.utils.network.MeteorExecutor;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.tabs.Tab;
+-import meteordevelopment.meteorclient.gui.tabs.TabScreen;
+-import meteordevelopment.meteorclient.gui.tabs.WindowTabScreen;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WTable;
+-import meteordevelopment.meteorclient.gui.widgets.input.WTextBox;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WMinus;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WPlus;
+-import meteordevelopment.meteorclient.systems.friends.Friend;
+-import meteordevelopment.meteorclient.systems.friends.Friends;
+-import meteordevelopment.meteorclient.utils.misc.NbtUtils;
+-import meteordevelopment.meteorclient.utils.network.MeteorExecutor;
+-import net.minecraft.client.gui.screens.Screen;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class FriendsTab extends Tab {
++public class FriendsTab
++extends Tab {
+     public FriendsTab() {
+         super("Friends");
+     }
+@@ -37,69 +38,57 @@
+         return screen instanceof FriendsScreen;
+     }
+ 
+-    private static class FriendsScreen extends WindowTabScreen {
++    private static class FriendsScreen
++    extends WindowTabScreen {
+         public FriendsScreen(GuiTheme theme, Tab tab) {
+             super(theme, tab);
+         }
+ 
+         @Override
+         public void initWidgets() {
+-            WTable table = add(theme.table()).expandX().minWidth(400).widget();
+-            initTable(table);
+-
+-            add(theme.horizontalSeparator()).expandX();
+-
+-            // New
+-            WHorizontalList list = add(theme.horizontalList()).expandX().widget();
+-
+-            WTextBox nameW = list.add(theme.textBox("", (_, c) -> c != ' ')).expandX().widget();
++            WTable table = this.add(this.theme.table()).expandX().minWidth(400.0).widget();
++            this.initTable(table);
++            this.add(this.theme.horizontalSeparator()).expandX();
++            WHorizontalList list = this.add(this.theme.horizontalList()).expandX().widget();
++            WTextBox nameW = list.add(this.theme.textBox("", (string, c) -> c != ' ')).expandX().widget();
+             nameW.setFocused(true);
+-
+-            WPlus add = list.add(theme.plus()).widget();
+-            add.action = () -> {
++            WPlus add = list.add(this.theme.plus()).widget();
++            this.enterAction = add.action = () -> {
+                 String name = nameW.get().trim();
+                 Friend friend = new Friend(name);
+-
+                 if (Friends.get().add(friend)) {
+                     nameW.set("");
+-                    initTable(table);
++                    this.initTable(table);
+                     nameW.setFocused(true);
+-
+                     MeteorExecutor.execute(() -> {
+                         friend.updateInfo();
+-                        mc.execute(() -> {
+-                            initTable(table);
++                        MeteorClient.mc.execute(() -> {
++                            this.initTable(table);
+                             nameW.setFocused(true);
+                         });
+                     });
+                 }
+             };
+-
+-            enterAction = add.action;
+         }
+ 
+         private void initTable(WTable table) {
+             table.clear();
+-            if (Friends.get().isEmpty()) return;
+-
+-            Friends.get().forEach(friend ->
+-                MeteorExecutor.execute(() -> {
+-                    if (friend.headTextureNeedsUpdate()) {
+-                        friend.updateInfo();
+-                    }
+-                })
+-            );
+-
+-            for (Friend friend : Friends.get()) {
+-                table.add(theme.texture(32, 32, friend.getHead().needsRotate() ? 90 : 0, friend.getHead()));
+-                table.add(theme.label(friend.getName()));
+-
+-                WMinus remove = table.add(theme.minus()).expandCellX().right().widget();
++            if (Friends.get().isEmpty()) {
++                return;
++            }
++            Friends.get().forEach(friend -> MeteorExecutor.execute(() -> {
++                if (friend.headTextureNeedsUpdate()) {
++                    friend.updateInfo();
++                }
++            }));
++            for (Friend friend2 : Friends.get()) {
++                table.add(this.theme.texture(32.0, 32.0, friend2.getHead().needsRotate() ? 90.0 : 0.0, friend2.getHead()));
++                table.add(this.theme.label(friend2.getName()));
++                WMinus remove = table.add(this.theme.minus()).expandCellX().right().widget();
+                 remove.action = () -> {
+-                    Friends.get().remove(friend);
+-                    initTable(table);
++                    Friends.get().remove(friend2);
++                    this.initTable(table);
+                 };
+-
+                 table.row();
+             }
+         }
+@@ -115,3 +104,4 @@
+         }
+     }
+ }
++

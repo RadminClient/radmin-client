@@ -1,0 +1,34 @@
+--- upstream261/mixin/CreativeModeInventoryScreenAccessor.java
++++ v1decompiled/mixin/CreativeModeInventoryScreenAccessor.java
+@@ -1,19 +1,24 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen
++ *  net.minecraft.world.item.CreativeModeTab
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
+ import net.minecraft.world.item.CreativeModeTab;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(CreativeModeInventoryScreen.class)
++@Mixin(value={CreativeModeInventoryScreen.class})
+ public interface CreativeModeInventoryScreenAccessor {
+-    @Accessor("selectedTab")
+-    static CreativeModeTab meteor$getSelectedTab() {
++    @Accessor(value="selectedTab")
++    public static CreativeModeTab meteor$getSelectedTab() {
+         return null;
+     }
+ }
++

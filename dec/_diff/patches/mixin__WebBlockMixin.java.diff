@@ -1,0 +1,52 @@
+--- upstream261/mixin/WebBlockMixin.java
++++ v1decompiled/mixin/WebBlockMixin.java
+@@ -1,12 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.BlockPos
++ *  net.minecraft.world.entity.Entity
++ *  net.minecraft.world.entity.InsideBlockEffectApplier
++ *  net.minecraft.world.level.Level
++ *  net.minecraft.world.level.block.WebBlock
++ *  net.minecraft.world.level.block.state.BlockState
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.injection.At
++ *  org.spongepowered.asm.mixin.injection.Inject
++ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.movement.NoSlow;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.InsideBlockEffectApplier;
+@@ -17,13 +25,17 @@
+ import org.spongepowered.asm.mixin.injection.At;
+ import org.spongepowered.asm.mixin.injection.Inject;
+ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
++import radmin.client.MeteorClient;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.movement.NoSlow;
+ 
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-@Mixin(WebBlock.class)
++@Mixin(value={WebBlock.class})
+ public abstract class WebBlockMixin {
+-    @Inject(method = "entityInside", at = @At("HEAD"), cancellable = true)
++    @Inject(method={"entityInside"}, at={@At(value="HEAD")}, cancellable=true)
+     private void onEntityCollision(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise, CallbackInfo ci) {
+-        if (entity == mc.player && Modules.get().get(NoSlow.class).cobweb()) ci.cancel();
++        if (entity == MeteorClient.mc.player && Modules.get().get(NoSlow.class).cobweb()) {
++            ci.cancel();
++        }
+     }
+ }
++

@@ -1,0 +1,116 @@
+--- upstream261/utils/render/color/RainbowColors.java
++++ v1decompiled/utils/render/color/RainbowColors.java
+@@ -1,35 +1,33 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
+  */
+-
+-package meteordevelopment.meteorclient.utils.render.color;
+-
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.gui.GuiThemes;
+-import meteordevelopment.meteorclient.gui.WidgetScreen;
+-import meteordevelopment.meteorclient.settings.ColorSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.systems.config.Config;
+-import meteordevelopment.meteorclient.systems.waypoints.Waypoint;
+-import meteordevelopment.meteorclient.systems.waypoints.Waypoints;
+-import meteordevelopment.meteorclient.utils.PostInit;
+-import meteordevelopment.meteorclient.utils.misc.UnorderedArrayList;
+-import meteordevelopment.orbit.EventHandler;
++package radmin.client.utils.render.color;
+ 
+ import java.util.List;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
++import meteordevelopment.orbit.EventHandler;
++import radmin.client.MeteorClient;
++import radmin.client.events.world.TickEvent;
++import radmin.client.gui.GuiThemes;
++import radmin.client.gui.WidgetScreen;
++import radmin.client.settings.ColorSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.config.Config;
++import radmin.client.systems.waypoints.Waypoint;
++import radmin.client.systems.waypoints.Waypoints;
++import radmin.client.utils.PostInit;
++import radmin.client.utils.misc.UnorderedArrayList;
++import radmin.client.utils.render.color.RainbowColor;
++import radmin.client.utils.render.color.SettingColor;
+ 
+ public class RainbowColors {
+-    private static final List<Setting<SettingColor>> colorSettings = new UnorderedArrayList<>();
+-    private static final List<Setting<List<SettingColor>>> colorListSettings = new UnorderedArrayList<>();
+-
+-    private static final List<SettingColor> colors = new UnorderedArrayList<>();
+-    private static final List<Runnable> listeners = new UnorderedArrayList<>();
+-
++    private static final List<Setting<SettingColor>> colorSettings = new UnorderedArrayList<Setting<SettingColor>>();
++    private static final List<Setting<List<SettingColor>>> colorListSettings = new UnorderedArrayList<Setting<List<SettingColor>>>();
++    private static final List<SettingColor> colors = new UnorderedArrayList<SettingColor>();
++    private static final List<Runnable> listeners = new UnorderedArrayList<Runnable>();
+     public static final RainbowColor GLOBAL = new RainbowColor();
+ 
+     private RainbowColors() {
+@@ -66,35 +64,35 @@
+ 
+     @EventHandler
+     private static void onTick(TickEvent.Post event) {
+-        GLOBAL.setSpeed(Config.get().rainbowSpeed.get() / 100);
++        GLOBAL.setSpeed(Config.get().rainbowSpeed.get() / 100.0);
+         GLOBAL.getNext();
+-
+         for (Setting<SettingColor> setting : colorSettings) {
+-            if (setting.module == null || setting.module.isActive()) setting.get().update();
++            if (setting.module != null && !setting.module.isActive()) continue;
++            setting.get().update();
+         }
+-
+-        for (Setting<List<SettingColor>> setting : colorListSettings) {
+-            if (setting.module == null || setting.module.isActive()) {
+-                for (SettingColor color : setting.get()) color.update();
++        for (Setting<Object> setting : colorListSettings) {
++            if (setting.module != null && !setting.module.isActive()) continue;
++            for (SettingColor color : (List)setting.get()) {
++                color.update();
+             }
+         }
+-
+-        for (SettingColor color : colors) {
+-            color.update();
++        for (SettingColor settingColor : colors) {
++            settingColor.update();
+         }
+-
+         for (Waypoint waypoint : Waypoints.get()) {
+             waypoint.color.get().update();
+         }
+-
+-        if (mc.screen instanceof WidgetScreen) {
+-            for (SettingGroup group : GuiThemes.get().settings) {
+-                for (Setting<?> setting : group) {
+-                    if (setting instanceof ColorSetting) ((SettingColor) setting.get()).update();
++        if (MeteorClient.mc.screen instanceof WidgetScreen) {
++            for (SettingGroup settingGroup : GuiThemes.get().settings) {
++                for (Setting setting : settingGroup) {
++                    if (!(setting instanceof ColorSetting)) continue;
++                    ((SettingColor)setting.get()).update();
+                 }
+             }
+         }
+-
+-        for (Runnable listener : listeners) listener.run();
++        for (Runnable runnable : listeners) {
++            runnable.run();
++        }
+     }
+ }
++

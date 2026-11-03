@@ -1,0 +1,81 @@
+--- upstream261/events/game/ItemStackTooltipEvent.java
++++ v1decompiled/events/game/ItemStackTooltipEvent.java
+@@ -1,15 +1,17 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  it.unimi.dsi.fastutil.objects.ObjectArrayList
++ *  net.minecraft.network.chat.Component
++ *  net.minecraft.world.item.ItemStack
+  */
+-
+-package meteordevelopment.meteorclient.events.game;
++package radmin.client.events.game;
+ 
+ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
++import java.util.List;
++import net.minecraft.network.chat.Component;
+ import net.minecraft.world.item.ItemStack;
+-import net.minecraft.network.chat.Component;
+-
+-import java.util.List;
+ 
+ public class ItemStackTooltipEvent {
+     private final ItemStack itemStack;
+@@ -21,39 +23,38 @@
+     }
+ 
+     public List<Component> list() {
+-        return list;
++        return this.list;
+     }
+ 
+     public ItemStack itemStack() {
+-        return itemStack;
++        return this.itemStack;
+     }
+ 
+     public void appendStart(Component text) {
+-        copyIfImmutable();
+-        int index = list.isEmpty() ? 0 : 1;
+-        list.add(index, text);
++        this.copyIfImmutable();
++        int index = this.list.isEmpty() ? 0 : 1;
++        this.list.add(index, text);
+     }
+ 
+     public void appendEnd(Component text) {
+-        copyIfImmutable();
+-        list.add(text);
++        this.copyIfImmutable();
++        this.list.add(text);
+     }
+ 
+     public void append(int index, Component text) {
+-        copyIfImmutable();
+-        list.add(index, text);
++        this.copyIfImmutable();
++        this.list.add(index, text);
+     }
+ 
+     public void set(int index, Component text) {
+-        copyIfImmutable();
+-        list.set(index, text);
++        this.copyIfImmutable();
++        this.list.set(index, text);
+     }
+ 
+     private void copyIfImmutable() {
+-        // ItemStack#getTooltip can sometimes return List.of(), which is immutable.
+-        // Some modules like BetterTooltips try to modify that list anyway, which causes a crash if we don't replace it.
+-        if (List.of().getClass().getSuperclass().isInstance(list)) {
+-            list = new ObjectArrayList<>(list);
++        if (List.of().getClass().getSuperclass().isInstance(this.list)) {
++            this.list = new ObjectArrayList(this.list);
+         }
+     }
+ }
++

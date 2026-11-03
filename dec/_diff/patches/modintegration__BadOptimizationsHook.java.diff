@@ -1,0 +1,47 @@
+--- upstream261/modintegration/BadOptimizationsHook.java
++++ v1decompiled/modintegration/BadOptimizationsHook.java
+@@ -1,31 +1,27 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.modintegration;
+-
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.render.Fullbright;
+-import meteordevelopment.meteorclient.systems.modules.render.Xray;
++package radmin.client.modintegration;
+ 
+ import java.util.function.BooleanSupplier;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.render.Fullbright;
++import radmin.client.systems.modules.render.Xray;
+ 
+-/*
+- * Hook for BadOptimizations mod compatibility.
+- * Signals when the lightmap needs to be updated due to Fullbright or Xray state changes.
+- */
+-public class BadOptimizationsHook implements BooleanSupplier {
++public class BadOptimizationsHook
++implements BooleanSupplier {
+     private int lastState;
+ 
+     @Override
+     public boolean getAsBoolean() {
+         Modules m = Modules.get();
+-        if (m == null) return false;
+-
++        if (m == null) {
++            return false;
++        }
+         int state = (m.get(Fullbright.class).getGamma() ? 1 : 0) | (m.isActive(Xray.class) ? 2 : 0);
+-        boolean changed = state != lastState;
+-        lastState = state;
++        boolean changed = state != this.lastState;
++        this.lastState = state;
+         return changed;
+     }
+ }
++

@@ -1,0 +1,44 @@
+--- upstream261/gui/themes/meteor/widgets/WMeteorMultiLabel.java
++++ v1decompiled/gui/themes/meteor/widgets/WMeteorMultiLabel.java
+@@ -1,27 +1,27 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.themes.meteor.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.themes.meteor.widgets;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.themes.meteor.MeteorWidget;
++import radmin.client.gui.widgets.WMultiLabel;
++import radmin.client.utils.render.color.Color;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.gui.themes.meteor.MeteorWidget;
+-import meteordevelopment.meteorclient.gui.widgets.WMultiLabel;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
+-
+-public class WMeteorMultiLabel extends WMultiLabel implements MeteorWidget {
++public class WMeteorMultiLabel
++extends WMultiLabel
++implements MeteorWidget {
+     public WMeteorMultiLabel(String text, boolean title, double maxWidth) {
+         super(text, title, maxWidth);
+     }
+ 
+     @Override
+     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        double h = theme.textHeight(title);
+-        Color defaultColor = theme().textColor.get();
+-
+-        for (int i = 0; i < lines.size(); i++) {
+-            renderer.text(lines.get(i), x, y + h * i, color != null ? color : defaultColor, false);
++        double h = this.theme.textHeight(this.title);
++        Color defaultColor = this.theme().textColor.get();
++        for (int i = 0; i < this.lines.size(); ++i) {
++            renderer.text((String)this.lines.get(i), this.x, this.y + h * (double)i, this.color != null ? this.color : defaultColor, false);
+         }
+     }
+ }
++

@@ -1,0 +1,38 @@
+--- upstream261/settings/PotionSetting.java
++++ v1decompiled/settings/PotionSetting.java
+@@ -1,23 +1,26 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.settings;
+-
+-import meteordevelopment.meteorclient.utils.misc.MyPotion;
++package radmin.client.settings;
+ 
+ import java.util.function.Consumer;
++import radmin.client.settings.EnumSetting;
++import radmin.client.settings.IVisible;
++import radmin.client.settings.Setting;
++import radmin.client.utils.misc.MyPotion;
+ 
+-public class PotionSetting extends EnumSetting<MyPotion> {
++public class PotionSetting
++extends EnumSetting<MyPotion> {
+     public PotionSetting(String name, String description, MyPotion defaultValue, Consumer<MyPotion> onChanged, Consumer<Setting<MyPotion>> onModuleActivated, IVisible visible) {
+         super(name, description, defaultValue, onChanged, onModuleActivated, visible);
+     }
+ 
+-    public static class Builder extends EnumSetting.Builder<MyPotion> {
++    public static class Builder
++    extends EnumSetting.Builder<MyPotion> {
+         @Override
+         public EnumSetting<MyPotion> build() {
+-            return new PotionSetting(name, description, defaultValue, onChanged, onModuleActivated, visible);
++            return new PotionSetting(this.name, this.description, (MyPotion)((Object)this.defaultValue), this.onChanged, this.onModuleActivated, this.visible);
+         }
+     }
+ }
++

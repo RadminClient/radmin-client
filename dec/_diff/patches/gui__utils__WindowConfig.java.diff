@@ -1,0 +1,64 @@
+--- upstream261/gui/utils/WindowConfig.java
++++ v1decompiled/gui/utils/WindowConfig.java
+@@ -1,37 +1,41 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.nbt.CompoundTag
+  */
++package radmin.client.gui.utils;
+ 
+-package meteordevelopment.meteorclient.gui.utils;
++import net.minecraft.nbt.CompoundTag;
++import radmin.client.utils.misc.ISerializable;
+ 
+-import meteordevelopment.meteorclient.utils.misc.ISerializable;
+-import net.minecraft.nbt.CompoundTag;
+-
+-public class WindowConfig implements ISerializable<WindowConfig> {
++public class WindowConfig
++implements ISerializable<WindowConfig> {
+     public boolean expanded = true;
+-    public double x = -1;
+-    public double y = -1;
+-
+-    // Saving
++    public double x = -1.0;
++    public double y = -1.0;
+ 
+     @Override
+     public CompoundTag toTag() {
+         CompoundTag tag = new CompoundTag();
+-
+-        tag.putBoolean("expanded", expanded);
+-        tag.putDouble("x", x);
+-        tag.putDouble("y", y);
+-
++        tag.putBoolean("expanded", this.expanded);
++        tag.putDouble("x", this.x);
++        tag.putDouble("y", this.y);
+         return tag;
+     }
+ 
+     @Override
+     public WindowConfig fromTag(CompoundTag tag) {
+-        tag.getBoolean("expanded").ifPresent(bool -> expanded = bool);
+-        tag.getDouble("x").ifPresent(x1 -> x = x1);
+-        tag.getDouble("y").ifPresent(y1 -> y = y1);
+-
++        tag.getBoolean("expanded").ifPresent(bool -> {
++            this.expanded = bool;
++        });
++        tag.getDouble("x").ifPresent(x1 -> {
++            this.x = x1;
++        });
++        tag.getDouble("y").ifPresent(y1 -> {
++            this.y = y1;
++        });
+         return this;
+     }
+ }
++

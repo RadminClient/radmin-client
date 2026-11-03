@@ -1,0 +1,47 @@
+--- upstream261/mixin/ItemRendererMixin.java
++++ v1decompiled/mixin/ItemRendererMixin.java
+@@ -1,30 +1,31 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.renderer.feature.ItemFeatureRenderer
++ *  net.minecraft.client.renderer.item.ItemStackRenderState$FoilType
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.injection.At
++ *  org.spongepowered.asm.mixin.injection.ModifyVariable
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.render.NoRender;
+ import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
+ import net.minecraft.client.renderer.item.ItemStackRenderState;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.injection.At;
+ import org.spongepowered.asm.mixin.injection.ModifyVariable;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.render.NoRender;
+ 
+-@Mixin(ItemFeatureRenderer.class)
++@Mixin(value={ItemFeatureRenderer.class})
+ public abstract class ItemRendererMixin {
+-    @ModifyVariable(
+-        method = "renderItem",
+-        at = @At("STORE"),
+-        name = "foilType"
+-    )
++    @ModifyVariable(method={"renderItem"}, at=@At(value="STORE"), name={"foilType"})
+     private ItemStackRenderState.FoilType modifyEnchant(ItemStackRenderState.FoilType foilType) {
+         if (Modules.get().get(NoRender.class).noEnchantGlint()) {
+             return ItemStackRenderState.FoilType.NONE;
+         }
+-
+         return foilType;
+     }
+ }
++

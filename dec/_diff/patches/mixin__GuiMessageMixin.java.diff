@@ -1,0 +1,69 @@
+--- upstream261/mixin/GuiMessageMixin.java
++++ v1decompiled/mixin/GuiMessageMixin.java
+@@ -1,21 +1,29 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.authlib.GameProfile
++ *  net.minecraft.client.multiplayer.chat.GuiMessage
++ *  net.minecraft.network.chat.Component
++ *  org.spongepowered.asm.mixin.Final
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Shadow
++ *  org.spongepowered.asm.mixin.Unique
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import com.mojang.authlib.GameProfile;
+-import meteordevelopment.meteorclient.mixininterface.IGuiMessage;
+ import net.minecraft.client.multiplayer.chat.GuiMessage;
+ import net.minecraft.network.chat.Component;
+ import org.spongepowered.asm.mixin.Final;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Shadow;
+ import org.spongepowered.asm.mixin.Unique;
++import radmin.client.mixininterface.IGuiMessage;
+ 
+-@Mixin(GuiMessage.class)
+-public abstract class GuiMessageMixin implements IGuiMessage {
++@Mixin(value={GuiMessage.class})
++public abstract class GuiMessageMixin
++implements IGuiMessage {
+     @Shadow
+     @Final
+     private Component content;
+@@ -26,12 +34,12 @@
+ 
+     @Override
+     public String meteor$getText() {
+-        return content.getString();
++        return this.content.getString();
+     }
+ 
+     @Override
+     public int meteor$getId() {
+-        return id;
++        return this.id;
+     }
+ 
+     @Override
+@@ -41,11 +49,12 @@
+ 
+     @Override
+     public GameProfile meteor$getSender() {
+-        return sender;
++        return this.sender;
+     }
+ 
+     @Override
+     public void meteor$setSender(GameProfile profile) {
+-        sender = profile;
++        this.sender = profile;
+     }
+ }
++

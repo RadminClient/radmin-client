@@ -1,0 +1,60 @@
+--- upstream261/gui/screens/accounts/AddAccountScreen.java
++++ v1decompiled/gui/screens/accounts/AddAccountScreen.java
+@@ -1,15 +1,15 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.screens.accounts;
+ 
+-package meteordevelopment.meteorclient.gui.screens.accounts;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WindowScreen;
++import radmin.client.gui.screens.accounts.AccountsScreen;
++import radmin.client.gui.widgets.pressable.WButton;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WindowScreen;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-
+-public abstract class AddAccountScreen extends WindowScreen {
++public abstract class AddAccountScreen
++extends WindowScreen {
+     public final AccountsScreen parent;
+     public WButton add;
+     private int timer;
+@@ -19,20 +19,16 @@
+         this.parent = parent;
+     }
+ 
+-    @Override
+     public void tick() {
+-        if (locked) {
+-            if (timer > 2) {
+-                add.set(getNext(add));
+-                timer = 0;
++        if (this.locked) {
++            if (this.timer > 2) {
++                this.add.set(this.getNext(this.add));
++                this.timer = 0;
++            } else {
++                ++this.timer;
+             }
+-            else {
+-                timer++;
+-            }
+-        }
+-
+-        else if (!add.getText().equals("Add")) {
+-            add.set("Add");
++        } else if (!this.add.getText().equals("Add")) {
++            this.add.set("Add");
+         }
+     }
+ 
+@@ -46,3 +42,4 @@
+         };
+     }
+ }
++

@@ -1,0 +1,63 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.llamalad7.mixinextras.injector.ModifyExpressionValue
+ *  com.llamalad7.mixinextras.sugar.Local
+ *  net.minecraft.client.gui.components.BossHealthOverlay
+ *  net.minecraft.client.gui.components.LerpingBossEvent
+ *  net.minecraft.network.chat.Component
+ *  org.spongepowered.asm.mixin.Mixin
+ *  org.spongepowered.asm.mixin.injection.At
+ *  org.spongepowered.asm.mixin.injection.Constant
+ *  org.spongepowered.asm.mixin.injection.Inject
+ *  org.spongepowered.asm.mixin.injection.ModifyConstant
+ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+ */
+package radmin.client.mixin;
+
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import java.util.Iterator;
+import net.minecraft.client.gui.components.BossHealthOverlay;
+import net.minecraft.client.gui.components.LerpingBossEvent;
+import net.minecraft.network.chat.Component;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import radmin.client.MeteorClient;
+import radmin.client.events.render.RenderBossBarEvent;
+import radmin.client.systems.modules.Modules;
+import radmin.client.systems.modules.render.NoRender;
+
+@Mixin(value={BossHealthOverlay.class})
+public abstract class BossHealthOverlayMixin {
+    @Inject(method={"extractRenderState"}, at={@At(value="HEAD")}, cancellable=true)
+    private void onRender(CallbackInfo ci) {
+        if (Modules.get().get(NoRender.class).noBossBar()) {
+            ci.cancel();
+        }
+    }
+
+    @ModifyExpressionValue(method={"extractRenderState"}, at={@At(value="INVOKE", target="Ljava/util/Collection;iterator()Ljava/util/Iterator;")})
+    public Iterator<LerpingBossEvent> modifyBossBarIterator(Iterator<LerpingBossEvent> original) {
+        RenderBossBarEvent.BossIterator event = (RenderBossBarEvent.BossIterator)MeteorClient.EVENT_BUS.post((Object)RenderBossBarEvent.BossIterator.get(original));
+        return event.iterator;
+    }
+
+    @ModifyExpressionValue(method={"extractRenderState"}, at={@At(value="INVOKE", target="Lnet/minecraft/client/gui/components/LerpingBossEvent;getName()Lnet/minecraft/network/chat/Component;")})
+    public Component modifyBossBarName(Component original, @Local(name={"event"}) LerpingBossEvent event) {
+        RenderBossBarEvent.BossText bossTextEvent = (RenderBossBarEvent.BossText)MeteorClient.EVENT_BUS.post((Object)RenderBossBarEvent.BossText.get(event, original));
+        return bossTextEvent.name;
+    }
+
+    @ModifyConstant(method={"extractRenderState"}, constant={@Constant(intValue=9, ordinal=1)})
+    public int modifySpacingConstant(int j) {
+        RenderBossBarEvent.BossSpacing event = (RenderBossBarEvent.BossSpacing)MeteorClient.EVENT_BUS.post((Object)RenderBossBarEvent.BossSpacing.get(j));
+        return event.spacing;
+    }
+}
+

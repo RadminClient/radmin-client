@@ -1,0 +1,57 @@
+--- upstream261/gui/widgets/WItem.java
++++ v1decompiled/gui/widgets/WItem.java
+@@ -1,14 +1,17 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.item.ItemStack
+  */
++package radmin.client.gui.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.widgets;
++import net.minecraft.world.item.ItemStack;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.widgets.WWidget;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import net.minecraft.world.item.ItemStack;
+-
+-public class WItem extends WWidget {
++public class WItem
++extends WWidget {
+     protected ItemStack itemStack;
+ 
+     public WItem(ItemStack itemStack) {
+@@ -17,18 +20,17 @@
+ 
+     @Override
+     protected void onCalculateSize() {
+-        double s = theme.scale(32);
+-
+-        width = s;
+-        height = s;
++        double s;
++        this.width = s = this.theme.scale(32.0);
++        this.height = s;
+     }
+ 
+     @Override
+     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        if (!itemStack.isEmpty()) {
++        if (!this.itemStack.isEmpty()) {
+             renderer.post(() -> {
+-                double s = theme.scale(2);
+-                renderer.item(itemStack, (int) x, (int) y, (float) s, true);
++                double s = this.theme.scale(2.0);
++                renderer.item(this.itemStack, (int)this.x, (int)this.y, (float)s, true);
+             });
+         }
+     }
+@@ -37,3 +39,4 @@
+         this.itemStack = itemStack;
+     }
+ }
++

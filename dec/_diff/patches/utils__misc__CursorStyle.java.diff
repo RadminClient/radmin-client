@@ -1,0 +1,45 @@
+--- upstream261/utils/misc/CursorStyle.java
++++ v1decompiled/utils/misc/CursorStyle.java
+@@ -1,9 +1,10 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  org.lwjgl.glfw.GLFW
+  */
+-
+-package meteordevelopment.meteorclient.utils.misc;
++package radmin.client.utils.misc;
+ 
+ import org.lwjgl.glfw.GLFW;
+ 
+@@ -16,15 +17,19 @@
+     private long cursor;
+ 
+     public long getGlfwCursor() {
+-        if (!created) {
+-            switch (this) {
+-                case Click -> cursor = GLFW.glfwCreateStandardCursor(GLFW.GLFW_HAND_CURSOR);
+-                case Type -> cursor = GLFW.glfwCreateStandardCursor(GLFW.GLFW_IBEAM_CURSOR);
++        if (!this.created) {
++            switch (this.ordinal()) {
++                case 1: {
++                    this.cursor = GLFW.glfwCreateStandardCursor((int)221188);
++                    break;
++                }
++                case 2: {
++                    this.cursor = GLFW.glfwCreateStandardCursor((int)221186);
++                }
+             }
+-
+-            created = true;
++            this.created = true;
+         }
+-
+-        return cursor;
++        return this.cursor;
+     }
+ }
++

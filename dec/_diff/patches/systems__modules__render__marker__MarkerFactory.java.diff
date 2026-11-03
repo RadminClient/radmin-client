@@ -1,0 +1,70 @@
+--- upstream261/systems/modules/render/marker/MarkerFactory.java
++++ v1decompiled/systems/modules/render/marker/MarkerFactory.java
+@@ -1,45 +1,45 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules.render.marker;
+-
+-import meteordevelopment.meteorclient.systems.modules.Modules;
++package radmin.client.systems.modules.render.marker;
+ 
+ import java.util.HashMap;
+ import java.util.Map;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.render.marker.BaseMarker;
++import radmin.client.systems.modules.render.marker.CuboidMarker;
++import radmin.client.systems.modules.render.marker.Marker;
++import radmin.client.systems.modules.render.marker.Sphere2dMarker;
+ 
+ public class MarkerFactory {
+-    private interface Factory {
+-        BaseMarker create();
+-    }
+-
+-    private final Map<String, Factory> factories;
++    private final Map<String, Factory> factories = new HashMap<String, Factory>();
+     private final String[] names;
+ 
+     public MarkerFactory() {
+-        factories = new HashMap<>();
+-        factories.put(CuboidMarker.type, CuboidMarker::new);
+-        factories.put(Sphere2dMarker.type, Sphere2dMarker::new);
+-
+-        names = new String[factories.size()];
++        this.factories.put("Cuboid", CuboidMarker::new);
++        this.factories.put("Sphere-2D", Sphere2dMarker::new);
++        this.names = new String[this.factories.size()];
+         int i = 0;
+-        for (String key : factories.keySet()) names[i++] = key;
++        for (String key : this.factories.keySet()) {
++            this.names[i++] = key;
++        }
+     }
+ 
+     public String[] getNames() {
+-        return names;
++        return this.names;
+     }
+ 
+     public BaseMarker createMarker(String name) {
+-        if (factories.containsKey(name)) {
+-            BaseMarker marker = factories.get(name).create();
++        if (this.factories.containsKey(name)) {
++            BaseMarker marker = this.factories.get(name).create();
+             marker.settings.registerColorSettings(Modules.get().get(Marker.class));
+-
+             return marker;
+         }
+-
+         return null;
+     }
++
++    private static interface Factory {
++        public BaseMarker create();
++    }
+ }
++

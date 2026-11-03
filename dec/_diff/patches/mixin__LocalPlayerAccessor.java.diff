@@ -1,0 +1,30 @@
+--- upstream261/mixin/LocalPlayerAccessor.java
++++ v1decompiled/mixin/LocalPlayerAccessor.java
+@@ -1,16 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.player.LocalPlayer
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.client.player.LocalPlayer;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(LocalPlayer.class)
++@Mixin(value={LocalPlayer.class})
+ public interface LocalPlayerAccessor {
+-    @Accessor("positionReminder")
+-    void meteor$setPositionReminder(int ticks);
++    @Accessor(value="positionReminder")
++    public void meteor$setPositionReminder(int var1);
+ }
++

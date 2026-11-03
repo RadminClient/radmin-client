@@ -1,0 +1,86 @@
+--- upstream261/mixin/sodium/AbstractBlockRenderContextMixin.java
++++ v1decompiled/mixin/sodium/AbstractBlockRenderContextMixin.java
+@@ -1,17 +1,30 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.llamalad7.mixinextras.injector.ModifyReturnValue
++ *  net.caffeinemc.mods.sodium.client.render.model.AbstractBlockRenderContext
++ *  net.minecraft.client.renderer.block.BlockAndTintGetter
++ *  net.minecraft.core.BlockPos
++ *  net.minecraft.core.Direction
++ *  net.minecraft.world.level.BlockGetter
++ *  net.minecraft.world.level.block.state.BlockState
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Shadow
++ *  org.spongepowered.asm.mixin.Unique
++ *  org.spongepowered.asm.mixin.injection.At
++ *  org.spongepowered.asm.mixin.injection.Inject
++ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
++ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+  */
+-
+-package meteordevelopment.meteorclient.mixin.sodium;
++package radmin.client.mixin.sodium;
+ 
+ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.render.Xray;
+ import net.caffeinemc.mods.sodium.client.render.model.AbstractBlockRenderContext;
+ import net.minecraft.client.renderer.block.BlockAndTintGetter;
+ import net.minecraft.core.BlockPos;
+ import net.minecraft.core.Direction;
++import net.minecraft.world.level.BlockGetter;
+ import net.minecraft.world.level.block.state.BlockState;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Shadow;
+@@ -20,8 +33,10 @@
+ import org.spongepowered.asm.mixin.injection.Inject;
+ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.render.Xray;
+ 
+-@Mixin(value = AbstractBlockRenderContext.class, remap = false)
++@Mixin(value={AbstractBlockRenderContext.class}, remap=false)
+ public abstract class AbstractBlockRenderContextMixin {
+     @Shadow
+     protected BlockState state;
+@@ -32,25 +47,24 @@
+     @Unique
+     private Xray xray;
+ 
+-    @Inject(method = "<init>", at = @At("TAIL"))
++    @Inject(method={"<init>"}, at={@At(value="TAIL")})
+     private void onInit(CallbackInfo ci) {
+-        xray = Modules.get().get(Xray.class);
++        this.xray = Modules.get().get(Xray.class);
+     }
+ 
+-    // For More Culling compatibility - runs before More Culling's inject to force-render whitelisted Xray blocks
+-    @Inject(method = "shouldDrawSide", at = @At("HEAD"), cancellable = true)
++    @Inject(method={"shouldDrawSide"}, at={@At(value="HEAD")}, cancellable=true)
+     private void meteor$forceXrayFace(Direction facing, CallbackInfoReturnable<Boolean> cir) {
+-        if (xray != null && xray.isActive() && !xray.isBlocked(state.getBlock(), null)) {
+-            cir.setReturnValue(true);
++        if (this.xray != null && this.xray.isActive() && !this.xray.isBlocked(this.state.getBlock(), null)) {
++            cir.setReturnValue((Object)true);
+         }
+     }
+ 
+-    @ModifyReturnValue(method = "shouldDrawSide", at = @At("RETURN"))
++    @ModifyReturnValue(method={"shouldDrawSide"}, at={@At(value="RETURN")})
+     private boolean shouldDrawSide(boolean original, Direction facing) {
+-        if (xray.isActive()) {
+-            return xray.modifyDrawSide(state, level, pos, facing, original);
++        if (this.xray.isActive()) {
++            return this.xray.modifyDrawSide(this.state, (BlockGetter)this.level, this.pos, facing, original);
+         }
+-
+         return original;
+     }
+ }
++

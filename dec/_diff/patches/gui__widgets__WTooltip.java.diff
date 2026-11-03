@@ -1,0 +1,58 @@
+--- upstream261/gui/widgets/WTooltip.java
++++ v1decompiled/gui/widgets/WTooltip.java
+@@ -1,16 +1,16 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.widgets;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.widgets.WRoot;
++import radmin.client.gui.widgets.containers.WContainer;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WContainer;
+-
+-public abstract class WTooltip extends WContainer implements WRoot {
++public abstract class WTooltip
++extends WContainer
++implements WRoot {
+     private boolean valid;
+-
+     protected String text;
+ 
+     public WTooltip(String text) {
+@@ -19,23 +19,22 @@
+ 
+     @Override
+     public void init() {
+-        add(theme.label(text)).pad(4);
++        this.add(this.theme.label(this.text)).pad(4.0);
+     }
+ 
+     @Override
+     public void invalidate() {
+-        valid = false;
++        this.valid = false;
+     }
+ 
+     @Override
+     public boolean render(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        if (!valid) {
+-            calculateSize();
+-            calculateWidgetPositions();
+-
+-            valid = true;
++        if (!this.valid) {
++            this.calculateSize();
++            this.calculateWidgetPositions();
++            this.valid = true;
+         }
+-
+         return super.render(renderer, mouseX, mouseY, delta);
+     }
+ }
++

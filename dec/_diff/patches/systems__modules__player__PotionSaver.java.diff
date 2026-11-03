@@ -1,0 +1,88 @@
+--- upstream261/systems/modules/player/PotionSaver.java
++++ v1decompiled/systems/modules/player/PotionSaver.java
+@@ -1,60 +1,38 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.effect.MobEffect
++ *  net.minecraft.world.effect.MobEffects
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules.player;
+-
+-import meteordevelopment.meteorclient.settings.BoolSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.settings.StatusEffectListSetting;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.utils.player.PlayerUtils;
+-import net.minecraft.world.effect.MobEffect;
++package radmin.client.systems.modules.player;
+ 
+ import java.util.List;
++import net.minecraft.world.effect.MobEffect;
++import net.minecraft.world.effect.MobEffects;
++import radmin.client.settings.BoolSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.settings.StatusEffectListSetting;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.utils.player.PlayerUtils;
+ 
+-import static net.minecraft.world.effect.MobEffects.*;
+-
+-public class PotionSaver extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<List<MobEffect>> effects = sgGeneral.add(new StatusEffectListSetting.Builder()
+-        .name("effects")
+-        .description("The effects to preserve.")
+-        .defaultValue(
+-            STRENGTH.value(),
+-            ABSORPTION.value(),
+-            RESISTANCE.value(),
+-            FIRE_RESISTANCE.value(),
+-            SPEED.value(),
+-            HASTE.value(),
+-            REGENERATION.value(),
+-            WATER_BREATHING.value(),
+-            SATURATION.value(),
+-            LUCK.value(),
+-            SLOW_FALLING.value(),
+-            DOLPHINS_GRACE.value(),
+-            CONDUIT_POWER.value(),
+-            HERO_OF_THE_VILLAGE.value()
+-        )
+-        .build()
+-    );
+-
+-    public final Setting<Boolean> onlyWhenStationary = sgGeneral.add(new BoolSetting.Builder()
+-        .name("only-when-stationary")
+-        .description("Only freezes effects when you aren't moving.")
+-        .defaultValue(false)
+-        .build()
+-    );
++public class PotionSaver
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final Setting<List<MobEffect>> effects;
++    public final Setting<Boolean> onlyWhenStationary;
+ 
+     public PotionSaver() {
+         super(Categories.Player, "potion-saver", "Stops potion effects ticking when you stand still.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.effects = this.sgGeneral.add(((StatusEffectListSetting.Builder)((StatusEffectListSetting.Builder)new StatusEffectListSetting.Builder().name("effects")).description("The effects to preserve.")).defaultValue((MobEffect)MobEffects.STRENGTH.value(), (MobEffect)MobEffects.ABSORPTION.value(), (MobEffect)MobEffects.RESISTANCE.value(), (MobEffect)MobEffects.FIRE_RESISTANCE.value(), (MobEffect)MobEffects.SPEED.value(), (MobEffect)MobEffects.HASTE.value(), (MobEffect)MobEffects.REGENERATION.value(), (MobEffect)MobEffects.WATER_BREATHING.value(), (MobEffect)MobEffects.SATURATION.value(), (MobEffect)MobEffects.LUCK.value(), (MobEffect)MobEffects.SLOW_FALLING.value(), (MobEffect)MobEffects.DOLPHINS_GRACE.value(), (MobEffect)MobEffects.CONDUIT_POWER.value(), (MobEffect)MobEffects.HERO_OF_THE_VILLAGE.value()).build());
++        this.onlyWhenStationary = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("only-when-stationary")).description("Only freezes effects when you aren't moving.")).defaultValue(false)).build());
+     }
+ 
+     public boolean shouldFreeze(MobEffect effect) {
+-        return isActive() && (!onlyWhenStationary.get() || !PlayerUtils.isMoving()) && !mc.player.getActiveEffects().isEmpty() && effects.get().contains(effect);
++        return this.isActive() && (this.onlyWhenStationary.get() == false || !PlayerUtils.isMoving()) && !this.mc.player.getActiveEffects().isEmpty() && this.effects.get().contains(effect);
+     }
+ }
++

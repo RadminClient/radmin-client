@@ -1,0 +1,25 @@
+--- upstream261/utils/misc/ISerializable.java
++++ v1decompiled/utils/misc/ISerializable.java
+@@ -1,14 +1,16 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.nbt.CompoundTag
+  */
+-
+-package meteordevelopment.meteorclient.utils.misc;
++package radmin.client.utils.misc;
+ 
+ import net.minecraft.nbt.CompoundTag;
+ 
+ public interface ISerializable<T> {
+-    CompoundTag toTag();
++    public CompoundTag toTag();
+ 
+-    T fromTag(CompoundTag tag);
++    public T fromTag(CompoundTag var1);
+ }
++

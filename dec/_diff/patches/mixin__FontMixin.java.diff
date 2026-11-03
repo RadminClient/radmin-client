@@ -1,0 +1,40 @@
+--- upstream261/mixin/FontMixin.java
++++ v1decompiled/mixin/FontMixin.java
+@@ -1,20 +1,24 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.llamalad7.mixinextras.injector.ModifyExpressionValue
++ *  net.minecraft.client.gui.Font
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.injection.At
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.render.NoRender;
+ import net.minecraft.client.gui.Font;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.injection.At;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.render.NoRender;
+ 
+-@Mixin(Font.class)
++@Mixin(value={Font.class})
+ public abstract class FontMixin {
+-    @ModifyExpressionValue(method = "getGlyph", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Style;isObfuscated()Z"))
++    @ModifyExpressionValue(method={"getGlyph"}, at={@At(value="INVOKE", target="Lnet/minecraft/network/chat/Style;isObfuscated()Z")})
+     private boolean onRenderObfuscatedStyle(boolean original) {
+         if (Modules.get() == null || Modules.get().get(NoRender.class) == null) {
+             return original;
+@@ -22,3 +26,4 @@
+         return !Modules.get().get(NoRender.class).noObfuscation() && original;
+     }
+ }
++

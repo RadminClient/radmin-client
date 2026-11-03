@@ -1,0 +1,60 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.world.entity.projectile.FireworkRocketEntity
+ *  net.minecraft.world.phys.BlockHitResult
+ *  net.minecraft.world.phys.EntityHitResult
+ *  org.spongepowered.asm.mixin.Mixin
+ *  org.spongepowered.asm.mixin.Shadow
+ *  org.spongepowered.asm.mixin.injection.At
+ *  org.spongepowered.asm.mixin.injection.Inject
+ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+ */
+package radmin.client.mixin;
+
+import net.minecraft.world.entity.projectile.FireworkRocketEntity;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import radmin.client.systems.modules.Modules;
+import radmin.client.systems.modules.movement.ElytraBoost;
+
+@Mixin(value={FireworkRocketEntity.class})
+public abstract class FireworkRocketEntityMixin {
+    @Shadow
+    private int life;
+    @Shadow
+    private int lifetime;
+
+    @Inject(method={"tick"}, at={@At(value="TAIL")})
+    private void onTick(CallbackInfo ci) {
+        FireworkRocketEntity firework = (FireworkRocketEntity)this;
+        if (Modules.get().get(ElytraBoost.class).isFirework(firework) && this.life > this.lifetime) {
+            firework.discard();
+        }
+    }
+
+    @Inject(method={"onHitEntity"}, at={@At(value="HEAD")}, cancellable=true)
+    private void onHitEntity(EntityHitResult hitResult, CallbackInfo ci) {
+        FireworkRocketEntity firework = (FireworkRocketEntity)this;
+        if (Modules.get().get(ElytraBoost.class).isFirework(firework)) {
+            firework.discard();
+            ci.cancel();
+        }
+    }
+
+    @Inject(method={"onHitBlock"}, at={@At(value="HEAD")}, cancellable=true)
+    private void onHitBlock(BlockHitResult hitResult, CallbackInfo ci) {
+        FireworkRocketEntity firework = (FireworkRocketEntity)this;
+        if (Modules.get().get(ElytraBoost.class).isFirework(firework)) {
+            firework.discard();
+            ci.cancel();
+        }
+    }
+}
+

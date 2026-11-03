@@ -1,0 +1,156 @@
+--- upstream261/utils/render/prompts/Prompt.java
++++ v1decompiled/utils/render/prompts/Prompt.java
+@@ -1,25 +1,29 @@
+-package meteordevelopment.meteorclient.utils.render.prompts;
++/*
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.systems.RenderSystem
++ *  net.minecraft.client.gui.screens.Screen
++ */
++package radmin.client.utils.render.prompts;
+ 
+ import com.mojang.blaze3d.systems.RenderSystem;
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WindowScreen;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WCheckbox;
+-import meteordevelopment.meteorclient.systems.config.Config;
+-import net.minecraft.client.gui.screens.Screen;
+-
+ import java.util.ArrayList;
+ import java.util.List;
++import java.util.Objects;
++import net.minecraft.client.gui.screens.Screen;
++import radmin.client.MeteorClient;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WindowScreen;
++import radmin.client.gui.widgets.containers.WHorizontalList;
++import radmin.client.gui.widgets.pressable.WCheckbox;
++import radmin.client.systems.config.Config;
+ 
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-@SuppressWarnings("unchecked") // cant instantiate a Prompt directly so this is fine
+ public abstract class Prompt<T> {
+     protected final GuiTheme theme;
+     protected final Screen parent;
+-
+     protected String title = "";
+-    protected final List<String> messages = new ArrayList<>();
++    protected final List<String> messages = new ArrayList<String>();
+     protected boolean dontShowAgainCheckboxVisible = true;
+     protected String id = null;
+ 
+@@ -30,73 +34,79 @@
+ 
+     public T title(String title) {
+         this.title = title;
+-        return (T) this;
++        return (T)this;
+     }
+ 
+     public T message(String message) {
+         this.messages.add(message);
+-        return (T) this;
++        return (T)this;
+     }
+ 
+-    public T message(String message, Object... args) {
++    public T message(String message, Object ... args) {
+         this.messages.add(String.format(message, args));
+-        return (T) this;
++        return (T)this;
+     }
+ 
+     public T dontShowAgainCheckboxVisible(boolean visible) {
+         this.dontShowAgainCheckboxVisible = visible;
+-        return (T) this;
++        return (T)this;
+     }
+ 
+     public T id(String from) {
+         this.id = from;
+-        return (T) this;
++        return (T)this;
+     }
+ 
+     public boolean show() {
+-        if (id != null && Config.get().dontShowAgainPrompts.contains(id)) return false;
+-
++        if (this.id != null && Config.get().dontShowAgainPrompts.contains(this.id)) {
++            return false;
++        }
+         if (!RenderSystem.isOnRenderThread()) {
+-            mc.execute(() -> mc.setScreen(new PromptScreen(theme)));
++            MeteorClient.mc.execute(() -> MeteorClient.mc.setScreen((Screen)new PromptScreen(this, this.theme)));
+         } else {
+-            mc.setScreen(new PromptScreen(theme));
++            MeteorClient.mc.setScreen((Screen)new PromptScreen(this, this.theme));
+         }
+-
+         return true;
+     }
+ 
+     protected void dontShowAgain(PromptScreen screen) {
+-        if (screen.dontShowAgainCheckbox != null && screen.dontShowAgainCheckbox.checked && id != null) {
+-            Config.get().dontShowAgainPrompts.add(id);
++        if (screen.dontShowAgainCheckbox != null && screen.dontShowAgainCheckbox.checked && this.id != null) {
++            Config.get().dontShowAgainPrompts.add(this.id);
+         }
+     }
+ 
+-    protected abstract void initialiseWidgets(PromptScreen screen);
++    protected abstract void initialiseWidgets(PromptScreen var1);
+ 
+-    protected class PromptScreen extends WindowScreen {
++    protected class PromptScreen
++    extends WindowScreen {
+         protected WCheckbox dontShowAgainCheckbox;
+         protected WHorizontalList list;
++        final /* synthetic */ Prompt this$0;
+ 
+-        public PromptScreen(GuiTheme theme) {
+-            super(theme, Prompt.this.title);
+-
+-            this.parent = Prompt.this.parent;
++        public PromptScreen(Prompt this$0, GuiTheme theme) {
++            Prompt prompt = this$0;
++            Objects.requireNonNull(prompt);
++            this.this$0 = prompt;
++            super(theme, this$0.title);
++            this.parent = this$0.parent;
+         }
+ 
+         @Override
+         public void initWidgets() {
+-            for (String line : messages) add(theme.label(line)).expandX();
+-            add(theme.horizontalSeparator()).expandX();
+-
+-            if (dontShowAgainCheckboxVisible) {
+-                WHorizontalList checkboxContainer = add(theme.horizontalList()).expandX().widget();
+-                dontShowAgainCheckbox = checkboxContainer.add(theme.checkbox(false)).widget();
+-                checkboxContainer.add(theme.label("Don't show this again.")).expandX();
+-            } else dontShowAgainCheckbox = null;
+-
+-            list = add(theme.horizontalList()).expandX().widget();
+-
+-            initialiseWidgets(this);
++            for (String line : this.this$0.messages) {
++                this.add(this.theme.label(line)).expandX();
++            }
++            this.add(this.theme.horizontalSeparator()).expandX();
++            if (this.this$0.dontShowAgainCheckboxVisible) {
++                WHorizontalList checkboxContainer = this.add(this.theme.horizontalList()).expandX().widget();
++                this.dontShowAgainCheckbox = checkboxContainer.add(this.theme.checkbox(false)).widget();
++                checkboxContainer.add(this.theme.label("Don't show this again.")).expandX();
++            } else {
++                this.dontShowAgainCheckbox = null;
++            }
++            this.list = this.add(this.theme.horizontalList()).expandX().widget();
++            this.this$0.initialiseWidgets(this);
+         }
+     }
+ }
++

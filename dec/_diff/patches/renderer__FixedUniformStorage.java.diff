@@ -1,0 +1,129 @@
+--- upstream261/renderer/FixedUniformStorage.java
++++ v1decompiled/renderer/FixedUniformStorage.java
+@@ -1,26 +1,27 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.buffers.GpuBuffer
++ *  com.mojang.blaze3d.buffers.GpuBuffer$MappedView
++ *  com.mojang.blaze3d.buffers.GpuBufferSlice
++ *  com.mojang.blaze3d.systems.GpuDevice
++ *  com.mojang.blaze3d.systems.RenderSystem
++ *  net.minecraft.client.renderer.DynamicUniformStorage$DynamicUniform
++ *  net.minecraft.client.renderer.MappableRingBuffer
++ *  net.minecraft.util.Mth
+  */
+-
+-package meteordevelopment.meteorclient.renderer;
++package radmin.client.renderer;
+ 
+ import com.mojang.blaze3d.buffers.GpuBuffer;
+ import com.mojang.blaze3d.buffers.GpuBufferSlice;
+ import com.mojang.blaze3d.systems.GpuDevice;
+ import com.mojang.blaze3d.systems.RenderSystem;
++import java.nio.ByteBuffer;
+ import net.minecraft.client.renderer.DynamicUniformStorage;
+ import net.minecraft.client.renderer.MappableRingBuffer;
+ import net.minecraft.util.Mth;
+ 
+-import java.nio.ByteBuffer;
+-
+-/**
+- * UBO storage with a constant size. Exceeding this size causes an {@link IndexOutOfBoundsException} to be thrown.
+- *
+- * @author Crosby
+- * @see DynamicUniformStorage
+- */
+ public class FixedUniformStorage<T extends DynamicUniformStorage.DynamicUniform> {
+     private final MappableRingBuffer buffer;
+     private final int blockSize;
+@@ -29,9 +30,9 @@
+ 
+     public FixedUniformStorage(String name, int blockSize, int capacity) {
+         GpuDevice gpuDevice = RenderSystem.getDevice();
+-        this.blockSize = Mth.roundToward(blockSize, gpuDevice.getUniformOffsetAlignment());
++        this.blockSize = Mth.roundToward((int)blockSize, (int)gpuDevice.getUniformOffsetAlignment());
+         this.capacity = capacity;
+-        int alignedCapacity = Mth.smallestEncompassingPowerOfTwo(capacity);
++        int alignedCapacity = Mth.smallestEncompassingPowerOfTwo((int)capacity);
+         this.size = 0;
+         this.buffer = new MappableRingBuffer(() -> name + " x" + this.blockSize, 130, this.blockSize * alignedCapacity);
+     }
+@@ -39,47 +40,37 @@
+     public GpuBufferSlice write(T value) {
+         if (this.size >= this.capacity) {
+             throw new IndexOutOfBoundsException(String.format("Index %s out of bounds for length %s", this.size, this.capacity));
+-        } else {
+-            int i = this.size * this.blockSize;
+-            GpuBufferSlice slice = this.buffer.currentBuffer().slice(i, this.blockSize);
+-
+-            try (GpuBuffer.MappedView mappedView = RenderSystem.getDevice()
+-                .createCommandEncoder()
+-                .mapBuffer(slice, false, true)) {
+-                value.write(mappedView.data());
+-            }
+-
+-            this.size++;
+-            return slice;
+         }
++        int i = this.size * this.blockSize;
++        GpuBufferSlice slice = this.buffer.currentBuffer().slice((long)i, (long)this.blockSize);
++        try (GpuBuffer.MappedView mappedView = RenderSystem.getDevice().createCommandEncoder().mapBuffer(slice, false, true);){
++            value.write(mappedView.data());
++        }
++        ++this.size;
++        return slice;
+     }
+ 
+     public GpuBufferSlice[] writeAll(T[] values) {
+         if (values.length == 0) {
+             return new GpuBufferSlice[0];
+-        } else if (this.size + values.length > this.capacity) {
++        }
++        if (this.size + values.length > this.capacity) {
+             throw new IndexOutOfBoundsException(String.format("Index %s out of bounds for length %s", this.size + values.length - 1, this.capacity));
+-        } else {
+-            int i = this.size * this.blockSize;
+-            GpuBufferSlice[] gpuBufferSlices = new GpuBufferSlice[values.length];
+-            GpuBuffer ubo = this.buffer.currentBuffer();
+-
+-            try (GpuBuffer.MappedView mappedView = RenderSystem.getDevice()
+-                .createCommandEncoder()
+-                .mapBuffer(ubo.slice(i, values.length * this.blockSize), false, true)) {
+-                ByteBuffer byteBuffer = mappedView.data();
+-
+-                for (int j = 0; j < values.length; j++) {
+-                    T uploadable = values[j];
+-                    gpuBufferSlices[j] = ubo.slice(i + j * this.blockSize, this.blockSize);
+-                    byteBuffer.position(j * this.blockSize);
+-                    uploadable.write(byteBuffer);
+-                }
++        }
++        int i = this.size * this.blockSize;
++        GpuBufferSlice[] gpuBufferSlices = new GpuBufferSlice[values.length];
++        GpuBuffer ubo = this.buffer.currentBuffer();
++        try (GpuBuffer.MappedView mappedView = RenderSystem.getDevice().createCommandEncoder().mapBuffer(ubo.slice((long)i, (long)(values.length * this.blockSize)), false, true);){
++            ByteBuffer byteBuffer = mappedView.data();
++            for (int j = 0; j < values.length; ++j) {
++                T uploadable = values[j];
++                gpuBufferSlices[j] = ubo.slice((long)(i + j * this.blockSize), (long)this.blockSize);
++                byteBuffer.position(j * this.blockSize);
++                uploadable.write(byteBuffer);
+             }
+-
+-            this.size += values.length;
+-            return gpuBufferSlices;
+         }
++        this.size += values.length;
++        return gpuBufferSlices;
+     }
+ 
+     public void clear() {
+@@ -91,3 +82,4 @@
+         this.buffer.close();
+     }
+ }
++

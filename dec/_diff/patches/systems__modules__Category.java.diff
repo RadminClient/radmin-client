@@ -1,0 +1,55 @@
+--- upstream261/systems/modules/Category.java
++++ v1decompiled/systems/modules/Category.java
+@@ -1,13 +1,13 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.item.ItemStack
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules;
+-
+-import net.minecraft.world.item.ItemStack;
++package radmin.client.systems.modules;
+ 
+ import java.util.function.Supplier;
++import net.minecraft.world.item.ItemStack;
+ 
+ public class Category {
+     public final String name;
+@@ -24,21 +24,23 @@
+         this(name, null);
+     }
+ 
+-    @Override
+     public String toString() {
+-        return name;
++        return this.name;
+     }
+ 
+-    @Override
+     public boolean equals(Object o) {
+-        if (this == o) return true;
+-        if (o == null || getClass() != o.getClass()) return false;
+-        Category category = (Category) o;
+-        return nameHash == category.nameHash;
++        if (this == o) {
++            return true;
++        }
++        if (o == null || this.getClass() != o.getClass()) {
++            return false;
++        }
++        Category category = (Category)o;
++        return this.nameHash == category.nameHash;
+     }
+ 
+-    @Override
+     public int hashCode() {
+-        return nameHash;
++        return this.nameHash;
+     }
+ }
++

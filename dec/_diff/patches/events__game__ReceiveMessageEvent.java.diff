@@ -1,0 +1,64 @@
+--- upstream261/events/game/ReceiveMessageEvent.java
++++ v1decompiled/events/game/ReceiveMessageEvent.java
+@@ -1,17 +1,19 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.multiplayer.chat.GuiMessageTag
++ *  net.minecraft.network.chat.Component
+  */
++package radmin.client.events.game;
+ 
+-package meteordevelopment.meteorclient.events.game;
+-
+-import meteordevelopment.meteorclient.events.Cancellable;
+ import net.minecraft.client.multiplayer.chat.GuiMessageTag;
+ import net.minecraft.network.chat.Component;
++import radmin.client.events.Cancellable;
+ 
+-public class ReceiveMessageEvent extends Cancellable {
++public class ReceiveMessageEvent
++extends Cancellable {
+     private static final ReceiveMessageEvent INSTANCE = new ReceiveMessageEvent();
+-
+     private Component message;
+     private GuiMessageTag indicator;
+     private boolean modified;
+@@ -19,19 +21,19 @@
+ 
+     public static ReceiveMessageEvent get(Component message, GuiMessageTag indicator, int id) {
+         INSTANCE.setCancelled(false);
+-        INSTANCE.message = message;
+-        INSTANCE.indicator = indicator;
+-        INSTANCE.modified = false;
+-        INSTANCE.id = id;
++        ReceiveMessageEvent.INSTANCE.message = message;
++        ReceiveMessageEvent.INSTANCE.indicator = indicator;
++        ReceiveMessageEvent.INSTANCE.modified = false;
++        ReceiveMessageEvent.INSTANCE.id = id;
+         return INSTANCE;
+     }
+ 
+     public Component getMessage() {
+-        return message;
++        return this.message;
+     }
+ 
+     public GuiMessageTag getIndicator() {
+-        return indicator;
++        return this.indicator;
+     }
+ 
+     public void setMessage(Component message) {
+@@ -45,6 +47,7 @@
+     }
+ 
+     public boolean isModified() {
+-        return modified;
++        return this.modified;
+     }
+ }
++

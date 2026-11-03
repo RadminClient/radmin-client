@@ -1,0 +1,176 @@
+--- upstream261/renderer/Texture.java
++++ v1decompiled/renderer/Texture.java
+@@ -1,9 +1,22 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.platform.NativeImage
++ *  com.mojang.blaze3d.platform.NativeImage$Format
++ *  com.mojang.blaze3d.platform.TextureUtil
++ *  com.mojang.blaze3d.systems.RenderSystem
++ *  com.mojang.blaze3d.textures.AddressMode
++ *  com.mojang.blaze3d.textures.FilterMode
++ *  com.mojang.blaze3d.textures.TextureFormat
++ *  net.minecraft.client.renderer.texture.AbstractTexture
++ *  org.jetbrains.annotations.NotNull
++ *  org.lwjgl.BufferUtils
++ *  org.lwjgl.stb.STBImage
++ *  org.lwjgl.system.MemoryStack
++ *  org.lwjgl.system.MemoryUtil
+  */
+-
+-package meteordevelopment.meteorclient.renderer;
++package radmin.client.renderer;
+ 
+ import com.mojang.blaze3d.platform.NativeImage;
+ import com.mojang.blaze3d.platform.TextureUtil;
+@@ -11,6 +24,10 @@
+ import com.mojang.blaze3d.textures.AddressMode;
+ import com.mojang.blaze3d.textures.FilterMode;
+ import com.mojang.blaze3d.textures.TextureFormat;
++import java.io.IOException;
++import java.io.InputStream;
++import java.nio.ByteBuffer;
++import java.nio.IntBuffer;
+ import net.minecraft.client.renderer.texture.AbstractTexture;
+ import org.jetbrains.annotations.NotNull;
+ import org.lwjgl.BufferUtils;
+@@ -18,77 +35,88 @@
+ import org.lwjgl.system.MemoryStack;
+ import org.lwjgl.system.MemoryUtil;
+ 
+-import java.io.IOException;
+-import java.nio.ByteBuffer;
+-import java.nio.IntBuffer;
+-
+-public class Texture extends AbstractTexture {
++public class Texture
++extends AbstractTexture {
+     public Texture(int width, int height, TextureFormat format, FilterMode min, FilterMode mag) {
+-        texture = RenderSystem.getDevice().createTexture("", 15, format, width, height, 1, 1);
+-        sampler = RenderSystem.getSamplerCache().getSampler(AddressMode.REPEAT, AddressMode.REPEAT, min, mag, false);
+-
+-        textureView = RenderSystem.getDevice().createTextureView(texture);
++        this.texture = RenderSystem.getDevice().createTexture("", 15, format, width, height, 1, 1);
++        this.sampler = RenderSystem.getSamplerCache().getSampler(AddressMode.REPEAT, AddressMode.REPEAT, min, mag, false);
++        this.textureView = RenderSystem.getDevice().createTextureView(this.texture);
+     }
+ 
+     public int getWidth() {
+-        return getTexture().getWidth(0);
++        return this.getTexture().getWidth(0);
+     }
+ 
+     public int getHeight() {
+-        return getTexture().getHeight(0);
++        return this.getTexture().getHeight(0);
+     }
+ 
+     public void upload(byte[] bytes) {
+-        upload(BufferUtils.createByteBuffer(bytes.length).put(bytes));
++        this.upload(BufferUtils.createByteBuffer((int)bytes.length).put(bytes));
+     }
+ 
+     public void upload(ByteBuffer buffer) {
+-        var image = getImage();
+-
++        NativeImage image = this.getImage();
+         buffer.rewind();
+-        MemoryUtil.memCopy(MemoryUtil.memAddress(buffer), image.getPointer(), buffer.remaining());
+-
+-        RenderSystem.getDevice().createCommandEncoder().writeToTexture(texture, image);
+-
++        MemoryUtil.memCopy((long)MemoryUtil.memAddress((ByteBuffer)buffer), (long)image.getPointer(), (long)buffer.remaining());
++        RenderSystem.getDevice().createCommandEncoder().writeToTexture(this.texture, image);
+         image.close();
+     }
+ 
+-    private @NotNull NativeImage getImage() {
+-        NativeImage.Format imageFormat = switch (texture.getFormat()) {
+-            case RGBA8 -> NativeImage.Format.RGBA;
+-            case RED8 -> NativeImage.Format.LUMINANCE;
++    @NotNull
++    private NativeImage getImage() {
++        NativeImage.Format imageFormat = switch (this.texture.getFormat()) {
++            case TextureFormat.RGBA8 -> NativeImage.Format.RGBA;
++            case TextureFormat.RED8 -> NativeImage.Format.LUMINANCE;
+             default -> throw new IllegalArgumentException();
+         };
+-
+-        // Workaround for writeToTexture(IntBuffer) overload comparing width * height to the size of the int buffer.
+-        // And since we are working with pixels which are only one byte in size, the sizes don't match
+-        return new NativeImage(imageFormat, getWidth(), getHeight(), false);
++        return new NativeImage(imageFormat, this.getWidth(), this.getHeight(), false);
+     }
+ 
++    /*
++     * Enabled aggressive exception aggregation
++     */
+     public static Texture readResource(String path, boolean flipY, FilterMode filter) {
+-        try (var in = Texture.class.getResourceAsStream(path)) {
+-            if (in == null) return null;
+-
+-            var data = TextureUtil.readResource(in).rewind();
+-
+-            try (MemoryStack stack = MemoryStack.stackPush()) {
+-                IntBuffer width = stack.mallocInt(1);
+-                IntBuffer height = stack.mallocInt(1);
+-                IntBuffer comp = stack.mallocInt(1);
+-
+-                STBImage.stbi_set_flip_vertically_on_load(flipY);
+-                ByteBuffer image = STBImage.stbi_load_from_memory(data, width, height, comp, 4);
+-
+-                var texture = new Texture(width.get(0), height.get(0), TextureFormat.RGBA8, filter, filter);
+-                texture.upload(image);
+-
+-                STBImage.stbi_image_free(image);
+-                STBImage.stbi_set_flip_vertically_on_load(false);
+-
+-                return texture;
++        try (InputStream in = Texture.class.getResourceAsStream(path);){
++            Texture texture;
++            block16: {
++                if (in == null) {
++                    Texture texture2 = null;
++                    return texture2;
++                }
++                ByteBuffer data = TextureUtil.readResource((InputStream)in).rewind();
++                MemoryStack stack = MemoryStack.stackPush();
++                try {
++                    IntBuffer width = stack.mallocInt(1);
++                    IntBuffer height = stack.mallocInt(1);
++                    IntBuffer comp = stack.mallocInt(1);
++                    STBImage.stbi_set_flip_vertically_on_load((boolean)flipY);
++                    ByteBuffer image = STBImage.stbi_load_from_memory((ByteBuffer)data, (IntBuffer)width, (IntBuffer)height, (IntBuffer)comp, (int)4);
++                    Texture texture3 = new Texture(width.get(0), height.get(0), TextureFormat.RGBA8, filter, filter);
++                    texture3.upload(image);
++                    STBImage.stbi_image_free((ByteBuffer)image);
++                    STBImage.stbi_set_flip_vertically_on_load((boolean)false);
++                    texture = texture3;
++                    if (stack == null) break block16;
++                }
++                catch (Throwable throwable) {
++                    if (stack != null) {
++                        try {
++                            stack.close();
++                        }
++                        catch (Throwable throwable2) {
++                            throwable.addSuppressed(throwable2);
++                        }
++                    }
++                    throw throwable;
++                }
++                stack.close();
+             }
+-        } catch (IOException _) {
++            return texture;
++        }
++        catch (IOException iOException) {
+             return null;
+         }
+     }
+ }
++

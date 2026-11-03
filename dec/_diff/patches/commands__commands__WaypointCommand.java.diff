@@ -1,0 +1,142 @@
+--- upstream261/commands/commands/WaypointCommand.java
++++ v1decompiled/commands/commands/WaypointCommand.java
+@@ -1,74 +1,68 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.arguments.StringArgumentType
++ *  com.mojang.brigadier.builder.LiteralArgumentBuilder
++ *  com.mojang.brigadier.context.CommandContext
++ *  net.minecraft.ChatFormatting
++ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
++ *  net.minecraft.core.BlockPos
+  */
+-
+-package meteordevelopment.meteorclient.commands.commands;
++package radmin.client.commands.commands;
+ 
+ import com.mojang.brigadier.arguments.StringArgumentType;
+ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+ import com.mojang.brigadier.context.CommandContext;
+-import meteordevelopment.meteorclient.commands.Command;
+-import meteordevelopment.meteorclient.commands.arguments.BlockPosArgumentType;
+-import meteordevelopment.meteorclient.commands.arguments.WaypointArgumentType;
+-import meteordevelopment.meteorclient.systems.waypoints.Waypoint;
+-import meteordevelopment.meteorclient.systems.waypoints.Waypoints;
+-import meteordevelopment.meteorclient.utils.player.PlayerUtils;
+ import net.minecraft.ChatFormatting;
+ import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+ import net.minecraft.core.BlockPos;
++import radmin.client.commands.Command;
++import radmin.client.commands.arguments.BlockPosArgumentType;
++import radmin.client.commands.arguments.WaypointArgumentType;
++import radmin.client.systems.waypoints.Waypoint;
++import radmin.client.systems.waypoints.Waypoints;
++import radmin.client.utils.player.PlayerUtils;
+ 
+-public class WaypointCommand extends Command {
++public class WaypointCommand
++extends Command {
+     public WaypointCommand() {
+         super("waypoint", "Manages waypoints.", "wp");
+     }
+ 
+     @Override
+     public void build(LiteralArgumentBuilder<ClientSuggestionProvider> builder) {
+-        builder.then(literal("list").executes(_ -> {
+-            if (Waypoints.get().isEmpty()) error("No created waypoints.");
+-            else {
+-                info(ChatFormatting.WHITE + "Created Waypoints:");
++        builder.then(WaypointCommand.literal("list").executes(commandContext -> {
++            if (Waypoints.get().isEmpty()) {
++                this.error("No created waypoints.", new Object[0]);
++            } else {
++                this.info(String.valueOf(ChatFormatting.WHITE) + "Created Waypoints:", new Object[0]);
+                 for (Waypoint waypoint : Waypoints.get()) {
+-                    info("Name: (highlight)'%s'(default), Dimension: (highlight)%s(default), Pos: (highlight)%s(default)", waypoint.name.get(), waypoint.dimension.get(), waypointPos(waypoint));
++                    this.info("Name: (highlight)'%s'(default), Dimension: (highlight)%s(default), Pos: (highlight)%s(default)", new Object[]{waypoint.name.get(), waypoint.dimension.get(), this.waypointPos(waypoint)});
+                 }
+             }
+-            return SINGLE_SUCCESS;
++            return 1;
+         }));
+-
+-        builder.then(literal("get").then(argument("waypoint", WaypointArgumentType.create()).executes(context -> {
++        builder.then(WaypointCommand.literal("get").then(WaypointCommand.argument("waypoint", WaypointArgumentType.create()).executes(context -> {
+             Waypoint waypoint = WaypointArgumentType.get(context);
+-            info("Name: " + ChatFormatting.WHITE + waypoint.name.get());
+-            info("Actual Dimension: " + ChatFormatting.WHITE + waypoint.dimension.get());
+-            info("Position: " + ChatFormatting.WHITE + waypointFullPos(waypoint));
+-            info("Visible: " + (waypoint.visible.get() ? ChatFormatting.GREEN + "True" : ChatFormatting.RED + "False"));
+-            return SINGLE_SUCCESS;
++            this.info("Name: " + String.valueOf(ChatFormatting.WHITE) + waypoint.name.get(), new Object[0]);
++            this.info("Actual Dimension: " + String.valueOf(ChatFormatting.WHITE) + String.valueOf((Object)waypoint.dimension.get()), new Object[0]);
++            this.info("Position: " + String.valueOf(ChatFormatting.WHITE) + this.waypointFullPos(waypoint), new Object[0]);
++            this.info("Visible: " + (waypoint.visible.get() != false ? String.valueOf(ChatFormatting.GREEN) + "True" : String.valueOf(ChatFormatting.RED) + "False"), new Object[0]);
++            return 1;
+         })));
+-
+-        builder.then(literal("add")
+-            .then(argument("pos", BlockPosArgumentType.blockPos())
+-                .then(argument("waypoint", StringArgumentType.greedyString()).executes(context -> addWaypoint(context, true)))
+-            )
+-
+-            .then(argument("waypoint", StringArgumentType.greedyString()).executes(context -> addWaypoint(context, false)))
+-        );
+-
+-        builder.then(literal("delete").then(argument("waypoint", WaypointArgumentType.create()).executes(context -> {
++        builder.then(((LiteralArgumentBuilder)WaypointCommand.literal("add").then(WaypointCommand.argument("pos", BlockPosArgumentType.blockPos()).then(WaypointCommand.argument("waypoint", StringArgumentType.greedyString()).executes(context -> this.addWaypoint((CommandContext<ClientSuggestionProvider>)context, true))))).then(WaypointCommand.argument("waypoint", StringArgumentType.greedyString()).executes(context -> this.addWaypoint((CommandContext<ClientSuggestionProvider>)context, false))));
++        builder.then(WaypointCommand.literal("delete").then(WaypointCommand.argument("waypoint", WaypointArgumentType.create()).executes(context -> {
+             Waypoint waypoint = WaypointArgumentType.get(context);
+-
+-            info("The waypoint (highlight)'%s'(default) has been deleted.", waypoint.name.get());
+-
++            this.info("The waypoint (highlight)'%s'(default) has been deleted.", waypoint.name.get());
+             Waypoints.get().remove(waypoint);
+-
+-            return SINGLE_SUCCESS;
++            return 1;
+         })));
+-
+-        builder.then(literal("toggle").then(argument("waypoint", WaypointArgumentType.create()).executes(context -> {
++        builder.then(WaypointCommand.literal("toggle").then(WaypointCommand.argument("waypoint", WaypointArgumentType.create()).executes(context -> {
+             Waypoint waypoint = WaypointArgumentType.get(context);
+-            waypoint.visible.set(!waypoint.visible.get());
+-
++            waypoint.visible.set(waypoint.visible.get() == false);
+             Waypoints.get().save();
+-            return SINGLE_SUCCESS;
++            return 1;
+         })));
+     }
+ 
+@@ -81,18 +75,14 @@
+     }
+ 
+     private int addWaypoint(CommandContext<ClientSuggestionProvider> context, boolean withCoords) {
+-        if (mc.player == null) return -1;
+-
+-        BlockPos pos = withCoords ? BlockPosArgumentType.getBlockPos(context, "pos") : mc.player.blockPosition().above(2);
+-        Waypoint waypoint = new Waypoint.Builder()
+-            .name(StringArgumentType.getString(context, "waypoint"))
+-            .pos(pos)
+-            .dimension(PlayerUtils.getDimension())
+-            .build();
+-
++        if (WaypointCommand.mc.player == null) {
++            return -1;
++        }
++        BlockPos pos = withCoords ? BlockPosArgumentType.getBlockPos(context, "pos") : WaypointCommand.mc.player.blockPosition().above(2);
++        Waypoint waypoint = new Waypoint.Builder().name(StringArgumentType.getString(context, (String)"waypoint")).pos(pos).dimension(PlayerUtils.getDimension()).build();
+         Waypoints.get().add(waypoint);
+-
+-        info("Created waypoint with name: (highlight)%s(default)", waypoint.name.get());
+-        return SINGLE_SUCCESS;
++        this.info("Created waypoint with name: (highlight)%s(default)", waypoint.name.get());
++        return 1;
+     }
+ }
++

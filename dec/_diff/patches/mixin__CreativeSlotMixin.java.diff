@@ -1,0 +1,47 @@
+--- upstream261/mixin/CreativeSlotMixin.java
++++ v1decompiled/mixin/CreativeSlotMixin.java
+@@ -1,29 +1,35 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.inventory.Slot
++ *  org.spongepowered.asm.mixin.Final
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Shadow
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.mixininterface.ISlot;
+ import net.minecraft.world.inventory.Slot;
+ import org.spongepowered.asm.mixin.Final;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Shadow;
++import radmin.client.mixininterface.ISlot;
+ 
+-@Mixin(targets = "net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen$SlotWrapper")
+-public abstract class CreativeSlotMixin implements ISlot {
++@Mixin(targets={"net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen$SlotWrapper"})
++public abstract class CreativeSlotMixin
++implements ISlot {
+     @Shadow
+     @Final
+     private Slot target;
+ 
+     @Override
+     public int meteor$getIndex() {
+-        return target.index;
++        return this.target.index;
+     }
+ 
+     @Override
+     public int meteor$getSlot() {
+-        return target.getContainerSlot();
++        return this.target.getContainerSlot();
+     }
+ }
++

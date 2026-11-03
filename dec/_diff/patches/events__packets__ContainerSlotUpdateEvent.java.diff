@@ -1,0 +1,29 @@
+--- upstream261/events/packets/ContainerSlotUpdateEvent.java
++++ v1decompiled/events/packets/ContainerSlotUpdateEvent.java
+@@ -1,19 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
+  */
+-
+-package meteordevelopment.meteorclient.events.packets;
++package radmin.client.events.packets;
+ 
+ import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
+ 
+ public class ContainerSlotUpdateEvent {
+     private static final ContainerSlotUpdateEvent INSTANCE = new ContainerSlotUpdateEvent();
+-
+     public ClientboundContainerSetSlotPacket packet;
+ 
+     public static ContainerSlotUpdateEvent get(ClientboundContainerSetSlotPacket packet) {
+-        INSTANCE.packet = packet;
++        ContainerSlotUpdateEvent.INSTANCE.packet = packet;
+         return INSTANCE;
+     }
+ }
++

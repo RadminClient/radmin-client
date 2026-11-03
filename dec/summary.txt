@@ -1,0 +1,9 @@
+Summary for tools/oldjar/radmin-client-26.1.2-local.jar
+Decompiled with CFR 0.152
+
+
+radmin.client.gui.widgets.WTopBar
+----------------------------
+
+onRender(radmin.client.gui.renderer.GuiRenderer double double double )
+  Unable to fully structure code

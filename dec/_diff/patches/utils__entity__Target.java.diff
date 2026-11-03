@@ -1,0 +1,20 @@
+--- upstream261/utils/entity/Target.java
++++ v1decompiled/utils/entity/Target.java
+@@ -1,12 +1,12 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.utils.entity;
++package radmin.client.utils.entity;
+ 
+ public enum Target {
+     Head,
+     Body,
+-    Feet
++    Feet;
++
+ }
++

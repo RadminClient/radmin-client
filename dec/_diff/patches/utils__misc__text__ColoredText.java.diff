@@ -1,0 +1,21 @@
+--- upstream261/utils/misc/text/ColoredText.java
++++ v1decompiled/utils/misc/text/ColoredText.java
+@@ -1,14 +1,10 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.utils.misc.text;
+ 
+-package meteordevelopment.meteorclient.utils.misc.text;
++import radmin.client.utils.render.color.Color;
+ 
+-import meteordevelopment.meteorclient.utils.render.color.Color;
+-
+-/**
+- * Encapsulates a string and the color it should have. See {@link TextUtils}
+- */
+ public record ColoredText(String text, Color color) {
+ }
++

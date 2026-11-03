@@ -1,0 +1,30 @@
+--- upstream261/settings/IGeneric.java
++++ v1decompiled/settings/IGeneric.java
+@@ -1,15 +1,17 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.settings;
+ 
+-package meteordevelopment.meteorclient.settings;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WidgetScreen;
++import radmin.client.settings.GenericSetting;
++import radmin.client.utils.misc.ICopyable;
++import radmin.client.utils.misc.ISerializable;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WidgetScreen;
+-import meteordevelopment.meteorclient.utils.misc.ICopyable;
+-import meteordevelopment.meteorclient.utils.misc.ISerializable;
++public interface IGeneric<T extends IGeneric<T>>
++extends ICopyable<T>,
++ISerializable<T> {
++    public WidgetScreen createScreen(GuiTheme var1, GenericSetting<T> var2);
++}
+ 
+-public interface IGeneric<T extends IGeneric<T>> extends ICopyable<T>, ISerializable<T> {
+-    WidgetScreen createScreen(GuiTheme theme, GenericSetting<T> setting);
+-}

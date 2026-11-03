@@ -1,0 +1,50 @@
+--- upstream261/utils/render/WrapperImmediateVertexConsumerProvider.java
++++ v1decompiled/utils/render/WrapperImmediateVertexConsumerProvider.java
+@@ -1,17 +1,21 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.vertex.VertexConsumer
++ *  net.minecraft.client.renderer.MultiBufferSource
++ *  net.minecraft.client.renderer.MultiBufferSource$BufferSource
++ *  net.minecraft.client.renderer.rendertype.RenderType
+  */
+-
+-package meteordevelopment.meteorclient.utils.render;
++package radmin.client.utils.render;
+ 
+ import com.mojang.blaze3d.vertex.VertexConsumer;
++import java.util.function.Supplier;
+ import net.minecraft.client.renderer.MultiBufferSource;
+ import net.minecraft.client.renderer.rendertype.RenderType;
+ 
+-import java.util.function.Supplier;
+-
+-public class WrapperImmediateVertexConsumerProvider extends MultiBufferSource.BufferSource {
++public class WrapperImmediateVertexConsumerProvider
++extends MultiBufferSource.BufferSource {
+     private final Supplier<MultiBufferSource> supplier;
+ 
+     public WrapperImmediateVertexConsumerProvider(Supplier<MultiBufferSource> supplier) {
+@@ -19,16 +23,14 @@
+         this.supplier = supplier;
+     }
+ 
+-    @Override
+     public VertexConsumer getBuffer(RenderType layer) {
+-        return supplier.get().getBuffer(layer);
++        return this.supplier.get().getBuffer(layer);
+     }
+ 
+-    @Override
+     public void endBatch() {
+     }
+ 
+-    @Override
+     public void endBatch(RenderType layer) {
+     }
+ }
++

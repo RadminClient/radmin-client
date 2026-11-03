@@ -1,0 +1,68 @@
+--- upstream261/pathing/PathManagers.java
++++ v1decompiled/pathing/PathManagers.java
+@@ -1,14 +1,15 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.pathing;
+-
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.utils.PreInit;
++package radmin.client.pathing;
+ 
+ import java.lang.reflect.InvocationTargetException;
++import radmin.client.MeteorClient;
++import radmin.client.pathing.BaritonePathManager;
++import radmin.client.pathing.BaritoneUtils;
++import radmin.client.pathing.IPathManager;
++import radmin.client.pathing.NopPathManager;
++import radmin.client.utils.PreInit;
+ 
+ public class PathManagers {
+     private static IPathManager INSTANCE = new NopPathManager();
+@@ -19,31 +20,31 @@
+ 
+     @PreInit
+     public static void init() {
+-        if (exists("meteordevelopment.voyager.PathManager")) {
++        if (PathManagers.exists("meteordevelopment.voyager.PathManager")) {
+             try {
+-                INSTANCE = (IPathManager) Class.forName("meteordevelopment.voyager.PathManager").getConstructor().newInstance();
+-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+-                     NoSuchMethodException | ClassNotFoundException e) {
++                INSTANCE = (IPathManager)Class.forName("meteordevelopment.voyager.PathManager").getConstructor(new Class[0]).newInstance(new Object[0]);
++            }
++            catch (ClassNotFoundException | IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException e) {
+                 throw new RuntimeException(e);
+             }
+         }
+-
+-        if (exists("baritone.api.BaritoneAPI")) {
++        if (PathManagers.exists("baritone.api.BaritoneAPI")) {
+             BaritoneUtils.IS_AVAILABLE = true;
+-
+-            if (INSTANCE instanceof NopPathManager)
++            if (INSTANCE instanceof NopPathManager) {
+                 INSTANCE = new BaritonePathManager();
++            }
+         }
+-
+-        MeteorClient.LOG.info("Path Manager: {}", INSTANCE.getName());
++        MeteorClient.LOG.info("Path Manager: {}", (Object)INSTANCE.getName());
+     }
+ 
+     private static boolean exists(String name) {
+         try {
+             Class.forName(name);
+             return true;
+-        } catch (ClassNotFoundException _) {
++        }
++        catch (ClassNotFoundException classNotFoundException) {
+             return false;
+         }
+     }
+ }
++

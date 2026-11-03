@@ -1,0 +1,102 @@
+--- upstream261/utils/player/EChestMemory.java
++++ v1decompiled/utils/player/EChestMemory.java
+@@ -1,15 +1,17 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.client.gui.screens.inventory.ContainerScreen
++ *  net.minecraft.core.NonNullList
++ *  net.minecraft.world.Container
++ *  net.minecraft.world.inventory.ChestMenu
++ *  net.minecraft.world.item.ItemStack
++ *  net.minecraft.world.level.block.EnderChestBlock
+  */
++package radmin.client.utils.player;
+ 
+-package meteordevelopment.meteorclient.utils.player;
+-
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.events.game.GameLeftEvent;
+-import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
+-import meteordevelopment.meteorclient.events.world.BlockActivateEvent;
+-import meteordevelopment.meteorclient.utils.PreInit;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+ import net.minecraft.core.NonNullList;
+@@ -17,13 +19,16 @@
+ import net.minecraft.world.inventory.ChestMenu;
+ import net.minecraft.world.item.ItemStack;
+ import net.minecraft.world.level.block.EnderChestBlock;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
++import radmin.client.MeteorClient;
++import radmin.client.events.game.GameLeftEvent;
++import radmin.client.events.game.OpenScreenEvent;
++import radmin.client.events.world.BlockActivateEvent;
++import radmin.client.utils.PreInit;
+ 
+ public class EChestMemory {
+-    public static final NonNullList<ItemStack> ITEMS = NonNullList.withSize(27, ItemStack.EMPTY);
++    public static final NonNullList<ItemStack> ITEMS = NonNullList.withSize((int)27, (Object)ItemStack.EMPTY);
+     private static int echestOpenedState;
+-    private static boolean isKnown = false;
++    private static boolean isKnown;
+ 
+     private EChestMemory() {
+     }
+@@ -35,7 +40,9 @@
+ 
+     @EventHandler
+     private static void onBlockActivate(BlockActivateEvent event) {
+-        if (event.blockState.getBlock() instanceof EnderChestBlock && echestOpenedState == 0) echestOpenedState = 1;
++        if (event.blockState.getBlock() instanceof EnderChestBlock && echestOpenedState == 0) {
++            echestOpenedState = 1;
++        }
+     }
+ 
+     @EventHandler
+@@ -44,18 +51,21 @@
+             echestOpenedState = 2;
+             return;
+         }
+-        if (echestOpenedState == 0) return;
+-
+-        if (!(mc.screen instanceof ContainerScreen)) return;
+-        ChestMenu container = ((ContainerScreen) mc.screen).getMenu();
+-        if (container == null) return;
++        if (echestOpenedState == 0) {
++            return;
++        }
++        if (!(MeteorClient.mc.screen instanceof ContainerScreen)) {
++            return;
++        }
++        ChestMenu container = (ChestMenu)((ContainerScreen)MeteorClient.mc.screen).getMenu();
++        if (container == null) {
++            return;
++        }
+         Container inv = container.getContainer();
+-
+-        for (int i = 0; i < 27; i++) {
+-            ITEMS.set(i, inv.getItem(i));
++        for (int i = 0; i < 27; ++i) {
++            ITEMS.set(i, (Object)inv.getItem(i));
+         }
+         isKnown = true;
+-
+         echestOpenedState = 0;
+     }
+ 
+@@ -68,4 +78,9 @@
+     public static boolean isKnown() {
+         return isKnown;
+     }
++
++    static {
++        isKnown = false;
++    }
+ }
++

@@ -1,0 +1,123 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.nbt.CompoundTag
+ *  net.minecraft.nbt.Tag
+ *  org.apache.commons.io.FileUtils
+ */
+package radmin.client.systems.profiles;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import org.apache.commons.io.FileUtils;
+import radmin.client.MeteorClient;
+import radmin.client.settings.BoolSetting;
+import radmin.client.settings.Setting;
+import radmin.client.settings.SettingGroup;
+import radmin.client.settings.Settings;
+import radmin.client.settings.StringListSetting;
+import radmin.client.settings.StringSetting;
+import radmin.client.systems.hud.Hud;
+import radmin.client.systems.macros.Macros;
+import radmin.client.systems.modules.Modules;
+import radmin.client.systems.profiles.Profiles;
+import radmin.client.systems.waypoints.Waypoints;
+import radmin.client.utils.Utils;
+import radmin.client.utils.misc.ISerializable;
+
+public class Profile
+implements ISerializable<Profile> {
+    public final Settings settings = new Settings();
+    private final SettingGroup sgGeneral = this.settings.getDefaultGroup();
+    private final SettingGroup sgSave = this.settings.createGroup("Save");
+    public Setting<String> name = this.sgGeneral.add(((StringSetting.Builder)((StringSetting.Builder)new StringSetting.Builder().name("name")).description("The name of the profile.")).filter(Utils::fileNameFilter).build());
+    public Setting<List<String>> loadOnJoin = this.sgGeneral.add(((StringListSetting.Builder)((StringListSetting.Builder)new StringListSetting.Builder().name("load-on-join")).description("Which servers to set this profile as active when joining.")).filter(Utils::ipFilter).build());
+    public Setting<Boolean> hud = this.sgSave.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("hud")).description("Whether the profile should save hud.")).defaultValue(false)).build());
+    public Setting<Boolean> macros = this.sgSave.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("macros")).description("Whether the profile should save macros.")).defaultValue(false)).build());
+    public Setting<Boolean> modules = this.sgSave.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("modules")).description("Whether the profile should save modules.")).defaultValue(false)).build());
+    public Setting<Boolean> waypoints = this.sgSave.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("waypoints")).description("Whether the profile should save waypoints.")).defaultValue(false)).build());
+
+    public Profile() {
+    }
+
+    public Profile(Tag tag) {
+        this.fromTag((CompoundTag)tag);
+    }
+
+    public void load() {
+        File folder = this.getFile();
+        if (this.hud.get().booleanValue()) {
+            Hud.get().load(folder);
+        }
+        if (this.macros.get().booleanValue()) {
+            Macros.get().load(folder);
+        }
+        if (this.modules.get().booleanValue()) {
+            Modules.get().load(folder);
+        }
+        if (this.waypoints.get().booleanValue()) {
+            Waypoints.get().load(folder);
+        }
+    }
+
+    public void save() {
+        File folder = this.getFile();
+        if (this.hud.get().booleanValue()) {
+            Hud.get().save(folder);
+        }
+        if (this.macros.get().booleanValue()) {
+            Macros.get().save(folder);
+        }
+        if (this.modules.get().booleanValue()) {
+            Modules.get().save(folder);
+        }
+        if (this.waypoints.get().booleanValue()) {
+            Waypoints.get().save(folder);
+        }
+    }
+
+    public void delete() {
+        try {
+            FileUtils.deleteDirectory((File)this.getFile());
+        }
+        catch (IOException e) {
+            MeteorClient.LOG.error("Error deleting profile {}", (Object)this.name.get(), (Object)e);
+        }
+    }
+
+    public File getFile() {
+        return new File(Profiles.FOLDER, this.name.get());
+    }
+
+    @Override
+    public CompoundTag toTag() {
+        CompoundTag tag = new CompoundTag();
+        tag.put("settings", (Tag)this.settings.toTag());
+        return tag;
+    }
+
+    @Override
+    public Profile fromTag(CompoundTag tag) {
+        if (tag.contains("settings")) {
+            this.settings.fromTag(tag.getCompoundOrEmpty("settings"));
+        }
+        return this;
+    }
+
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        }
+        Profile profile = (Profile)o;
+        return Objects.equals(profile.name.get(), this.name.get());
+    }
+}
+

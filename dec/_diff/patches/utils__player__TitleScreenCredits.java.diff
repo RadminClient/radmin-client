@@ -1,0 +1,247 @@
+--- upstream261/utils/player/TitleScreenCredits.java
++++ v1decompiled/utils/player/TitleScreenCredits.java
+@@ -1,79 +1,88 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.ChatFormatting
++ *  net.minecraft.client.gui.GuiGraphicsExtractor
++ *  net.minecraft.client.gui.components.toasts.Toast
++ *  net.minecraft.client.gui.screens.Screen
++ *  net.minecraft.network.chat.Component
++ *  net.minecraft.network.chat.FormattedText
++ *  net.minecraft.network.chat.MutableComponent
++ *  net.minecraft.world.item.Items
+  */
++package radmin.client.utils.player;
+ 
+-package meteordevelopment.meteorclient.utils.player;
+-
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.addons.AddonManager;
+-import meteordevelopment.meteorclient.addons.GithubRepo;
+-import meteordevelopment.meteorclient.addons.MeteorAddon;
+-import meteordevelopment.meteorclient.gui.GuiThemes;
+-import meteordevelopment.meteorclient.gui.screens.CommitsScreen;
+-import meteordevelopment.meteorclient.mixininterface.IComponent;
+-import meteordevelopment.meteorclient.utils.network.Http;
+-import meteordevelopment.meteorclient.utils.network.MeteorExecutor;
+-import meteordevelopment.meteorclient.utils.render.MeteorToast;
+-import net.minecraft.ChatFormatting;
+-import net.minecraft.client.gui.GuiGraphicsExtractor;
+-import net.minecraft.network.chat.Component;
+-import net.minecraft.network.chat.MutableComponent;
+-import net.minecraft.world.item.Items;
+-
++import java.lang.reflect.Type;
+ import java.net.http.HttpResponse;
+ import java.util.ArrayList;
+ import java.util.Comparator;
+ import java.util.List;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
++import java.util.Objects;
++import net.minecraft.ChatFormatting;
++import net.minecraft.client.gui.GuiGraphicsExtractor;
++import net.minecraft.client.gui.components.toasts.Toast;
++import net.minecraft.client.gui.screens.Screen;
++import net.minecraft.network.chat.Component;
++import net.minecraft.network.chat.FormattedText;
++import net.minecraft.network.chat.MutableComponent;
++import net.minecraft.world.item.Items;
++import radmin.client.MeteorClient;
++import radmin.client.addons.AddonManager;
++import radmin.client.addons.GithubRepo;
++import radmin.client.addons.MeteorAddon;
++import radmin.client.gui.GuiThemes;
++import radmin.client.gui.screens.CommitsScreen;
++import radmin.client.mixininterface.IComponent;
++import radmin.client.utils.network.Http;
++import radmin.client.utils.network.MeteorExecutor;
++import radmin.client.utils.render.MeteorToast;
+ 
+ public class TitleScreenCredits {
+-    private static final List<Credit> credits = new ArrayList<>();
++    private static final List<Credit> credits = new ArrayList<Credit>();
+ 
+     private TitleScreenCredits() {
+     }
+ 
+     private static void init() {
+-        // Add addons
+-        for (MeteorAddon addon : AddonManager.ADDONS) add(addon);
+-
+-        // Sort by width (Meteor always first)
+-        credits.sort(Comparator.comparingInt(value -> value.addon == MeteorClient.ADDON ? Integer.MIN_VALUE : -mc.font.width(value.text)));
+-
+-        // Check for latest commits
++        for (MeteorAddon addon : AddonManager.ADDONS) {
++            TitleScreenCredits.add(addon);
++        }
++        credits.sort(Comparator.comparingInt(value -> value.addon == MeteorClient.ADDON ? Integer.MIN_VALUE : -MeteorClient.mc.font.width((FormattedText)value.text)));
+         MeteorExecutor.execute(() -> {
+-            for (Credit credit : credits) {
++            block9: for (Credit credit : credits) {
+                 if (credit.addon.getRepo() == null || credit.addon.getCommit() == null) continue;
+-
+                 GithubRepo repo = credit.addon.getRepo();
+                 Http.Request request = Http.get("https://api.github.com/repos/%s/branches/%s".formatted(repo.getOwnerName(), repo.branch()));
+-                request.exceptionHandler(e -> MeteorClient.LOG.error("Could not fetch repository information for addon '{}'.", credit.addon.name, e));
++                request.exceptionHandler(e -> MeteorClient.LOG.error("Could not fetch repository information for addon '{}'.", (Object)credit.addon.name, e));
+                 repo.authenticate(request);
+-                HttpResponse<Response> res = request.sendJsonResponse(Response.class);
+-
++                HttpResponse res = request.sendJsonResponse((Type)((Object)Response.class));
+                 switch (res.statusCode()) {
+-                    case Http.UNAUTHORIZED -> {
++                    case 401: {
+                         String message = "Invalid authentication token for repository '%s'".formatted(repo.getOwnerName());
+                         MeteorToast toast = new MeteorToast.Builder("GitHub: Unauthorized").icon(Items.BARRIER).text(message).build();
+-                        mc.getToastManager().addToast(toast);
++                        MeteorClient.mc.getToastManager().addToast((Toast)toast);
+                         MeteorClient.LOG.warn(message);
+-                        if (System.getenv("meteor.github.authorization") == null) {
+-                            MeteorClient.LOG.info("Consider setting an authorization " +
+-                                "token with the 'meteor.github.authorization' environment variable.");
+-                            MeteorClient.LOG.info("See: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens");
+-                        }
++                        if (System.getenv("meteor.github.authorization") != null) continue block9;
++                        MeteorClient.LOG.info("Consider setting an authorization token with the 'meteor.github.authorization' environment variable.");
++                        MeteorClient.LOG.info("See: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens");
++                        break;
+                     }
+-                    case Http.FORBIDDEN ->
+-                        MeteorClient.LOG.warn("Could not fetch updates for addon '{}': Rate-limited by GitHub.", credit.addon.name);
+-                    case Http.NOT_FOUND ->
+-                        MeteorClient.LOG.warn("Could not fetch updates for addon '{}': GitHub repository '{}' not found.", credit.addon.name, repo.getOwnerName());
+-                    case Http.SUCCESS -> {
+-                        if (!credit.addon.getCommit().equals(res.body().commit.sha)) {
+-                            synchronized (credit.text) {
+-                                credit.text.append(Component.literal("*").withStyle(ChatFormatting.RED));
+-                                ((IComponent) ((Component) credit.text)).meteor$invalidateCache(); // ???
+-                            }
++                    case 403: {
++                        MeteorClient.LOG.warn("Could not fetch updates for addon '{}': Rate-limited by GitHub.", (Object)credit.addon.name);
++                        break;
++                    }
++                    case 404: {
++                        MeteorClient.LOG.warn("Could not fetch updates for addon '{}': GitHub repository '{}' not found.", (Object)credit.addon.name, (Object)repo.getOwnerName());
++                        break;
++                    }
++                    case 200: {
++                        if (credit.addon.getCommit().equals(((Response)res.body()).commit.sha)) break;
++                        MutableComponent mutableComponent = credit.text;
++                        synchronized (mutableComponent) {
++                            credit.text.append((Component)Component.literal((String)"*").withStyle(ChatFormatting.RED));
++                            ((IComponent)credit.text).meteor$invalidateCache();
++                            break;
+                         }
+                     }
+                 }
+@@ -83,56 +92,58 @@
+ 
+     private static void add(MeteorAddon addon) {
+         Credit credit = new Credit(addon);
+-
+-        credit.text.append(Component.literal(addon.name).withStyle(style -> style.withColor(addon.color.getPacked())));
+-        credit.text.append(Component.literal(" by ").withStyle(ChatFormatting.GRAY));
+-
+-        for (int i = 0; i < addon.authors.length; i++) {
++        credit.text.append((Component)Component.literal((String)addon.name).withStyle(style -> style.withColor(addon.color.getPacked())));
++        credit.text.append((Component)Component.literal((String)" by ").withStyle(ChatFormatting.GRAY));
++        for (int i = 0; i < addon.authors.length; ++i) {
+             if (i > 0) {
+-                credit.text.append(Component.literal(i == addon.authors.length - 1 ? " & " : ", ").withStyle(ChatFormatting.GRAY));
++                credit.text.append((Component)Component.literal((String)(i == addon.authors.length - 1 ? " & " : ", ")).withStyle(ChatFormatting.GRAY));
+             }
+-
+-            credit.text.append(Component.literal(addon.authors[i]).withStyle(ChatFormatting.WHITE));
++            credit.text.append((Component)Component.literal((String)addon.authors[i]).withStyle(ChatFormatting.WHITE));
+         }
+-
+         credits.add(credit);
+     }
+ 
++    /*
++     * WARNING - Removed try catching itself - possible behaviour change.
++     */
+     public static void render(GuiGraphicsExtractor graphics) {
+-        if (credits.isEmpty()) init();
+-
++        if (credits.isEmpty()) {
++            TitleScreenCredits.init();
++        }
+         int y = 3;
+         for (Credit credit : credits) {
+-            synchronized (credit.text) {
+-                int x = mc.screen.width - 3 - mc.font.width(credit.text);
+-
+-                graphics.text(mc.font, credit.text, x, y, -1);
++            MutableComponent mutableComponent = credit.text;
++            synchronized (mutableComponent) {
++                int x = MeteorClient.mc.screen.width - 3 - MeteorClient.mc.font.width((FormattedText)credit.text);
++                graphics.text(MeteorClient.mc.font, (Component)credit.text, x, y, -1);
+             }
+-
+-            y += mc.font.lineHeight + 2;
++            Objects.requireNonNull(MeteorClient.mc.font);
++            y += 9 + 2;
+         }
+     }
+ 
++    /*
++     * WARNING - Removed try catching itself - possible behaviour change.
++     */
+     public static boolean onClicked(double mouseX, double mouseY) {
+         int y = 3;
+         for (Credit credit : credits) {
+             int width;
+-            synchronized (credit.text) {
+-                width = mc.font.width(credit.text);
++            MutableComponent mutableComponent = credit.text;
++            synchronized (mutableComponent) {
++                width = MeteorClient.mc.font.width((FormattedText)credit.text);
+             }
+-
+-            int x = mc.screen.width - 3 - width;
+-
+-            if (mouseX >= x && mouseX <= x + width && mouseY >= y && mouseY <= y + mc.font.lineHeight + 2) {
+-                if (credit.addon.getRepo() != null && credit.addon.getCommit() != null) {
+-                    mc.setScreen(new CommitsScreen(GuiThemes.get(), credit.addon));
++            int x = MeteorClient.mc.screen.width - 3 - width;
++            if (mouseX >= (double)x && mouseX <= (double)(x + width) && mouseY >= (double)y) {
++                Objects.requireNonNull(MeteorClient.mc.font);
++                if (mouseY <= (double)(y + 9 + 2) && credit.addon.getRepo() != null && credit.addon.getCommit() != null) {
++                    MeteorClient.mc.setScreen((Screen)new CommitsScreen(GuiThemes.get(), credit.addon));
+                     return true;
+                 }
+             }
+-
+-            y += mc.font.lineHeight + 2;
++            Objects.requireNonNull(MeteorClient.mc.font);
++            y += 9 + 2;
+         }
+-
+         return false;
+     }
+ 
+@@ -147,9 +158,16 @@
+ 
+     private static class Response {
+         public Commit commit;
++
++        private Response() {
++        }
+     }
+ 
+     private static class Commit {
+         public String sha;
++
++        private Commit() {
++        }
+     }
+ }
++

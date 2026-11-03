@@ -1,0 +1,50 @@
+--- upstream261/mixin/EntityRenderStateMixin.java
++++ v1decompiled/mixin/EntityRenderStateMixin.java
+@@ -1,26 +1,32 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.renderer.entity.state.EntityRenderState
++ *  net.minecraft.world.entity.Entity
++ *  org.jetbrains.annotations.Nullable
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Unique
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.mixininterface.IEntityRenderState;
+ import net.minecraft.client.renderer.entity.state.EntityRenderState;
+ import net.minecraft.world.entity.Entity;
+ import org.jetbrains.annotations.Nullable;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Unique;
++import radmin.client.mixininterface.IEntityRenderState;
+ 
+-@Mixin(EntityRenderState.class)
+-public abstract class EntityRenderStateMixin implements IEntityRenderState {
++@Mixin(value={EntityRenderState.class})
++public abstract class EntityRenderStateMixin
++implements IEntityRenderState {
+     @Unique
+     private Entity entity;
+ 
+     @Override
+-    @Nullable(value = "EntityCulling mod can prevent the code that sets the entity from running")
+-    public Entity meteor$getEntity() {
+-        return entity;
++    @Nullable(value="EntityCulling mod can prevent the code that sets the entity from running")
++    public @Nullable(value="EntityCulling mod can prevent the code that sets the entity from running") Entity meteor$getEntity() {
++        return this.entity;
+     }
+ 
+     @Override
+@@ -28,3 +34,4 @@
+         this.entity = entity;
+     }
+ }
++

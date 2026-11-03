@@ -1,0 +1,417 @@
+--- upstream261/commands/commands/NotebotCommand.java
++++ v1decompiled/commands/commands/NotebotCommand.java
+@@ -1,30 +1,28 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.Message
++ *  com.mojang.brigadier.arguments.StringArgumentType
++ *  com.mojang.brigadier.builder.LiteralArgumentBuilder
++ *  com.mojang.brigadier.exceptions.DynamicCommandExceptionType
++ *  com.mojang.brigadier.exceptions.SimpleCommandExceptionType
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
++ *  net.minecraft.network.chat.Component
++ *  net.minecraft.network.protocol.Packet
++ *  net.minecraft.network.protocol.game.ClientboundSoundPacket
++ *  net.minecraft.sounds.SoundEvent
++ *  net.minecraft.util.Util
++ *  net.minecraft.world.level.block.state.properties.NoteBlockInstrument
+  */
+-
+-package meteordevelopment.meteorclient.commands.commands;
+-
++package radmin.client.commands.commands;
++
++import com.mojang.brigadier.Message;
+ import com.mojang.brigadier.arguments.StringArgumentType;
+ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.commands.Command;
+-import meteordevelopment.meteorclient.commands.arguments.NotebotSongArgumentType;
+-import meteordevelopment.meteorclient.events.packets.PacketEvent;
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.misc.Notebot;
+-import meteordevelopment.meteorclient.utils.notebot.song.Note;
+-import meteordevelopment.orbit.EventHandler;
+-import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+-import net.minecraft.network.chat.Component;
+-import net.minecraft.network.protocol.game.ClientboundSoundPacket;
+-import net.minecraft.sounds.SoundEvent;
+-import net.minecraft.util.Util;
+-import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+-
+ import java.io.FileWriter;
+ import java.io.IOException;
+ import java.nio.file.Path;
+@@ -32,122 +30,128 @@
+ import java.util.HashMap;
+ import java.util.List;
+ import java.util.Map;
+-
+-public class NotebotCommand extends Command {
+-    private static final SimpleCommandExceptionType INVALID_SONG = new SimpleCommandExceptionType(Component.literal("Invalid song."));
+-    private static final DynamicCommandExceptionType INVALID_PATH = new DynamicCommandExceptionType(object -> Component.literal("'%s' is not a valid path.".formatted(object)));
+-
++import meteordevelopment.orbit.EventHandler;
++import net.minecraft.client.multiplayer.ClientSuggestionProvider;
++import net.minecraft.network.chat.Component;
++import net.minecraft.network.protocol.Packet;
++import net.minecraft.network.protocol.game.ClientboundSoundPacket;
++import net.minecraft.sounds.SoundEvent;
++import net.minecraft.util.Util;
++import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
++import radmin.client.MeteorClient;
++import radmin.client.commands.Command;
++import radmin.client.commands.arguments.NotebotSongArgumentType;
++import radmin.client.events.packets.PacketEvent;
++import radmin.client.events.world.TickEvent;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.misc.Notebot;
++import radmin.client.utils.notebot.song.Note;
++
++public class NotebotCommand
++extends Command {
++    private static final SimpleCommandExceptionType INVALID_SONG = new SimpleCommandExceptionType((Message)Component.literal((String)"Invalid song."));
++    private static final DynamicCommandExceptionType INVALID_PATH = new DynamicCommandExceptionType(object -> Component.literal((String)"'%s' is not a valid path.".formatted(object)));
+     int ticks = -1;
+-    private final Map<Integer, List<Note>> song = new HashMap<>(); // tick -> notes
++    private final Map<Integer, List<Note>> song = new HashMap<Integer, List<Note>>();
+ 
+     public NotebotCommand() {
+-        super("notebot", "Allows you load notebot files");
++        super("notebot", "Allows you load notebot files", new String[0]);
+     }
+ 
+     @Override
+     public void build(LiteralArgumentBuilder<ClientSuggestionProvider> builder) {
+-        builder.then(literal("help").executes(_ -> {
+-            Util.getPlatform().openUri("https://github.com/MeteorDevelopment/meteor-client/wiki/Notebot-Guide");
+-            return SINGLE_SUCCESS;
+-        }));
+-
+-        builder.then(literal("status").executes(_ -> {
+-            Notebot notebot = Modules.get().get(Notebot.class);
+-            info(notebot.getStatus());
+-            return SINGLE_SUCCESS;
+-        }));
+-
+-        builder.then(literal("pause").executes(_ -> {
++        builder.then(NotebotCommand.literal("help").executes(commandContext -> {
++            Util.getPlatform().openUri("https://github.com/MeteorDevelopment/radmin-client/wiki/Notebot-Guide");
++            return 1;
++        }));
++        builder.then(NotebotCommand.literal("status").executes(commandContext -> {
++            Notebot notebot = Modules.get().get(Notebot.class);
++            this.info(notebot.getStatus(), new Object[0]);
++            return 1;
++        }));
++        builder.then(NotebotCommand.literal("pause").executes(commandContext -> {
+             Notebot notebot = Modules.get().get(Notebot.class);
+             notebot.pause();
+-            return SINGLE_SUCCESS;
+-        }));
+-
+-        builder.then(literal("resume").executes(_ -> {
++            return 1;
++        }));
++        builder.then(NotebotCommand.literal("resume").executes(commandContext -> {
+             Notebot notebot = Modules.get().get(Notebot.class);
+             notebot.pause();
+-            return SINGLE_SUCCESS;
+-        }));
+-
+-        builder.then(literal("stop").executes(_ -> {
++            return 1;
++        }));
++        builder.then(NotebotCommand.literal("stop").executes(commandContext -> {
+             Notebot notebot = Modules.get().get(Notebot.class);
+             notebot.stop();
+-            return SINGLE_SUCCESS;
+-        }));
+-
+-        builder.then(literal("randomsong").executes(_ -> {
++            return 1;
++        }));
++        builder.then(NotebotCommand.literal("randomsong").executes(commandContext -> {
+             Notebot notebot = Modules.get().get(Notebot.class);
+             notebot.playRandomSong();
+-            return SINGLE_SUCCESS;
+-        }));
+-
+-        builder.then(
+-            literal("play").then(
+-                argument("song", NotebotSongArgumentType.create()).executes(ctx -> {
+-                    Notebot notebot = Modules.get().get(Notebot.class);
+-                    Path songPath = ctx.getArgument("song", Path.class);
+-                    if (songPath == null || !songPath.toFile().exists()) {
+-                        throw INVALID_SONG.create();
+-                    }
+-                    notebot.loadSong(songPath.toFile());
+-                    return SINGLE_SUCCESS;
+-                })
+-            )
+-        );
+-
+-        builder.then(
+-            literal("preview").then(
+-                argument("song", NotebotSongArgumentType.create()).executes(ctx -> {
+-                    Notebot notebot = Modules.get().get(Notebot.class);
+-                    Path songPath = ctx.getArgument("song", Path.class);
+-                    if (songPath == null || !songPath.toFile().exists()) {
+-                        throw INVALID_SONG.create();
+-                    }
+-                    notebot.previewSong(songPath.toFile());
+-                    return SINGLE_SUCCESS;
+-                })));
+-
+-        builder.then(literal("record").then(literal("start").executes(_ -> {
+-            ticks = -1;
+-            song.clear();
+-            MeteorClient.EVENT_BUS.subscribe(this);
+-            info("Recording started");
+-            return SINGLE_SUCCESS;
+-        })));
+-
+-        builder.then(literal("record").then(literal("cancel").executes(_ -> {
+-            MeteorClient.EVENT_BUS.unsubscribe(this);
+-            info("Recording cancelled");
+-            return SINGLE_SUCCESS;
+-        })));
+-
+-        builder.then(literal("record").then(literal("save").then(argument("name", StringArgumentType.greedyString()).executes(ctx -> {
+-            String name = ctx.getArgument("name", String.class);
++            return 1;
++        }));
++        builder.then(NotebotCommand.literal("play").then(NotebotCommand.argument("song", NotebotSongArgumentType.create()).executes(ctx -> {
++            Notebot notebot = Modules.get().get(Notebot.class);
++            Path songPath = (Path)ctx.getArgument("song", Path.class);
++            if (songPath == null || !songPath.toFile().exists()) {
++                throw INVALID_SONG.create();
++            }
++            notebot.loadSong(songPath.toFile());
++            return 1;
++        })));
++        builder.then(NotebotCommand.literal("preview").then(NotebotCommand.argument("song", NotebotSongArgumentType.create()).executes(ctx -> {
++            Notebot notebot = Modules.get().get(Notebot.class);
++            Path songPath = (Path)ctx.getArgument("song", Path.class);
++            if (songPath == null || !songPath.toFile().exists()) {
++                throw INVALID_SONG.create();
++            }
++            notebot.previewSong(songPath.toFile());
++            return 1;
++        })));
++        builder.then(NotebotCommand.literal("record").then(NotebotCommand.literal("start").executes(commandContext -> {
++            this.ticks = -1;
++            this.song.clear();
++            MeteorClient.EVENT_BUS.subscribe((Object)this);
++            this.info("Recording started", new Object[0]);
++            return 1;
++        })));
++        builder.then(NotebotCommand.literal("record").then(NotebotCommand.literal("cancel").executes(commandContext -> {
++            MeteorClient.EVENT_BUS.unsubscribe((Object)this);
++            this.info("Recording cancelled", new Object[0]);
++            return 1;
++        })));
++        builder.then(NotebotCommand.literal("record").then(NotebotCommand.literal("save").then(NotebotCommand.argument("name", StringArgumentType.greedyString()).executes(ctx -> {
++            String name = (String)ctx.getArgument("name", String.class);
+             if (name == null || name.isEmpty()) {
+-                throw INVALID_PATH.create(name);
++                throw INVALID_PATH.create((Object)name);
+             }
+             Path notebotFolder = MeteorClient.FOLDER.toPath().resolve("notebot");
+             Path path = notebotFolder.resolve(String.format("%s.txt", name)).normalize();
+             if (!path.startsWith(notebotFolder)) {
+-                throw INVALID_PATH.create(path);
+-            }
+-            saveRecording(path);
+-            return SINGLE_SUCCESS;
++                throw INVALID_PATH.create((Object)path);
++            }
++            this.saveRecording(path);
++            return 1;
+         }))));
+     }
+ 
+     @EventHandler
+     private void onTick(TickEvent.Post event) {
+-        if (ticks == -1) return;
+-        ticks++;
++        if (this.ticks == -1) {
++            return;
++        }
++        ++this.ticks;
+     }
+ 
+     @EventHandler
+     private void onReadPacket(PacketEvent.Receive event) {
+-        if (event.packet instanceof ClientboundSoundPacket sound && sound.getSound().value().location().getPath().contains("note_block")) {
+-            if (ticks == -1) ticks = 0;
+-            List<Note> notes = song.computeIfAbsent(ticks, _ -> new ArrayList<>());
+-            var note = getNote(sound);
++        ClientboundSoundPacket sound;
++        Packet<?> packet = event.packet;
++        if (packet instanceof ClientboundSoundPacket && ((SoundEvent)(sound = (ClientboundSoundPacket)packet).getSound().value()).location().getPath().contains("note_block")) {
++            if (this.ticks == -1) {
++                this.ticks = 0;
++            }
++            List notes = this.song.computeIfAbsent(this.ticks, n -> new ArrayList());
++            Note note = this.getNote(sound);
+             if (note != null) {
+                 notes.add(note);
+             }
+@@ -155,96 +159,102 @@
+     }
+ 
+     private void saveRecording(Path path) {
+-        if (song.isEmpty()) {
+-            MeteorClient.EVENT_BUS.unsubscribe(this);
++        if (this.song.isEmpty()) {
++            MeteorClient.EVENT_BUS.unsubscribe((Object)this);
+             return;
+         }
+         try {
+-            MeteorClient.EVENT_BUS.unsubscribe(this);
+-
++            MeteorClient.EVENT_BUS.unsubscribe((Object)this);
+             FileWriter file = new FileWriter(path.toFile());
+-            for (var entry : song.entrySet()) {
++            for (Map.Entry<Integer, List<Note>> entry : this.song.entrySet()) {
+                 int tick = entry.getKey();
+                 List<Note> notes = entry.getValue();
+-
+-                for (var note : notes) {
++                for (Note note : notes) {
+                     NoteBlockInstrument instrument = note.getInstrument();
+                     int noteLevel = note.getNoteLevel();
+-
+                     file.write(String.format("%d:%d:%d\n", tick, noteLevel, instrument.ordinal()));
+                 }
+             }
+-
+             file.close();
+-            info("Song saved.");
+-        } catch (IOException _) {
+-            info("Couldn't create the file.");
+-            MeteorClient.EVENT_BUS.unsubscribe(this);
+-        }
+-
++            this.info("Song saved.", new Object[0]);
++        }
++        catch (IOException iOException) {
++            this.info("Couldn't create the file.", new Object[0]);
++            MeteorClient.EVENT_BUS.unsubscribe((Object)this);
++        }
+     }
+ 
+     private Note getNote(ClientboundSoundPacket soundPacket) {
+         float pitch = soundPacket.getPitch();
+-
+-        // Bruteforce note level
+         int noteLevel = -1;
+-        for (int n = 0; n < 25; n++) {
+-            if ((float) Math.pow(2.0D, (n - 12) / 12.0D) - 0.01 < pitch &&
+-                (float) Math.pow(2.0D, (n - 12) / 12.0D) + 0.01 > pitch) {
+-                noteLevel = n;
+-                break;
+-            }
+-        }
+-
++        for (int n = 0; n < 25; ++n) {
++            if (!((double)((float)Math.pow(2.0, (double)(n - 12) / 12.0)) - 0.01 < (double)pitch) || !((double)((float)Math.pow(2.0, (double)(n - 12) / 12.0)) + 0.01 > (double)pitch)) continue;
++            noteLevel = n;
++            break;
++        }
+         if (noteLevel == -1) {
+-            error("Error while bruteforcing a note level! Sound: " + soundPacket.getSound().value() + " Pitch: " + pitch);
++            this.error("Error while bruteforcing a note level! Sound: " + String.valueOf(soundPacket.getSound().value()) + " Pitch: " + pitch, new Object[0]);
+             return null;
+         }
+-
+-        NoteBlockInstrument instrument = getInstrumentFromSound(soundPacket.getSound().value());
++        NoteBlockInstrument instrument = this.getInstrumentFromSound((SoundEvent)soundPacket.getSound().value());
+         if (instrument == null) {
+-            error("Can't find the instrument from sound! Sound: " + soundPacket.getSound().value());
++            this.error("Can't find the instrument from sound! Sound: " + String.valueOf(soundPacket.getSound().value()), new Object[0]);
+             return null;
+         }
+-
+         return new Note(instrument, noteLevel);
+     }
+ 
+     private NoteBlockInstrument getInstrumentFromSound(SoundEvent sound) {
+         String path = sound.location().getPath();
+-        if (path.contains("harp"))
++        if (path.contains("harp")) {
+             return NoteBlockInstrument.HARP;
+-        else if (path.contains("basedrum"))
++        }
++        if (path.contains("basedrum")) {
+             return NoteBlockInstrument.BASEDRUM;
+-        else if (path.contains("snare"))
++        }
++        if (path.contains("snare")) {
+             return NoteBlockInstrument.SNARE;
+-        else if (path.contains("hat"))
++        }
++        if (path.contains("hat")) {
+             return NoteBlockInstrument.HAT;
+-        else if (path.contains("bass"))
++        }
++        if (path.contains("bass")) {
+             return NoteBlockInstrument.BASS;
+-        else if (path.contains("flute"))
++        }
++        if (path.contains("flute")) {
+             return NoteBlockInstrument.FLUTE;
+-        else if (path.contains("bell"))
++        }
++        if (path.contains("bell")) {
+             return NoteBlockInstrument.BELL;
+-        else if (path.contains("guitar"))
++        }
++        if (path.contains("guitar")) {
+             return NoteBlockInstrument.GUITAR;
+-        else if (path.contains("chime"))
++        }
++        if (path.contains("chime")) {
+             return NoteBlockInstrument.CHIME;
+-        else if (path.contains("xylophone"))
++        }
++        if (path.contains("xylophone")) {
+             return NoteBlockInstrument.XYLOPHONE;
+-        else if (path.contains("iron_xylophone"))
++        }
++        if (path.contains("iron_xylophone")) {
+             return NoteBlockInstrument.IRON_XYLOPHONE;
+-        else if (path.contains("cow_bell"))
++        }
++        if (path.contains("cow_bell")) {
+             return NoteBlockInstrument.COW_BELL;
+-        else if (path.contains("didgeridoo"))
++        }
++        if (path.contains("didgeridoo")) {
+             return NoteBlockInstrument.DIDGERIDOO;
+-        else if (path.contains("bit"))
++        }
++        if (path.contains("bit")) {
+             return NoteBlockInstrument.BIT;
+-        else if (path.contains("banjo"))
++        }
++        if (path.contains("banjo")) {
+             return NoteBlockInstrument.BANJO;
+-        else if (path.contains("pling"))
++        }
++        if (path.contains("pling")) {
+             return NoteBlockInstrument.PLING;
++        }
+         return null;
+     }
+ }
++

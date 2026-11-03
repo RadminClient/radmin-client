@@ -1,0 +1,25 @@
+--- upstream261/utils/misc/EmptyIterator.java
++++ v1decompiled/utils/misc/EmptyIterator.java
+@@ -1,13 +1,12 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.utils.misc;
++package radmin.client.utils.misc;
+ 
+ import java.util.Iterator;
+ 
+-public class EmptyIterator<T> implements Iterator<T> {
++public class EmptyIterator<T>
++implements Iterator<T> {
+     @Override
+     public boolean hasNext() {
+         return false;
+@@ -18,3 +17,4 @@
+         return null;
+     }
+ }
++

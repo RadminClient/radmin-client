@@ -1,0 +1,283 @@
+--- upstream261/systems/modules/player/AutoReplenish.java
++++ v1decompiled/systems/modules/player/AutoReplenish.java
+@@ -1,192 +1,136 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.world.item.Item
++ *  net.minecraft.world.item.ItemStack
+  */
++package radmin.client.systems.modules.player;
+ 
+-package meteordevelopment.meteorclient.systems.modules.player;
+-
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.settings.*;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.combat.AutoTotem;
+-import meteordevelopment.meteorclient.utils.player.InvUtils;
+-import meteordevelopment.meteorclient.utils.player.SlotUtils;
++import java.util.List;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.ItemStack;
++import radmin.client.events.world.TickEvent;
++import radmin.client.settings.BoolSetting;
++import radmin.client.settings.IntSetting;
++import radmin.client.settings.ItemListSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.combat.AutoTotem;
++import radmin.client.utils.player.InvUtils;
+ 
+-import java.util.List;
+-
+-public class AutoReplenish extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<Integer> minCount = sgGeneral.add(new IntSetting.Builder()
+-        .name("min-count")
+-        .description("Replenish a slot when it reaches this item count.")
+-        .defaultValue(8)
+-        .min(1)
+-        .sliderRange(1, 63)
+-        .build()
+-    );
+-
+-    private final Setting<Integer> tickDelay = sgGeneral.add(new IntSetting.Builder()
+-        .name("delay")
+-        .description("How long in ticks to wait between replenishing your hotbar.")
+-        .defaultValue(1)
+-        .min(0)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> offhand = sgGeneral.add(new BoolSetting.Builder()
+-        .name("offhand")
+-        .description("Whether or not to replenish items in your offhand.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> unstackable = sgGeneral.add(new BoolSetting.Builder()
+-        .name("unstackable")
+-        .description("Replenish unstackable items.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> sameEnchants = sgGeneral.add(new BoolSetting.Builder()
+-        .name("same-enchants")
+-        .description("Only replace unstackables with items that have the same enchants.")
+-        .defaultValue(true)
+-        .visible(unstackable::get)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> searchHotbar = sgGeneral.add(new BoolSetting.Builder()
+-        .name("search-hotbar")
+-        .description("Combine stacks in your hotbar/offhand as a last resort.")
+-        .defaultValue(false)
+-        .build()
+-    );
+-
+-    private final Setting<List<Item>> excludedItems = sgGeneral.add(new ItemListSetting.Builder()
+-        .name("excluded-items")
+-        .description("Items that won't be replenished.")
+-        .build()
+-    );
+-
+-    /**
+-     * Represents the items the player had last tick. Indices 0-8 represent the
+-     * hotbar from left to right, index 9 represents the player's offhand
+-     */
+-    private final ItemStack[] items = new ItemStack[10];
++public class AutoReplenish
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final Setting<Integer> minCount;
++    private final Setting<Integer> tickDelay;
++    private final Setting<Boolean> offhand;
++    private final Setting<Boolean> unstackable;
++    private final Setting<Boolean> sameEnchants;
++    private final Setting<Boolean> searchHotbar;
++    private final Setting<List<Item>> excludedItems;
++    private final ItemStack[] items;
+     private boolean prevHadOpenScreen;
+     private int tickDelayLeft;
+ 
+     public AutoReplenish() {
+         super(Categories.Player, "auto-replenish", "Automatically refills items in your hotbar, main hand, or offhand.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.minCount = this.sgGeneral.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("min-count")).description("Replenish a slot when it reaches this item count.")).defaultValue(8)).min(1).sliderRange(1, 63).build());
++        this.tickDelay = this.sgGeneral.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("delay")).description("How long in ticks to wait between replenishing your hotbar.")).defaultValue(1)).min(0).build());
++        this.offhand = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("offhand")).description("Whether or not to replenish items in your offhand.")).defaultValue(true)).build());
++        this.unstackable = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("unstackable")).description("Replenish unstackable items.")).defaultValue(true)).build());
++        this.sameEnchants = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("same-enchants")).description("Only replace unstackables with items that have the same enchants.")).defaultValue(true)).visible(this.unstackable::get)).build());
++        this.searchHotbar = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("search-hotbar")).description("Combine stacks in your hotbar/offhand as a last resort.")).defaultValue(false)).build());
++        this.excludedItems = this.sgGeneral.add(((ItemListSetting.Builder)((ItemListSetting.Builder)new ItemListSetting.Builder().name("excluded-items")).description("Items that won't be replenished.")).build());
++        this.items = new ItemStack[10];
+     }
+ 
+     @Override
+     public void onActivate() {
+-        fillItems();
+-        tickDelayLeft = tickDelay.get();
+-        prevHadOpenScreen = mc.screen != null;
++        this.fillItems();
++        this.tickDelayLeft = this.tickDelay.get();
++        this.prevHadOpenScreen = this.mc.screen != null;
+     }
+ 
+     @EventHandler
+     private void onTick(TickEvent.Pre event) {
+-        if (mc.screen == null && prevHadOpenScreen) {
+-            fillItems();
++        if (this.mc.screen == null && this.prevHadOpenScreen) {
++            this.fillItems();
+         }
+-
+-        prevHadOpenScreen = mc.screen != null;
+-        if (mc.player.containerMenu.getItems().size() != 46 || mc.screen != null) return;
+-
+-        if (tickDelayLeft > 0) {
+-            tickDelayLeft--;
++        boolean bl = this.prevHadOpenScreen = this.mc.screen != null;
++        if (this.mc.player.containerMenu.getItems().size() != 46 || this.mc.screen != null) {
+             return;
+         }
+-
+-        // Hotbar
+-        for (int i = 0; i < 9; i++) {
+-            ItemStack stack = mc.player.getInventory().getItem(i);
+-            checkSlot(i, stack);
++        if (this.tickDelayLeft > 0) {
++            --this.tickDelayLeft;
++            return;
+         }
+-
+-        // Offhand
+-        if (offhand.get() && !Modules.get().get(AutoTotem.class).isLocked()) {
+-            ItemStack stack = mc.player.getOffhandItem();
+-            checkSlot(9, stack);
++        for (int i = 0; i < 9; ++i) {
++            ItemStack stack = this.mc.player.getInventory().getItem(i);
++            this.checkSlot(i, stack);
+         }
+-
+-        tickDelayLeft = tickDelay.get();
++        if (this.offhand.get().booleanValue() && !Modules.get().get(AutoTotem.class).isLocked()) {
++            ItemStack stack = this.mc.player.getOffhandItem();
++            this.checkSlot(9, stack);
++        }
++        this.tickDelayLeft = this.tickDelay.get();
+     }
+ 
+     private void checkSlot(int slot, ItemStack stack) {
+-        ItemStack prevStack = items[slot];
+-        items[slot] = stack.copy();
+-
+-        if (slot == 9) slot = SlotUtils.OFFHAND;
+-
+-        if (excludedItems.get().contains(stack.getItem())) return;
+-        if (excludedItems.get().contains(prevStack.getItem())) return;
+-
++        ItemStack prevStack = this.items[slot];
++        this.items[slot] = stack.copy();
++        if (slot == 9) {
++            slot = 40;
++        }
++        if (this.excludedItems.get().contains(stack.getItem())) {
++            return;
++        }
++        if (this.excludedItems.get().contains(prevStack.getItem())) {
++            return;
++        }
+         int fromSlot = -1;
+-
+-        // If there are still items left in the stack, but it just crossed the threshold
+-        if (stack.isStackable() && !stack.isEmpty() && stack.getCount() <= minCount.get()) {
+-            fromSlot = findItem(stack, slot, minCount.get() - stack.getCount() + 1, true);
++        if (stack.isStackable() && !stack.isEmpty() && stack.getCount() <= this.minCount.get()) {
++            fromSlot = this.findItem(stack, slot, this.minCount.get() - stack.getCount() + 1, true);
+         }
+-
+-        // If the stack just went from above the threshold to empty in a single tick
+-        // this can happen if the threshold is set low enough while using modules that
+-        // place many blocks per tick, like surround or holefiller
+         if (prevStack.isStackable() && stack.isEmpty() && !prevStack.isEmpty()) {
+-            fromSlot = findItem(prevStack, slot, minCount.get() - stack.getCount() + 1, false);
++            fromSlot = this.findItem(prevStack, slot, this.minCount.get() - stack.getCount() + 1, false);
+         }
+-
+-        // Unstackable items
+-        if (unstackable.get() && !prevStack.isStackable() && stack.isEmpty() && !prevStack.isEmpty()) {
+-            fromSlot = findItem(prevStack, slot, 1, false);
++        if (this.unstackable.get().booleanValue() && !prevStack.isStackable() && stack.isEmpty() && !prevStack.isEmpty()) {
++            fromSlot = this.findItem(prevStack, slot, 1, false);
+         }
+-
+-        // eliminate occasional loops when moving items from hotbar to itself
+-        if (fromSlot == mc.player.getInventory().getSelectedSlot() || fromSlot == SlotUtils.OFFHAND) return;
+-        if (fromSlot < 9 && fromSlot < slot && slot != mc.player.getInventory().getSelectedSlot() && slot != SlotUtils.OFFHAND)
++        if (fromSlot == this.mc.player.getInventory().getSelectedSlot() || fromSlot == 40) {
+             return;
+-
++        }
++        if (fromSlot < 9 && fromSlot < slot && slot != this.mc.player.getInventory().getSelectedSlot() && slot != 40) {
++            return;
++        }
+         InvUtils.move().from(fromSlot).to(slot);
+     }
+ 
+     private int findItem(ItemStack lookForStack, int excludedSlot, int goodEnoughCount, boolean mustCombine) {
+         int slot = -1;
+         int count = 0;
+-
+-        for (int i = mc.player.getInventory().getContainerSize() - 2; i >= (searchHotbar.get() ? 0 : 9); i--) {
+-            if (i == excludedSlot) continue;
+-
+-            ItemStack stack = mc.player.getInventory().getItem(i);
+-            if (stack.getItem() != lookForStack.getItem()) continue;
+-
+-            if (mustCombine && !ItemStack.isSameItemSameComponents(lookForStack, stack)) continue;
+-            if (sameEnchants.get() && !stack.getEnchantments().equals(lookForStack.getEnchantments())) continue;
+-
+-            if (stack.getCount() > count) {
+-                slot = i;
+-                count = stack.getCount();
+-
+-                if (count >= goodEnoughCount) break;
+-            }
++        for (int i = this.mc.player.getInventory().getContainerSize() - 2; i >= (this.searchHotbar.get() != false ? 0 : 9); --i) {
++            ItemStack stack;
++            if (i == excludedSlot || (stack = this.mc.player.getInventory().getItem(i)).getItem() != lookForStack.getItem() || mustCombine && !ItemStack.isSameItemSameComponents((ItemStack)lookForStack, (ItemStack)stack) || this.sameEnchants.get().booleanValue() && !stack.getEnchantments().equals((Object)lookForStack.getEnchantments()) || stack.getCount() <= count) continue;
++            slot = i;
++            count = stack.getCount();
++            if (count >= goodEnoughCount) break;
+         }
+-
+         return slot;
+     }
+ 
+     private void fillItems() {
+-        for (int i = 0; i < 9; i++) {
+-            items[i] = mc.player.getInventory().getItem(i).copy();
++        for (int i = 0; i < 9; ++i) {
++            this.items[i] = this.mc.player.getInventory().getItem(i).copy();
+         }
+-
+-        items[9] = mc.player.getOffhandItem().copy();
++        this.items[9] = this.mc.player.getOffhandItem().copy();
+     }
+ }
++

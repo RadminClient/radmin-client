@@ -1,0 +1,45 @@
+--- upstream261/renderer/MeteorVertexFormats.java
++++ v1decompiled/renderer/MeteorVertexFormats.java
+@@ -1,28 +1,23 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.vertex.VertexFormat
++ *  com.mojang.blaze3d.vertex.VertexFormatElement
+  */
+-
+-package meteordevelopment.meteorclient.renderer;
++package radmin.client.renderer;
+ 
+ import com.mojang.blaze3d.vertex.VertexFormat;
+ import com.mojang.blaze3d.vertex.VertexFormatElement;
++import radmin.client.renderer.MeteorVertexFormatElements;
+ 
+ public abstract class MeteorVertexFormats {
+-    public static final VertexFormat POS2 = VertexFormat.builder()
+-        .add("Position", MeteorVertexFormatElements.POS2)
+-        .build();
++    public static final VertexFormat POS2 = VertexFormat.builder().add("Position", MeteorVertexFormatElements.POS2).build();
++    public static final VertexFormat POS2_COLOR = VertexFormat.builder().add("Position", MeteorVertexFormatElements.POS2).add("Color", VertexFormatElement.COLOR).build();
++    public static final VertexFormat POS2_TEXTURE_COLOR = VertexFormat.builder().add("Position", MeteorVertexFormatElements.POS2).add("Texture", VertexFormatElement.UV).add("Color", VertexFormatElement.COLOR).build();
++    public static final VertexFormat POS3_TEXTURE_COLOR = VertexFormat.builder().add("Position", VertexFormatElement.POSITION).add("Texture", VertexFormatElement.UV).add("Color", VertexFormatElement.COLOR).build();
+ 
+-    public static final VertexFormat POS2_COLOR = VertexFormat.builder()
+-        .add("Position", MeteorVertexFormatElements.POS2)
+-        .add("Color", VertexFormatElement.COLOR)
+-        .build();
++    private MeteorVertexFormats() {
++    }
++}
+ 
+-    public static final VertexFormat POS2_TEXTURE_COLOR = VertexFormat.builder()
+-        .add("Position", MeteorVertexFormatElements.POS2)
+-        .add("Texture", VertexFormatElement.UV)
+-        .add("Color", VertexFormatElement.COLOR)
+-        .build();
+-
+-    private MeteorVertexFormats() {}
+-}

@@ -1,0 +1,71 @@
+--- upstream261/gui/themes/meteor/widgets/input/WMeteorSlider.java
++++ v1decompiled/gui/themes/meteor/widgets/input/WMeteorSlider.java
+@@ -1,45 +1,42 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.themes.meteor.widgets.input;
+ 
+-package meteordevelopment.meteorclient.gui.themes.meteor.widgets.input;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.themes.meteor.MeteorGuiTheme;
++import radmin.client.gui.themes.meteor.MeteorWidget;
++import radmin.client.gui.widgets.input.WSlider;
++import radmin.client.utils.render.color.Color;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.gui.themes.meteor.MeteorGuiTheme;
+-import meteordevelopment.meteorclient.gui.themes.meteor.MeteorWidget;
+-import meteordevelopment.meteorclient.gui.widgets.input.WSlider;
+-
+-public class WMeteorSlider extends WSlider implements MeteorWidget {
++public class WMeteorSlider
++extends WSlider
++implements MeteorWidget {
+     public WMeteorSlider(double value, double min, double max) {
+         super(value, min, max);
+     }
+ 
+     @Override
+     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        double valueWidth = valueWidth();
+-
+-        renderBar(renderer, valueWidth);
+-        renderHandle(renderer, valueWidth);
++        double valueWidth = this.valueWidth();
++        this.renderBar(renderer, valueWidth);
++        this.renderHandle(renderer, valueWidth);
+     }
+ 
+     private void renderBar(GuiRenderer renderer, double valueWidth) {
+-        MeteorGuiTheme theme = theme();
+-
+-        double s = theme.scale(3);
+-        double handleSize = handleSize();
+-
+-        double x = this.x + handleSize / 2;
+-        double y = this.y + height / 2 - s / 2;
+-
++        MeteorGuiTheme theme = this.theme();
++        double s = theme.scale(3.0);
++        double handleSize = this.handleSize();
++        double x = this.x + handleSize / 2.0;
++        double y = this.y + this.height / 2.0 - s / 2.0;
+         renderer.quad(x, y, valueWidth, s, theme.sliderLeft.get());
+-        renderer.quad(x + valueWidth, y, width - valueWidth - handleSize, s, theme.sliderRight.get());
++        renderer.quad(x + valueWidth, y, this.width - valueWidth - handleSize, s, theme.sliderRight.get());
+     }
+ 
+     private void renderHandle(GuiRenderer renderer, double valueWidth) {
+-        MeteorGuiTheme theme = theme();
+-        double s = handleSize();
+-
+-        renderer.quad(x + valueWidth, y, s, s, GuiRenderer.CIRCLE, theme.sliderHandle.get(dragging, handleMouseOver));
++        MeteorGuiTheme theme = this.theme();
++        double s = this.handleSize();
++        renderer.quad(this.x + valueWidth, this.y, s, s, GuiRenderer.CIRCLE, (Color)theme.sliderHandle.get(this.dragging, this.handleMouseOver));
+     }
+ }
++

@@ -1,0 +1,38 @@
+--- upstream261/gui/tabs/TabScreen.java
++++ v1decompiled/gui/tabs/TabScreen.java
+@@ -1,21 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.tabs;
+ 
+-package meteordevelopment.meteorclient.gui.tabs;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WidgetScreen;
++import radmin.client.gui.tabs.Tab;
++import radmin.client.gui.utils.Cell;
++import radmin.client.gui.widgets.WWidget;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WidgetScreen;
+-import meteordevelopment.meteorclient.gui.utils.Cell;
+-import meteordevelopment.meteorclient.gui.widgets.WWidget;
+-
+-public abstract class TabScreen extends WidgetScreen {
++public abstract class TabScreen
++extends WidgetScreen {
+     public final Tab tab;
+ 
+     public TabScreen(GuiTheme theme, Tab tab) {
+         super(theme, tab.name);
+-
+         this.tab = tab;
+     }
+ 
+@@ -23,3 +22,4 @@
+         return super.add(widget);
+     }
+ }
++

@@ -1,0 +1,17 @@
+--- upstream261/mixininterface/IComponent.java
++++ v1decompiled/mixininterface/IComponent.java
+@@ -1,10 +1,9 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ public interface IComponent {
+-    void meteor$invalidateCache();
++    public void meteor$invalidateCache();
+ }
++

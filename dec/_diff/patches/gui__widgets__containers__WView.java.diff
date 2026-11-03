@@ -1,0 +1,295 @@
+--- upstream261/gui/widgets/containers/WView.java
++++ v1decompiled/gui/widgets/containers/WView.java
+@@ -1,196 +1,185 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.input.MouseButtonEvent
++ *  net.minecraft.util.Mth
+  */
++package radmin.client.gui.widgets.containers;
+ 
+-package meteordevelopment.meteorclient.gui.widgets.containers;
+-
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.gui.widgets.WWidget;
+-import meteordevelopment.meteorclient.utils.Utils;
+ import net.minecraft.client.input.MouseButtonEvent;
+ import net.minecraft.util.Mth;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.gui.widgets.containers.WVerticalList;
++import radmin.client.utils.Utils;
+ 
+-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LEFT;
+-
+-public abstract class WView extends WVerticalList {
++public abstract class WView
++extends WVerticalList {
+     public double maxHeight = Double.MAX_VALUE;
+     public boolean scrollOnlyWhenMouseOver = true;
+     public boolean hasScrollBar = true;
+-
+     protected boolean canScroll;
+     private double actualHeight;
+-
+     private double scroll;
+     private double targetScroll;
+     private boolean moveAfterPositionWidgets;
+-
+     protected boolean handleMouseOver;
+ 
+     @Override
+     public void init() {
+-        maxHeight = Utils.getWindowHeight() - theme.scale(128);
++        this.maxHeight = (double)Utils.getWindowHeight() - this.theme.scale(128.0);
+     }
+ 
+     @Override
+     protected void onCalculateSize() {
+-        boolean couldScroll = canScroll;
+-        canScroll = false;
+-        widthRemove = 0;
+-
++        boolean couldScroll = this.canScroll;
++        this.canScroll = false;
++        this.widthRemove = 0.0;
+         super.onCalculateSize();
+-
+-        if (height > maxHeight) {
+-            actualHeight = height;
+-            height = maxHeight;
+-            canScroll = true;
+-
+-            if (hasScrollBar) {
+-                widthRemove = handleWidth() * 2;
+-                width += widthRemove;
++        if (this.height > this.maxHeight) {
++            this.actualHeight = this.height;
++            this.height = this.maxHeight;
++            this.canScroll = true;
++            if (this.hasScrollBar) {
++                this.widthRemove = this.handleWidth() * 2.0;
++                this.width += this.widthRemove;
+             }
+-
+-            if (couldScroll) moveAfterPositionWidgets = true;
++            if (couldScroll) {
++                this.moveAfterPositionWidgets = true;
++            }
+         } else {
+-            actualHeight = height;
+-            scroll = 0;
+-            targetScroll = 0;
++            this.actualHeight = this.height;
++            this.scroll = 0.0;
++            this.targetScroll = 0.0;
+         }
+     }
+ 
+     @Override
+     protected void onCalculateWidgetPositions() {
+         super.onCalculateWidgetPositions();
+-
+-        if (moveAfterPositionWidgets) {
+-            scroll = Mth.clamp(scroll, 0, actualHeight - height);
+-            targetScroll = scroll;
+-
+-            moveCells(0, -scroll);
+-
+-            moveAfterPositionWidgets = false;
++        if (this.moveAfterPositionWidgets) {
++            this.targetScroll = this.scroll = Mth.clamp((double)this.scroll, (double)0.0, (double)(this.actualHeight - this.height));
++            this.moveCells(0.0, -this.scroll);
++            this.moveAfterPositionWidgets = false;
+         }
+     }
+ 
+     @Override
+     public boolean onMouseClicked(MouseButtonEvent click, boolean doubled) {
+-        if (handleMouseOver && click.button() == GLFW_MOUSE_BUTTON_LEFT && !doubled) {
+-            setFocused(true);
++        if (this.handleMouseOver && click.button() == 0 && !doubled) {
++            this.setFocused(true);
+             return true;
+         }
+-
+         return false;
+     }
+ 
+     @Override
+     public boolean onMouseReleased(MouseButtonEvent click) {
+-        if (focused) setFocused(false);
+-
++        if (this.focused) {
++            this.setFocused(false);
++        }
+         return false;
+     }
+ 
+     @Override
+     public void onMouseMoved(double mouseX, double mouseY, double lastMouseX, double lastMouseY) {
+-        handleMouseOver = false;
+-
+-        if (canScroll && hasScrollBar) {
+-            double x = handleX();
+-            double y = handleY();
+-
+-            if (mouseX >= x && mouseX <= x + handleWidth() && mouseY >= y && mouseY <= y + handleHeight()) {
+-                handleMouseOver = true;
++        this.handleMouseOver = false;
++        if (this.canScroll && this.hasScrollBar) {
++            double x = this.handleX();
++            double y = this.handleY();
++            if (mouseX >= x && mouseX <= x + this.handleWidth() && mouseY >= y && mouseY <= y + this.handleHeight()) {
++                this.handleMouseOver = true;
+             }
+         }
+-
+-        if (focused) {
+-            double preScroll = scroll;
++        if (this.focused) {
++            double preScroll = this.scroll;
+             double mouseDelta = mouseY - lastMouseY;
+-
+-            //scroll += Math.round(theme.scale(mouseDelta + mouseDelta * ((height / actualHeight) * 0.7627725)));
+-            //scroll += Math.round(theme.scale(mouseDelta * (1 / (height / actualHeight))));
+-            scroll += Math.round(mouseDelta * ((actualHeight - handleHeight() / 2) / height));
+-            scroll = Mth.clamp(scroll, 0, actualHeight - height);
+-
+-            targetScroll = scroll;
+-
+-            double delta = scroll - preScroll;
+-            if (delta != 0) moveCells(0, -delta);
++            this.scroll += (double)Math.round(mouseDelta * ((this.actualHeight - this.handleHeight() / 2.0) / this.height));
++            this.targetScroll = this.scroll = Mth.clamp((double)this.scroll, (double)0.0, (double)(this.actualHeight - this.height));
++            double delta = this.scroll - preScroll;
++            if (delta != 0.0) {
++                this.moveCells(0.0, -delta);
++            }
+         }
+     }
+ 
+     @Override
+     public boolean onMouseScrolled(double amount) {
+-        if (!scrollOnlyWhenMouseOver || mouseOver) {
+-            double max = actualHeight - height;
+-
+-            targetScroll -= Math.round(theme.scale(amount * 40));
+-            targetScroll = Mth.clamp(targetScroll, 0, max);
+-
+-            // Only consume the event if the view actually scrolled, otherwise propagate to parent.
+-            return targetScroll > 0 && targetScroll < max;
++        if (!this.scrollOnlyWhenMouseOver || this.mouseOver) {
++            double max = this.actualHeight - this.height;
++            this.targetScroll -= (double)Math.round(this.theme.scale(amount * 40.0));
++            this.targetScroll = Mth.clamp((double)this.targetScroll, (double)0.0, (double)max);
++            return this.targetScroll > 0.0 && this.targetScroll < max;
+         }
+-
+         return false;
+     }
+ 
+     @Override
+     public boolean render(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        updateScroll(delta);
+-
+-        if (canScroll) renderer.scissorStart(x, y, width, height);
++        this.updateScroll(delta);
++        if (this.canScroll) {
++            renderer.scissorStart(this.x, this.y, this.width, this.height);
++        }
+         boolean render = super.render(renderer, mouseX, mouseY, delta);
+-        if (canScroll) renderer.scissorEnd();
+-
++        if (this.canScroll) {
++            renderer.scissorEnd();
++        }
+         return render;
+     }
+ 
+     private void updateScroll(double delta) {
+-        double preScroll = scroll;
+-        double max = actualHeight - height;
+-
+-        if (Math.abs(targetScroll - scroll) < 1) scroll = targetScroll;
+-        else if (targetScroll > scroll) {
+-            scroll += Math.round(theme.scale(delta * 300 + delta * 100 * (Math.abs(targetScroll - scroll) / 10)));
+-            if (scroll > targetScroll) scroll = targetScroll;
+-        } else if (targetScroll < scroll) {
+-            scroll -= Math.round(theme.scale(delta * 300 + delta * 100 * (Math.abs(targetScroll - scroll) / 10)));
+-            if (scroll < targetScroll) scroll = targetScroll;
++        double preScroll = this.scroll;
++        double max = this.actualHeight - this.height;
++        if (Math.abs(this.targetScroll - this.scroll) < 1.0) {
++            this.scroll = this.targetScroll;
++        } else if (this.targetScroll > this.scroll) {
++            this.scroll += (double)Math.round(this.theme.scale(delta * 300.0 + delta * 100.0 * (Math.abs(this.targetScroll - this.scroll) / 10.0)));
++            if (this.scroll > this.targetScroll) {
++                this.scroll = this.targetScroll;
++            }
++        } else if (this.targetScroll < this.scroll) {
++            this.scroll -= (double)Math.round(this.theme.scale(delta * 300.0 + delta * 100.0 * (Math.abs(this.targetScroll - this.scroll) / 10.0)));
++            if (this.scroll < this.targetScroll) {
++                this.scroll = this.targetScroll;
++            }
+         }
+-
+-        scroll = Mth.clamp(scroll, 0, max);
+-
+-        double change = scroll - preScroll;
+-        if (change != 0) moveCells(0, -change);
++        this.scroll = Mth.clamp((double)this.scroll, (double)0.0, (double)max);
++        double change = this.scroll - preScroll;
++        if (change != 0.0) {
++            this.moveCells(0.0, -change);
++        }
+     }
+ 
+     @Override
+     protected boolean propagateEvents(WWidget widget) {
+-        if (widget.isFocused()) return true;
+-
+-        // Propagate to any visible view, to allow inputs even when not hovered
+-        if (widget instanceof WView) return isWidgetInView(widget);
+-
+-        // Propagate to any visible widget while the view is hovered
+-        return mouseOver && isWidgetInView(widget);
++        if (widget.isFocused()) {
++            return true;
++        }
++        if (widget instanceof WView) {
++            return this.isWidgetInView(widget);
++        }
++        return this.mouseOver && this.isWidgetInView(widget);
+     }
+ 
+     protected double handleWidth() {
+-        return theme.scale(6);
++        return this.theme.scale(6.0);
+     }
+ 
+     protected double handleHeight() {
+-        return height / actualHeight * height;
++        return this.height / this.actualHeight * this.height;
+     }
+ 
+     protected double handleX() {
+-        return x + width - handleWidth();
++        return this.x + this.width - this.handleWidth();
+     }
+ 
+     protected double handleY() {
+-        return y + (height - handleHeight()) * (scroll / (actualHeight - height));
++        return this.y + (this.height - this.handleHeight()) * (this.scroll / (this.actualHeight - this.height));
+     }
+ 
+     public boolean isWidgetInView(WWidget widget) {
+-        return widget.y < y + height && widget.y + widget.height > y;
++        return widget.y < this.y + this.height && widget.y + widget.height > this.y;
+     }
+ }
++

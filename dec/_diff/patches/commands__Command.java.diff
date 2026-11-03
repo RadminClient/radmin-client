@@ -1,0 +1,164 @@
+--- upstream261/commands/Command.java
++++ v1decompiled/commands/Command.java
+@@ -1,105 +1,119 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.CommandDispatcher
++ *  com.mojang.brigadier.arguments.ArgumentType
++ *  com.mojang.brigadier.builder.LiteralArgumentBuilder
++ *  com.mojang.brigadier.builder.RequiredArgumentBuilder
++ *  net.minecraft.client.Minecraft
++ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
++ *  net.minecraft.commands.CommandBuildContext
++ *  net.minecraft.commands.Commands
++ *  net.minecraft.core.HolderLookup$Provider
++ *  net.minecraft.data.registries.VanillaRegistries
++ *  net.minecraft.network.chat.Component
+  */
+-
+-package meteordevelopment.meteorclient.commands;
++package radmin.client.commands;
+ 
+ import com.mojang.brigadier.CommandDispatcher;
+ import com.mojang.brigadier.arguments.ArgumentType;
+ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.systems.config.Config;
+-import meteordevelopment.meteorclient.utils.Utils;
+-import meteordevelopment.meteorclient.utils.player.ChatUtils;
++import java.util.List;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+ import net.minecraft.commands.CommandBuildContext;
+ import net.minecraft.commands.Commands;
++import net.minecraft.core.HolderLookup;
+ import net.minecraft.data.registries.VanillaRegistries;
+ import net.minecraft.network.chat.Component;
+-
+-import java.util.List;
++import radmin.client.MeteorClient;
++import radmin.client.systems.config.Config;
++import radmin.client.utils.Utils;
++import radmin.client.utils.player.ChatUtils;
+ 
+ public abstract class Command {
+-    protected static CommandBuildContext REGISTRY_ACCESS = Commands.createValidationContext(VanillaRegistries.createLookup());
+-    protected static final int SINGLE_SUCCESS = com.mojang.brigadier.Command.SINGLE_SUCCESS;
++    protected static CommandBuildContext REGISTRY_ACCESS = Commands.createValidationContext((HolderLookup.Provider)VanillaRegistries.createLookup());
++    protected static final int SINGLE_SUCCESS = 1;
+     protected static final Minecraft mc = MeteorClient.mc;
+-
+     private final String name;
+     private final String title;
+     private final String description;
+     private final List<String> aliases;
+ 
+-    public Command(String name, String description, String... aliases) {
++    public Command(String name, String description, String ... aliases) {
+         this.name = name;
+         this.title = Utils.nameToTitle(name);
+         this.description = description;
+         this.aliases = List.of(aliases);
+     }
+ 
+-    // Helper methods to painlessly infer the CommandSource generic type argument
+-    protected static <T> RequiredArgumentBuilder<ClientSuggestionProvider, T> argument(final String name, final ArgumentType<T> type) {
+-        return RequiredArgumentBuilder.argument(name, type);
++    protected static <T> RequiredArgumentBuilder<ClientSuggestionProvider, T> argument(String name, ArgumentType<T> type) {
++        return RequiredArgumentBuilder.argument((String)name, type);
+     }
+ 
+-    protected static LiteralArgumentBuilder<ClientSuggestionProvider> literal(final String name) {
+-        return LiteralArgumentBuilder.literal(name);
++    protected static LiteralArgumentBuilder<ClientSuggestionProvider> literal(String name) {
++        return LiteralArgumentBuilder.literal((String)name);
+     }
+ 
+     public final void registerTo(CommandDispatcher<ClientSuggestionProvider> dispatcher) {
+-        register(dispatcher, name);
+-        for (String alias : aliases) register(dispatcher, alias);
++        this.register(dispatcher, this.name);
++        for (String alias : this.aliases) {
++            this.register(dispatcher, alias);
++        }
+     }
+ 
+     public void register(CommandDispatcher<ClientSuggestionProvider> dispatcher, String name) {
+-        LiteralArgumentBuilder<ClientSuggestionProvider> builder = LiteralArgumentBuilder.literal(name);
+-        build(builder);
++        LiteralArgumentBuilder builder = LiteralArgumentBuilder.literal((String)name);
++        this.build((LiteralArgumentBuilder<ClientSuggestionProvider>)builder);
+         dispatcher.register(builder);
+     }
+ 
+-    public abstract void build(LiteralArgumentBuilder<ClientSuggestionProvider> builder);
++    public abstract void build(LiteralArgumentBuilder<ClientSuggestionProvider> var1);
+ 
+     public String getName() {
+-        return name;
++        return this.name;
+     }
+ 
+     public String getDescription() {
+-        return description;
++        return this.description;
+     }
+ 
+     public List<String> getAliases() {
+-        return aliases;
++        return this.aliases;
+     }
+ 
+     public String toString() {
+-        return Config.get().prefix.get() + name;
++        return Config.get().prefix.get() + this.name;
+     }
+ 
+-    public String toString(String... args) {
+-        StringBuilder base = new StringBuilder(toString());
+-        for (String arg : args) base.append(' ').append(arg);
++    public String toString(String ... args) {
++        StringBuilder base = new StringBuilder(this.toString());
++        for (String arg : args) {
++            base.append(' ').append(arg);
++        }
+         return base.toString();
+     }
+ 
+     public void info(Component message) {
+-        ChatUtils.forceNextPrefixClass(getClass());
+-        ChatUtils.sendMsg(title, message);
++        ChatUtils.forceNextPrefixClass(this.getClass());
++        ChatUtils.sendMsg(this.title, message);
+     }
+ 
+-    public void info(String message, Object... args) {
+-        ChatUtils.forceNextPrefixClass(getClass());
+-        ChatUtils.infoPrefix(title, message, args);
++    public void info(String message, Object ... args) {
++        ChatUtils.forceNextPrefixClass(this.getClass());
++        ChatUtils.infoPrefix(this.title, message, args);
+     }
+ 
+-    public void warning(String message, Object... args) {
+-        ChatUtils.forceNextPrefixClass(getClass());
+-        ChatUtils.warningPrefix(title, message, args);
++    public void warning(String message, Object ... args) {
++        ChatUtils.forceNextPrefixClass(this.getClass());
++        ChatUtils.warningPrefix(this.title, message, args);
+     }
+ 
+-    public void error(String message, Object... args) {
+-        ChatUtils.forceNextPrefixClass(getClass());
+-        ChatUtils.errorPrefix(title, message, args);
++    public void error(String message, Object ... args) {
++        ChatUtils.forceNextPrefixClass(this.getClass());
++        ChatUtils.errorPrefix(this.title, message, args);
+     }
+ }
++

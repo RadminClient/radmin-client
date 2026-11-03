@@ -1,0 +1,287 @@
+--- upstream261/utils/misc/Keybind.java
++++ v1decompiled/utils/misc/Keybind.java
+@@ -1,31 +1,35 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.input.KeyEvent
++ *  net.minecraft.client.input.MouseButtonInfo
++ *  net.minecraft.nbt.CompoundTag
+  */
+-
+-package meteordevelopment.meteorclient.utils.misc;
+-
+-import meteordevelopment.meteorclient.utils.Utils;
+-import meteordevelopment.meteorclient.utils.misc.input.Input;
++package radmin.client.utils.misc;
++
++import java.util.Objects;
+ import net.minecraft.client.input.KeyEvent;
+ import net.minecraft.client.input.MouseButtonInfo;
+ import net.minecraft.nbt.CompoundTag;
+-
+-import java.util.Objects;
+-
+-import static org.lwjgl.glfw.GLFW.*;
+-
+-public class Keybind implements ISerializable<Keybind>, ICopyable<Keybind> {
++import radmin.client.utils.Utils;
++import radmin.client.utils.misc.ICopyable;
++import radmin.client.utils.misc.ISerializable;
++import radmin.client.utils.misc.input.Input;
++
++public class Keybind
++implements ISerializable<Keybind>,
++ICopyable<Keybind> {
+     private boolean isKey;
+     private int value;
+     private int modifiers;
+ 
+     private Keybind(boolean isKey, int value, int modifiers) {
+-        set(isKey, value, modifiers);
++        this.set(isKey, value, modifiers);
+     }
+ 
+     public static Keybind none() {
+-        return new Keybind(true, GLFW_KEY_UNKNOWN, 0);
++        return new Keybind(true, -1, 0);
+     }
+ 
+     public static Keybind fromKey(int key) {
+@@ -41,19 +45,19 @@
+     }
+ 
+     public int getValue() {
+-        return value;
++        return this.value;
+     }
+ 
+     public boolean isSet() {
+-        return value != GLFW_KEY_UNKNOWN;
++        return this.value != -1;
+     }
+ 
+     public boolean isKey() {
+-        return isKey;
++        return this.isKey;
+     }
+ 
+     public boolean hasMods() {
+-        return isKey && modifiers != 0;
++        return this.isKey && this.modifiers != 0;
+     }
+ 
+     public void set(boolean isKey, int value, int modifiers) {
+@@ -67,120 +71,144 @@
+         this.isKey = value.isKey;
+         this.value = value.value;
+         this.modifiers = value.modifiers;
+-
+         return this;
+     }
+ 
+     public void reset() {
+-        set(true, GLFW_KEY_UNKNOWN, 0);
++        this.set(true, -1, 0);
+     }
+ 
+     public boolean canBindTo(boolean isKey, int value, int modifiers) {
+         if (isKey) {
+-            if (modifiers != 0 && isKeyMod(value)) return false;
+-            return value != GLFW_KEY_UNKNOWN && value != GLFW_KEY_ESCAPE;
+-        }
+-        return value != GLFW_MOUSE_BUTTON_LEFT && value != GLFW_MOUSE_BUTTON_RIGHT;
++            if (modifiers != 0 && this.isKeyMod(value)) {
++                return false;
++            }
++            return value != -1 && value != 256;
++        }
++        return value != 0 && value != 1;
+     }
+ 
+     public boolean matches(boolean isKey, int value, int modifiers) {
+-        if (!this.isSet() || this.isKey != isKey) return false;
+-        if (!hasMods()) return this.value == value;
++        if (!this.isSet() || this.isKey != isKey) {
++            return false;
++        }
++        if (!this.hasMods()) {
++            return this.value == value;
++        }
+         return this.value == value && this.modifiers == modifiers;
+     }
+ 
+     public boolean matches(KeyEvent input) {
+-        return matches(true, input.key(), input.modifiers());
++        return this.matches(true, input.key(), input.modifiers());
+     }
+ 
+     public boolean matches(MouseButtonInfo input) {
+-        return matches(false, input.button(), 0);
++        return this.matches(false, input.button(), 0);
+     }
+ 
+     public boolean isPressed() {
+-        return isKey ? modifiersPressed() && Input.isKeyPressed(value) : Input.isButtonPressed(value);
++        return this.isKey ? this.modifiersPressed() && Input.isKeyPressed(this.value) : Input.isButtonPressed(this.value);
+     }
+ 
+     private boolean modifiersPressed() {
+-        if (!hasMods()) return true;
+-
+-        if (!isModPressed(GLFW_MOD_CONTROL, GLFW_KEY_LEFT_CONTROL, GLFW_KEY_RIGHT_CONTROL)) return false;
+-        if (!isModPressed(GLFW_MOD_SUPER, GLFW_KEY_LEFT_SUPER, GLFW_KEY_RIGHT_SUPER)) return false;
+-        if (!isModPressed(GLFW_MOD_ALT, GLFW_KEY_LEFT_ALT, GLFW_KEY_RIGHT_ALT)) return false;
+-        if (!isModPressed(GLFW_MOD_SHIFT, GLFW_KEY_LEFT_SHIFT, GLFW_KEY_RIGHT_SHIFT)) return false;
+-
+-        return true;
+-    }
+-
+-    private boolean isModPressed(int value, int... keys) {
+-        if ((modifiers & value) == 0) return true;
+-
++        if (!this.hasMods()) {
++            return true;
++        }
++        if (!this.isModPressed(2, 341, 345)) {
++            return false;
++        }
++        if (!this.isModPressed(8, 343, 347)) {
++            return false;
++        }
++        if (!this.isModPressed(4, 342, 346)) {
++            return false;
++        }
++        return this.isModPressed(1, 340, 344);
++    }
++
++    private boolean isModPressed(int value, int ... keys) {
++        if ((this.modifiers & value) == 0) {
++            return true;
++        }
+         for (int key : keys) {
+-            if (Input.isKeyPressed(key)) return true;
+-        }
+-
++            if (!Input.isKeyPressed(key)) continue;
++            return true;
++        }
+         return false;
+     }
+ 
+     private boolean isKeyMod(int key) {
+-        return key >= GLFW_KEY_LEFT_SHIFT && key <= GLFW_KEY_RIGHT_SUPER;
++        return key >= 340 && key <= 347;
+     }
+ 
+     @Override
+     public Keybind copy() {
+-        return new Keybind(isKey, value, modifiers);
+-    }
+-
+-    @Override
++        return new Keybind(this.isKey, this.value, this.modifiers);
++    }
++
+     public String toString() {
+-        if (!isSet()) return "None";
+-        if (!isKey) return Utils.getButtonName(value);
+-        if (modifiers == 0) return Utils.getKeyName(value);
+-
++        if (!this.isSet()) {
++            return "None";
++        }
++        if (!this.isKey) {
++            return Utils.getButtonName(this.value);
++        }
++        if (this.modifiers == 0) {
++            return Utils.getKeyName(this.value);
++        }
+         StringBuilder label = new StringBuilder();
+-        if ((modifiers & GLFW_MOD_CONTROL) != 0) label.append("Ctrl + ");
+-        if ((modifiers & GLFW_MOD_SUPER) != 0) label.append("Cmd + ");
+-        if ((modifiers & GLFW_MOD_ALT) != 0) label.append("Alt + ");
+-        if ((modifiers & GLFW_MOD_SHIFT) != 0) label.append("Shift + ");
+-        if ((modifiers & GLFW_MOD_CAPS_LOCK) != 0) label.append("Caps Lock + ");
+-        if ((modifiers & GLFW_MOD_NUM_LOCK) != 0) label.append("Num Lock + ");
+-        label.append(Utils.getKeyName(value));
+-
++        if ((this.modifiers & 2) != 0) {
++            label.append("Ctrl + ");
++        }
++        if ((this.modifiers & 8) != 0) {
++            label.append("Cmd + ");
++        }
++        if ((this.modifiers & 4) != 0) {
++            label.append("Alt + ");
++        }
++        if ((this.modifiers & 1) != 0) {
++            label.append("Shift + ");
++        }
++        if ((this.modifiers & 0x10) != 0) {
++            label.append("Caps Lock + ");
++        }
++        if ((this.modifiers & 0x20) != 0) {
++            label.append("Num Lock + ");
++        }
++        label.append(Utils.getKeyName(this.value));
+         return label.toString();
+     }
+ 
+-    @Override
+     public boolean equals(Object o) {
+-        if (this == o) return true;
+-        if (o == null || getClass() != o.getClass()) return false;
+-        Keybind keybind = (Keybind) o;
+-        return isKey == keybind.isKey && value == keybind.value && modifiers == keybind.modifiers;
+-    }
+-
+-    @Override
++        if (this == o) {
++            return true;
++        }
++        if (o == null || this.getClass() != o.getClass()) {
++            return false;
++        }
++        Keybind keybind = (Keybind)o;
++        return this.isKey == keybind.isKey && this.value == keybind.value && this.modifiers == keybind.modifiers;
++    }
++
+     public int hashCode() {
+-        return Objects.hash(isKey, value, modifiers);
+-    }
+-
+-    // Serialization
++        return Objects.hash(this.isKey, this.value, this.modifiers);
++    }
+ 
+     @Override
+     public CompoundTag toTag() {
+         CompoundTag tag = new CompoundTag();
+-
+-        tag.putBoolean("isKey", isKey);
+-        tag.putInt("value", value);
+-        tag.putInt("modifiers", modifiers);
+-
++        tag.putBoolean("isKey", this.isKey);
++        tag.putInt("value", this.value);
++        tag.putInt("modifiers", this.modifiers);
+         return tag;
+     }
+ 
+     @Override
+     public Keybind fromTag(CompoundTag tag) {
+-        isKey = tag.getBooleanOr("isKey", false);
+-        value = tag.getIntOr("value", 0);
+-        modifiers = tag.getIntOr("modifiers", 0);
+-
++        this.isKey = tag.getBooleanOr("isKey", false);
++        this.value = tag.getIntOr("value", 0);
++        this.modifiers = tag.getIntOr("modifiers", 0);
+         return this;
+     }
+ }
++

@@ -1,0 +1,41 @@
+--- upstream261/gui/tabs/Tab.java
++++ v1decompiled/gui/tabs/Tab.java
+@@ -1,14 +1,15 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.screens.Screen
+  */
++package radmin.client.gui.tabs;
+ 
+-package meteordevelopment.meteorclient.gui.tabs;
+-
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+ import net.minecraft.client.gui.screens.Screen;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
++import radmin.client.MeteorClient;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.tabs.TabScreen;
+ 
+ public abstract class Tab {
+     public final String name;
+@@ -19,11 +20,11 @@
+ 
+     public void openScreen(GuiTheme theme) {
+         TabScreen screen = this.createScreen(theme);
+-        screen.addDirect(theme.topBar()).top().centerX();
+-        mc.setScreen(screen);
++        MeteorClient.mc.setScreen((Screen)screen);
+     }
+ 
+-    public abstract TabScreen createScreen(GuiTheme theme);
++    public abstract TabScreen createScreen(GuiTheme var1);
+ 
+-    public abstract boolean isScreen(Screen screen);
++    public abstract boolean isScreen(Screen var1);
+ }
++

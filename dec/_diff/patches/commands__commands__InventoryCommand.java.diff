@@ -1,0 +1,45 @@
+--- upstream261/commands/commands/InventoryCommand.java
++++ v1decompiled/commands/commands/InventoryCommand.java
+@@ -1,27 +1,32 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.builder.LiteralArgumentBuilder
++ *  net.minecraft.client.gui.screens.inventory.InventoryScreen
++ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
+  */
+-
+-package meteordevelopment.meteorclient.commands.commands;
++package radmin.client.commands.commands;
+ 
+ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+-import meteordevelopment.meteorclient.commands.Command;
+-import meteordevelopment.meteorclient.commands.arguments.PlayerArgumentType;
+-import meteordevelopment.meteorclient.utils.Utils;
+ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
+ import net.minecraft.client.multiplayer.ClientSuggestionProvider;
++import radmin.client.commands.Command;
++import radmin.client.commands.arguments.PlayerArgumentType;
++import radmin.client.utils.Utils;
+ 
+-public class InventoryCommand extends Command {
++public class InventoryCommand
++extends Command {
+     public InventoryCommand() {
+         super("inventory", "Allows you to see parts of another player's inventory.", "inv", "invsee");
+     }
+ 
+     @Override
+     public void build(LiteralArgumentBuilder<ClientSuggestionProvider> builder) {
+-        builder.then(argument("player", PlayerArgumentType.create()).executes(context -> {
++        builder.then(InventoryCommand.argument("player", PlayerArgumentType.create()).executes(context -> {
+             Utils.screenToOpen = new InventoryScreen(PlayerArgumentType.get(context));
+-            return SINGLE_SUCCESS;
++            return 1;
+         }));
+     }
+ }
++

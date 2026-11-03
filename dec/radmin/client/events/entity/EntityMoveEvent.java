@@ -1,0 +1,24 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.world.entity.Entity
+ *  net.minecraft.world.phys.Vec3
+ */
+package radmin.client.events.entity;
+
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
+
+public class EntityMoveEvent {
+    private static final EntityMoveEvent INSTANCE = new EntityMoveEvent();
+    public Entity entity;
+    public Vec3 movement;
+
+    public static EntityMoveEvent get(Entity entity, Vec3 movement) {
+        EntityMoveEvent.INSTANCE.entity = entity;
+        EntityMoveEvent.INSTANCE.movement = movement;
+        return INSTANCE;
+    }
+}
+

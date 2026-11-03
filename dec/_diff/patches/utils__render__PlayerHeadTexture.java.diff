@@ -1,0 +1,155 @@
+--- upstream261/utils/render/PlayerHeadTexture.java
++++ v1decompiled/utils/render/PlayerHeadTexture.java
+@@ -1,96 +1,106 @@
+-package meteordevelopment.meteorclient.utils.render;
++/*
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.platform.TextureUtil
++ *  com.mojang.blaze3d.textures.FilterMode
++ *  com.mojang.blaze3d.textures.TextureFormat
++ *  net.minecraft.server.packs.resources.Resource
++ *  org.lwjgl.BufferUtils
++ *  org.lwjgl.stb.STBImage
++ *  org.lwjgl.system.MemoryStack
++ *  org.lwjgl.system.MemoryUtil
++ */
++package radmin.client.utils.render;
+ 
+ import com.mojang.blaze3d.platform.TextureUtil;
+ import com.mojang.blaze3d.textures.FilterMode;
+ import com.mojang.blaze3d.textures.TextureFormat;
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.renderer.Texture;
+-import meteordevelopment.meteorclient.utils.network.Http;
+-import org.lwjgl.BufferUtils;
+-import org.lwjgl.stb.STBImage;
+-import org.lwjgl.system.MemoryStack;
+-import org.lwjgl.system.MemoryUtil;
+-
+-import javax.imageio.ImageIO;
+ import java.awt.image.BufferedImage;
+ import java.io.IOException;
+ import java.io.InputStream;
+ import java.nio.ByteBuffer;
+ import java.nio.IntBuffer;
++import javax.imageio.ImageIO;
++import net.minecraft.server.packs.resources.Resource;
++import org.lwjgl.BufferUtils;
++import org.lwjgl.stb.STBImage;
++import org.lwjgl.system.MemoryStack;
++import org.lwjgl.system.MemoryUtil;
++import radmin.client.MeteorClient;
++import radmin.client.renderer.Texture;
++import radmin.client.utils.network.Http;
+ 
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class PlayerHeadTexture extends Texture {
++public class PlayerHeadTexture
++extends Texture {
+     private boolean needsRotate;
+ 
+     public PlayerHeadTexture(byte[] head, boolean needsRotate) {
+         super(8, 8, TextureFormat.RGBA8, FilterMode.NEAREST, FilterMode.NEAREST);
+-
+-        upload(BufferUtils.createByteBuffer(head.length).put(head));
++        this.upload(BufferUtils.createByteBuffer((int)head.length).put(head));
+         this.needsRotate = needsRotate;
+     }
+ 
+     public PlayerHeadTexture() {
+         super(8, 8, TextureFormat.RGBA8, FilterMode.NEAREST, FilterMode.NEAREST);
+-
+-        try (InputStream inputStream = mc.getResourceManager().getResource(MeteorClient.identifier("textures/steve.png")).get().open()) {
+-            ByteBuffer data = TextureUtil.readResource(inputStream);
++        try (InputStream inputStream = ((Resource)MeteorClient.mc.getResourceManager().getResource(MeteorClient.identifier("textures/steve.png")).get()).open();){
++            ByteBuffer data = TextureUtil.readResource((InputStream)inputStream);
+             data.rewind();
+-
+-            try (MemoryStack stack = MemoryStack.stackPush()) {
++            try (MemoryStack stack = MemoryStack.stackPush();){
+                 IntBuffer width = stack.mallocInt(1);
+                 IntBuffer height = stack.mallocInt(1);
+                 IntBuffer comp = stack.mallocInt(1);
+-
+-                ByteBuffer image = STBImage.stbi_load_from_memory(data, width, height, comp, 4);
+-                upload(image);
+-                STBImage.stbi_image_free(image);
++                ByteBuffer image = STBImage.stbi_load_from_memory((ByteBuffer)data, (IntBuffer)width, (IntBuffer)height, (IntBuffer)comp, (int)4);
++                this.upload(image);
++                STBImage.stbi_image_free((ByteBuffer)image);
+             }
+-            MemoryUtil.memFree(data);
+-        } catch (IOException e) {
++            MemoryUtil.memFree((ByteBuffer)data);
++        }
++        catch (IOException e) {
+             e.printStackTrace();
+         }
+     }
+ 
+     public boolean needsRotate() {
+-        return needsRotate;
++        return this.needsRotate;
+     }
+ 
+     public static byte[] downloadHead(String url) throws IOException {
++        int j;
++        int y;
++        int x;
+         BufferedImage skin;
+-        try (InputStream in = Http.get(url).sendInputStream()) {
++        try (InputStream in = Http.get(url).sendInputStream();){
+             skin = ImageIO.read(in);
+         }
+-
+-        if (skin == null) throw new IOException("Failed to decode skin image.");
+-
+-        byte[] head = new byte[8 * 8 * 4];
++        if (skin == null) {
++            throw new IOException("Failed to decode skin image.");
++        }
++        byte[] head = new byte[256];
+         int[] pixel = new int[4];
+-
+         int i = 0;
+-        for (int x = 8; x < 16; x++) {
+-            for (int y = 8; y < 16; y++) {
++        for (x = 8; x < 16; ++x) {
++            for (y = 8; y < 16; ++y) {
+                 skin.getData().getPixel(x, y, pixel);
+-
+-                for (int j = 0; j < 4; j++) {
+-                    head[i++] = (byte) pixel[j];
++                for (j = 0; j < 4; ++j) {
++                    head[i++] = (byte)pixel[j];
+                 }
+             }
+         }
+-
+         i = 0;
+-        for (int x = 40; x < 48; x++) {
+-            for (int y = 8; y < 16; y++) {
++        for (x = 40; x < 48; ++x) {
++            for (y = 8; y < 16; ++y) {
+                 skin.getData().getPixel(x, y, pixel);
+-
+                 if (pixel[3] != 0) {
+-                    for (int j = 0; j < 4; j++) {
+-                        head[i++] = (byte) pixel[j];
++                    for (j = 0; j < 4; ++j) {
++                        head[i++] = (byte)pixel[j];
+                     }
+-                } else i += 4;
++                    continue;
++                }
++                i += 4;
+             }
+         }
+-
+         return head;
+     }
+ }
++

@@ -1,0 +1,34 @@
+--- upstream261/utils/notebot/decoder/SongDecoder.java
++++ v1decompiled/utils/notebot/decoder/SongDecoder.java
+@@ -1,24 +1,16 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.utils.notebot.decoder;
+-
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.misc.Notebot;
+-import meteordevelopment.meteorclient.utils.notebot.song.Song;
++package radmin.client.utils.notebot.decoder;
+ 
+ import java.io.File;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.misc.Notebot;
++import radmin.client.utils.notebot.song.Song;
+ 
+ public abstract class SongDecoder {
+     protected Notebot notebot = Modules.get().get(Notebot.class);
+ 
+-    /**
+-     * Parse file to a {@link Song} object
+-     *
+-     * @param file Song file
+-     * @return A {@link Song} object
+-     */
+-    public abstract Song parse(File file) throws Exception;
++    public abstract Song parse(File var1) throws Exception;
+ }
++

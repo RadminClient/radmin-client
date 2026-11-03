@@ -1,0 +1,41 @@
+--- upstream261/gui/widgets/pressable/WCheckbox.java
++++ v1decompiled/gui/widgets/pressable/WCheckbox.java
+@@ -1,11 +1,12 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.widgets.pressable;
+ 
+-package meteordevelopment.meteorclient.gui.widgets.pressable;
++import radmin.client.gui.widgets.pressable.WPressable;
+ 
+-public abstract class WCheckbox extends WPressable {
++public abstract class WCheckbox
++extends WPressable {
+     public boolean checked;
+ 
+     public WCheckbox(boolean checked) {
+@@ -14,15 +15,15 @@
+ 
+     @Override
+     protected void onCalculateSize() {
+-        double pad = pad();
+-        double s = theme.textHeight();
+-
+-        width = pad + s + pad;
+-        height = pad + s + pad;
++        double pad = this.pad();
++        double s = this.theme.textHeight();
++        this.width = pad + s + pad;
++        this.height = pad + s + pad;
+     }
+ 
+     @Override
+     protected void onPressed(int button) {
+-        checked = !checked;
++        this.checked = !this.checked;
+     }
+ }
++

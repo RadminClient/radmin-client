@@ -1,0 +1,44 @@
+--- upstream261/gui/widgets/WTexture.java
++++ v1decompiled/gui/widgets/WTexture.java
+@@ -1,15 +1,16 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.widgets;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.renderer.Texture;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.renderer.Texture;
+-
+-public class WTexture extends WWidget {
+-    private final double width, height;
++public class WTexture
++extends WWidget {
++    private final double width;
++    private final double height;
+     private final double rotation;
+     private final Texture texture;
+ 
+@@ -22,12 +23,13 @@
+ 
+     @Override
+     protected void onCalculateSize() {
+-        super.width = theme.scale(width);
+-        super.height = theme.scale(height);
++        ((WWidget)this).width = this.theme.scale(this.width);
++        ((WWidget)this).height = this.theme.scale(this.height);
+     }
+ 
+     @Override
+     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        renderer.texture(x, y, super.width, super.height, rotation, texture);
++        renderer.texture(this.x, this.y, ((WWidget)this).width, ((WWidget)this).height, this.rotation, this.texture);
+     }
+ }
++

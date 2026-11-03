@@ -1,0 +1,268 @@
+--- upstream261/systems/modules/world/AutoBrewer.java
++++ v1decompiled/systems/modules/world/AutoBrewer.java
+@@ -1,130 +1,130 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.resources.language.I18n
++ *  net.minecraft.core.Holder
++ *  net.minecraft.core.component.DataComponents
++ *  net.minecraft.world.inventory.BrewingStandMenu
++ *  net.minecraft.world.inventory.Slot
++ *  net.minecraft.world.item.Item
++ *  net.minecraft.world.item.Items
++ *  net.minecraft.world.item.alchemy.Potion
++ *  net.minecraft.world.item.alchemy.PotionContents
++ *  net.minecraft.world.item.alchemy.Potions
+  */
++package radmin.client.systems.modules.world;
+ 
+-package meteordevelopment.meteorclient.systems.modules.world;
+-
+-import meteordevelopment.meteorclient.settings.PotionSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.utils.misc.MyPotion;
+-import meteordevelopment.meteorclient.utils.player.InvUtils;
+ import net.minecraft.client.resources.language.I18n;
++import net.minecraft.core.Holder;
+ import net.minecraft.core.component.DataComponents;
+ import net.minecraft.world.inventory.BrewingStandMenu;
++import net.minecraft.world.inventory.Slot;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.Items;
+ import net.minecraft.world.item.alchemy.Potion;
++import net.minecraft.world.item.alchemy.PotionContents;
+ import net.minecraft.world.item.alchemy.Potions;
++import radmin.client.settings.EnumSetting;
++import radmin.client.settings.PotionSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.utils.misc.MyPotion;
++import radmin.client.utils.player.InvUtils;
+ 
+-public class AutoBrewer extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<MyPotion> potion = sgGeneral.add(new PotionSetting.Builder()
+-        .name("potion")
+-        .description("The type of potion to brew.")
+-        .defaultValue(MyPotion.Strength)
+-        .build()
+-    );
+-
++public class AutoBrewer
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final Setting<MyPotion> potion;
+     private int ingredientI;
+     private boolean first;
+     private int timer;
+ 
+     public AutoBrewer() {
+         super(Categories.World, "auto-brewer", "Automatically brews the specified potion.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.potion = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new PotionSetting.Builder().name("potion")).description("The type of potion to brew.")).defaultValue(MyPotion.Strength)).build());
+     }
+ 
+     @Override
+     public void onActivate() {
+-        first = false;
++        this.first = false;
+     }
+ 
+     public void onBrewingStandClose() {
+-        first = false;
++        this.first = false;
+     }
+ 
+     public void tick(BrewingStandMenu c) {
+-        timer++;
+-
+-        // When the brewing stand is opened.
+-        if (!first) {
+-            first = true;
+-
+-            ingredientI = -2;
+-            timer = 0;
++        ++this.timer;
++        if (!this.first) {
++            this.first = true;
++            this.ingredientI = -2;
++            this.timer = 0;
+         }
+-
+-        // Wait for the brewing to complete.
+-        if (c.getBrewingTicks() != 0 || timer < 5) return;
+-
+-        if (ingredientI == -2) {
+-            // Take the bottles.
+-            if (takePotions(c)) return;
+-            ingredientI++;
+-            timer = 0;
+-        } else if (ingredientI == -1) {
+-            // Insert water bottles into the brewing stand.
+-            if (insertWaterBottles(c)) return;
+-            ingredientI++;
+-            timer = 0;
+-        } else if (ingredientI < potion.get().ingredients.length) {
+-            // Check for fuel for the brew and add the ingredient.
+-            if (checkFuel(c)) return;
+-            if (insertIngredient(c, potion.get().ingredients[ingredientI])) return;
+-            ingredientI++;
+-            timer = 0;
++        if (c.getBrewingTicks() != 0 || this.timer < 5) {
++            return;
++        }
++        if (this.ingredientI == -2) {
++            if (this.takePotions(c)) {
++                return;
++            }
++            ++this.ingredientI;
++            this.timer = 0;
++        } else if (this.ingredientI == -1) {
++            if (this.insertWaterBottles(c)) {
++                return;
++            }
++            ++this.ingredientI;
++            this.timer = 0;
++        } else if (this.ingredientI < this.potion.get().ingredients.length) {
++            if (this.checkFuel(c)) {
++                return;
++            }
++            if (this.insertIngredient(c, this.potion.get().ingredients[this.ingredientI])) {
++                return;
++            }
++            ++this.ingredientI;
++            this.timer = 0;
+         } else {
+-            // Reset the loop.
+-            ingredientI = -2;
+-            timer = 0;
++            this.ingredientI = -2;
++            this.timer = 0;
+         }
+     }
+ 
+     private boolean insertIngredient(BrewingStandMenu c, Item ingredient) {
+         int slot = -1;
+-
+-        for (int slotI = 5; slotI < c.slots.size(); slotI++) {
+-            if (c.slots.get(slotI).getItem().getItem() == ingredient) {
+-                slot = slotI;
+-                break;
+-            }
++        for (int slotI = 5; slotI < c.slots.size(); ++slotI) {
++            if (((Slot)c.slots.get(slotI)).getItem().getItem() != ingredient) continue;
++            slot = slotI;
++            break;
+         }
+-
+         if (slot == -1) {
+-            error("You do not have any %s left in your inventory... disabling.", I18n.get(ingredient.getDescriptionId()));
+-            toggle();
++            this.error("You do not have any %s left in your inventory... disabling.", I18n.get((String)ingredient.getDescriptionId(), (Object[])new Object[0]));
++            this.toggle();
+             return true;
+         }
+-
+-        moveOneItem(c, slot, 3);
+-
++        this.moveOneItem(c, slot, 3);
+         return false;
+     }
+ 
+     private boolean checkFuel(BrewingStandMenu c) {
+         if (c.getFuel() == 0) {
+             int slot = -1;
+-
+-            for (int slotI = 5; slotI < c.slots.size(); slotI++) {
+-                if (c.slots.get(slotI).getItem().getItem() == Items.BLAZE_POWDER) {
+-                    slot = slotI;
+-                    break;
+-                }
++            for (int slotI = 5; slotI < c.slots.size(); ++slotI) {
++                if (((Slot)c.slots.get(slotI)).getItem().getItem() != Items.BLAZE_POWDER) continue;
++                slot = slotI;
++                break;
+             }
+-
+             if (slot == -1) {
+-                error("You do not have a sufficient amount of blaze powder to use as fuel for the brew... disabling.");
+-                toggle();
++                this.error("You do not have a sufficient amount of blaze powder to use as fuel for the brew... disabling.", new Object[0]);
++                this.toggle();
+                 return true;
+             }
+-
+-            moveOneItem(c, slot, 4);
++            this.moveOneItem(c, slot, 4);
+         }
+-
+         return false;
+     }
+ 
+@@ -133,42 +133,33 @@
+     }
+ 
+     private boolean insertWaterBottles(BrewingStandMenu c) {
+-        for (int i = 0; i < 3; i++) {
++        for (int i = 0; i < 3; ++i) {
+             int slot = -1;
+-
+-            for (int slotI = 5; slotI < c.slots.size(); slotI++) {
+-                if (c.slots.get(slotI).getItem().getItem() == Items.POTION) {
+-                    Potion potion = c.slots.get(slotI).getItem().get(DataComponents.POTION_CONTENTS).potion().get().value();
+-                    if (potion == Potions.WATER.value()) {
+-                        slot = slotI;
+-                        break;
+-                    }
+-                }
++            for (int slotI = 5; slotI < c.slots.size(); ++slotI) {
++                Potion potion;
++                if (((Slot)c.slots.get(slotI)).getItem().getItem() != Items.POTION || (potion = (Potion)((Holder)((PotionContents)((Slot)c.slots.get(slotI)).getItem().get(DataComponents.POTION_CONTENTS)).potion().get()).value()) != Potions.WATER.value()) continue;
++                slot = slotI;
++                break;
+             }
+-
+             if (slot == -1) {
+-                error("You do not have a sufficient amount of water bottles to complete this brew... disabling.");
+-                toggle();
++                this.error("You do not have a sufficient amount of water bottles to complete this brew... disabling.", new Object[0]);
++                this.toggle();
+                 return true;
+             }
+-
+             InvUtils.move().fromId(slot).toId(i);
+         }
+-
+         return false;
+     }
+ 
+     private boolean takePotions(BrewingStandMenu c) {
+-        for (int i = 0; i < 3; i++) {
++        for (int i = 0; i < 3; ++i) {
+             InvUtils.shiftClick().slotId(i);
+-
+-            if (!c.slots.get(i).getItem().isEmpty()) {
+-                error("You do not have a sufficient amount of inventory space... disabling.");
+-                toggle();
+-                return true;
+-            }
++            if (((Slot)c.slots.get(i)).getItem().isEmpty()) continue;
++            this.error("You do not have a sufficient amount of inventory space... disabling.", new Object[0]);
++            this.toggle();
++            return true;
+         }
+-
+         return false;
+     }
+ }
++

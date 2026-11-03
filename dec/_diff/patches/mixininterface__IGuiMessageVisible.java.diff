@@ -1,0 +1,23 @@
+--- upstream261/mixininterface/IGuiMessageVisible.java
++++ v1decompiled/mixininterface/IGuiMessageVisible.java
+@@ -1,12 +1,14 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.mixininterface;
+ 
+-package meteordevelopment.meteorclient.mixininterface;
++import radmin.client.mixininterface.IGuiMessage;
+ 
+-public interface IGuiMessageVisible extends IGuiMessage {
+-    boolean meteor$isStartOfEntry();
++public interface IGuiMessageVisible
++extends IGuiMessage {
++    public boolean meteor$isStartOfEntry();
+ 
+-    void meteor$setStartOfEntry(boolean start);
++    public void meteor$setStartOfEntry(boolean var1);
+ }
++

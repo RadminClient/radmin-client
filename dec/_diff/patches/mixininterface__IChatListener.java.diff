@@ -1,0 +1,29 @@
+--- upstream261/mixininterface/IChatListener.java
++++ v1decompiled/mixininterface/IChatListener.java
+@@ -1,19 +1,14 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.authlib.GameProfile
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ import com.mojang.authlib.GameProfile;
+-import net.minecraft.client.multiplayer.chat.GuiMessageSource;
+-import net.minecraft.client.multiplayer.chat.GuiMessageTag;
+-import net.minecraft.network.chat.Component;
+-import net.minecraft.network.chat.MessageSignature;
+ 
+ public interface IChatListener {
+-    /**
+-     * Only valid inside of {@link net.minecraft.client.gui.components.ChatComponent#addMessage(Component, MessageSignature, GuiMessageSource, GuiMessageTag)} call
+-     */
+-    GameProfile meteor$getSender();
++    public GameProfile meteor$getSender();
+ }
++

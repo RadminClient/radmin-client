@@ -1,0 +1,84 @@
+--- upstream261/systems/hud/HudElementInfo.java
++++ v1decompiled/systems/hud/HudElementInfo.java
+@@ -1,24 +1,23 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.hud;
+-
+-import meteordevelopment.meteorclient.utils.Utils;
++package radmin.client.systems.hud;
+ 
+ import java.util.ArrayList;
+ import java.util.Comparator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.function.Consumer;
+ import java.util.function.Supplier;
++import radmin.client.systems.hud.HudElement;
++import radmin.client.systems.hud.HudGroup;
++import radmin.client.utils.Utils;
+ 
+ public class HudElementInfo<T extends HudElement> {
+     public final HudGroup group;
+     public final String name;
+     public final String title;
+     public final String description;
+-
+     public final Supplier<T> factory;
+     public final List<Preset> presets;
+ 
+@@ -27,9 +26,8 @@
+         this.name = name;
+         this.title = title;
+         this.description = description;
+-
+         this.factory = factory;
+-        this.presets = new ArrayList<>();
++        this.presets = new ArrayList<Preset>();
+     }
+ 
+     public HudElementInfo(HudGroup group, String name, String description, Supplier<T> factory) {
+@@ -37,20 +35,18 @@
+     }
+ 
+     public Preset addPreset(String title, Consumer<T> callback) {
+-        Preset preset = new Preset(this, title, callback);
+-
+-        presets.add(preset);
+-        presets.sort(Comparator.comparing(p -> p.title));
+-
++        Preset preset = new Preset(this, this, title, callback);
++        this.presets.add(preset);
++        this.presets.sort(Comparator.comparing(p -> p.title));
+         return preset;
+     }
+ 
+     public boolean hasPresets() {
+-        return !presets.isEmpty();
++        return !this.presets.isEmpty();
+     }
+ 
+     public HudElement create() {
+-        return factory.get();
++        return (HudElement)this.factory.get();
+     }
+ 
+     public class Preset {
+@@ -58,10 +54,12 @@
+         public final String title;
+         public final Consumer<T> callback;
+ 
+-        public Preset(HudElementInfo<?> info, String title, Consumer<T> callback) {
++        public Preset(HudElementInfo this$0, HudElementInfo<?> info, String title, Consumer<T> callback) {
++            Objects.requireNonNull(this$0);
+             this.info = info;
+             this.title = title;
+             this.callback = callback;
+         }
+     }
+ }
++

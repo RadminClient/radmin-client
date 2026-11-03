@@ -1,0 +1,22 @@
+--- upstream261/mixininterface/IChatHud.java
++++ v1decompiled/mixininterface/IChatHud.java
+@@ -1,12 +1,14 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.network.chat.Component
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ import net.minecraft.network.chat.Component;
+ 
+ public interface IChatHud {
+-    void meteor$add(Component message, int id);
++    public void meteor$add(Component var1, int var2);
+ }
++

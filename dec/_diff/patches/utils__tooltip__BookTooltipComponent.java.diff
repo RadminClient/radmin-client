@@ -1,0 +1,81 @@
+--- upstream261/utils/tooltip/BookTooltipComponent.java
++++ v1decompiled/utils/tooltip/BookTooltipComponent.java
+@@ -1,22 +1,34 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.Font
++ *  net.minecraft.client.gui.GuiGraphicsExtractor
++ *  net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
++ *  net.minecraft.client.renderer.RenderPipelines
++ *  net.minecraft.network.chat.Component
++ *  net.minecraft.network.chat.FormattedText
++ *  net.minecraft.resources.Identifier
++ *  net.minecraft.util.FormattedCharSequence
++ *  org.joml.Matrix3x2fStack
+  */
+-
+-package meteordevelopment.meteorclient.utils.tooltip;
++package radmin.client.utils.tooltip;
+ 
+ import net.minecraft.client.gui.Font;
+ import net.minecraft.client.gui.GuiGraphicsExtractor;
+ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+ import net.minecraft.client.renderer.RenderPipelines;
+ import net.minecraft.network.chat.Component;
++import net.minecraft.network.chat.FormattedText;
+ import net.minecraft.resources.Identifier;
+ import net.minecraft.util.FormattedCharSequence;
+ import org.joml.Matrix3x2fStack;
++import radmin.client.utils.tooltip.MeteorTooltipData;
+ 
+-public class BookTooltipComponent implements ClientTooltipComponent, MeteorTooltipData {
+-    private static final Identifier TEXTURE_BOOK_BACKGROUND = Identifier.parse("textures/gui/book.png");
+-
++public class BookTooltipComponent
++implements ClientTooltipComponent,
++MeteorTooltipData {
++    private static final Identifier TEXTURE_BOOK_BACKGROUND = Identifier.parse((String)"textures/gui/book.png");
+     private final Component page;
+ 
+     public BookTooltipComponent(Component page) {
+@@ -28,31 +40,26 @@
+         return this;
+     }
+ 
+-    @Override
+     public int getHeight(Font textRenderer) {
+         return 134;
+     }
+ 
+-    @Override
+     public int getWidth(Font textRenderer) {
+         return 112;
+     }
+ 
+-    @Override
+     public void extractImage(Font font, int x, int y, int width, int height, GuiGraphicsExtractor graphics) {
+-        // Background
+-        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE_BOOK_BACKGROUND, x - 10, y, 0, 0, 128, 128, 179, 179);
+-
+-        // Content
++        graphics.blit(RenderPipelines.GUI_TEXTURED, TEXTURE_BOOK_BACKGROUND, x - 10, y, 0.0f, 0.0f, 128, 128, 179, 179);
+         Matrix3x2fStack matrices = graphics.pose();
+         matrices.pushMatrix();
+-        matrices.translate(x + 16, y + 12);
++        matrices.translate((float)(x + 16), (float)(y + 12));
+         matrices.scale(0.7f, 0.7f);
+         int offset = 0;
+-        for (FormattedCharSequence line : font.split(page, 112)) {
+-            graphics.text(font, line, 0, offset, 0xFF000000, false);
++        for (FormattedCharSequence line : font.split((FormattedText)this.page, 112)) {
++            graphics.text(font, line, 0, offset, -16777216, false);
+             offset += 8;
+         }
+         matrices.popMatrix();
+     }
+ }
++

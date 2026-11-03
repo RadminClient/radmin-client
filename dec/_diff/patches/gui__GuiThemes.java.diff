@@ -1,0 +1,206 @@
+--- upstream261/gui/GuiThemes.java
++++ v1decompiled/gui/GuiThemes.java
+@@ -1,29 +1,31 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.NbtIo
+  */
+-
+-package meteordevelopment.meteorclient.gui;
+-
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.gui.themes.meteor.MeteorGuiTheme;
+-import meteordevelopment.meteorclient.utils.PostInit;
+-import meteordevelopment.meteorclient.utils.PreInit;
+-import net.minecraft.nbt.CompoundTag;
+-import net.minecraft.nbt.NbtIo;
++package radmin.client.gui;
+ 
+ import java.io.File;
+ import java.io.IOException;
++import java.nio.file.Path;
+ import java.util.ArrayList;
+ import java.util.List;
+ import java.util.ListIterator;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.NbtIo;
++import radmin.client.MeteorClient;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.themes.meteor.MeteorGuiTheme;
++import radmin.client.utils.PostInit;
++import radmin.client.utils.PreInit;
+ 
+ public class GuiThemes {
+     private static final File FOLDER = new File(MeteorClient.FOLDER, "gui");
+     private static final File THEMES_FOLDER = new File(FOLDER, "themes");
+     private static final File FILE = new File(FOLDER, "gui.nbt");
+-
+-    private static final List<GuiTheme> themes = new ArrayList<>();
++    private static final List<GuiTheme> themes = new ArrayList<GuiTheme>();
+     private static GuiTheme theme;
+ 
+     private GuiThemes() {
+@@ -31,70 +33,59 @@
+ 
+     @PreInit
+     public static void init() {
+-        add(new MeteorGuiTheme());
++        GuiThemes.add(new MeteorGuiTheme());
+     }
+ 
+     @PostInit
+     public static void postInit() {
+         if (FILE.exists()) {
+             try {
+-                CompoundTag tag = NbtIo.read(FILE.toPath());
+-
+-                if (tag != null) select(tag.getStringOr("currentTheme", ""));
+-            } catch (IOException e) {
++                CompoundTag tag = NbtIo.read((Path)FILE.toPath());
++                if (tag != null) {
++                    GuiThemes.select(tag.getStringOr("currentTheme", ""));
++                }
++            }
++            catch (IOException e) {
+                 e.printStackTrace();
+             }
+         }
+-
+-        if (theme == null) select("Meteor");
++        if (theme == null) {
++            GuiThemes.select("Meteor");
++        }
+     }
+ 
+     public static void add(GuiTheme theme) {
+-        for (ListIterator<GuiTheme> it = themes.listIterator(); it.hasNext(); ) {
+-            if (it.next().name.equals(theme.name)) {
+-                // Replace the old one with same name
+-                it.set(theme);
+-
+-                MeteorClient.LOG.error("Theme with the name '{}' has already been added.", theme.name);
+-                return;
+-            }
++        ListIterator<GuiTheme> it = themes.listIterator();
++        while (it.hasNext()) {
++            if (!it.next().name.equals(theme.name)) continue;
++            it.set(theme);
++            MeteorClient.LOG.error("Theme with the name '{}' has already been added.", (Object)theme.name);
++            return;
+         }
+-
+         themes.add(theme);
+     }
+ 
+     public static void select(String name) {
+-        // Find theme with the provided name
+         GuiTheme theme = null;
+-
+         for (GuiTheme t : themes) {
+-            if (t.name.equals(name)) {
+-                theme = t;
+-                break;
++            if (!t.name.equals(name)) continue;
++            theme = t;
++            break;
++        }
++        if (theme != null) {
++            GuiThemes.saveTheme();
++            GuiThemes.theme = theme;
++            try {
++                CompoundTag tag;
++                File file = new File(THEMES_FOLDER, GuiThemes.get().name + ".nbt");
++                if (file.exists() && (tag = NbtIo.read((Path)file.toPath())) != null) {
++                    GuiThemes.get().fromTag(tag);
++                }
+             }
+-        }
+-
+-        if (theme != null) {
+-            // Save current theme
+-            saveTheme();
+-
+-            // Select new theme
+-            GuiThemes.theme = theme;
+-
+-            // Load new theme
+-            try {
+-                File file = new File(THEMES_FOLDER, get().name + ".nbt");
+-
+-                if (file.exists()) {
+-                    CompoundTag tag = NbtIo.read(file.toPath());
+-                    if (tag != null) get().fromTag(tag);
+-                }
+-            } catch (IOException e) {
++            catch (IOException e) {
+                 e.printStackTrace();
+             }
+-
+-            // Save global gui settings with the new theme
+-            saveGlobal();
++            GuiThemes.saveGlobal();
+         }
+     }
+ 
+@@ -104,24 +95,20 @@
+ 
+     public static String[] getNames() {
+         String[] names = new String[themes.size()];
+-
+-        for (int i = 0; i < themes.size(); i++) {
+-            names[i] = themes.get(i).name;
++        for (int i = 0; i < themes.size(); ++i) {
++            names[i] = GuiThemes.themes.get((int)i).name;
+         }
+-
+         return names;
+     }
+ 
+-    // Saving
+-
+     private static void saveTheme() {
+-        if (get() != null) {
++        if (GuiThemes.get() != null) {
+             try {
+-                CompoundTag tag = get().toTag();
+-
++                CompoundTag tag = GuiThemes.get().toTag();
+                 THEMES_FOLDER.mkdirs();
+-                NbtIo.write(tag, new File(THEMES_FOLDER, get().name + ".nbt").toPath());
+-            } catch (IOException e) {
++                NbtIo.write((CompoundTag)tag, (Path)new File(THEMES_FOLDER, GuiThemes.get().name + ".nbt").toPath());
++            }
++            catch (IOException e) {
+                 e.printStackTrace();
+             }
+         }
+@@ -130,17 +117,18 @@
+     private static void saveGlobal() {
+         try {
+             CompoundTag tag = new CompoundTag();
+-            tag.putString("currentTheme", get().name);
+-
++            tag.putString("currentTheme", GuiThemes.get().name);
+             FOLDER.mkdirs();
+-            NbtIo.write(tag, FILE.toPath());
+-        } catch (IOException e) {
++            NbtIo.write((CompoundTag)tag, (Path)FILE.toPath());
++        }
++        catch (IOException e) {
+             e.printStackTrace();
+         }
+     }
+ 
+     public static void save() {
+-        saveTheme();
+-        saveGlobal();
++        GuiThemes.saveTheme();
++        GuiThemes.saveGlobal();
+     }
+ }
++

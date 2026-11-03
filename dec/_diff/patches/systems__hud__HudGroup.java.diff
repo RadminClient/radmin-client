@@ -1,0 +1,15 @@
+--- upstream261/systems/hud/HudGroup.java
++++ v1decompiled/systems/hud/HudGroup.java
+@@ -1,9 +1,8 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.hud;
++package radmin.client.systems.hud;
+ 
+ public record HudGroup(String title) {
+ }
++

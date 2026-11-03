@@ -1,0 +1,197 @@
+--- upstream261/systems/hud/HudElement.java
++++ v1decompiled/systems/hud/HudElement.java
+@@ -1,28 +1,39 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.Tag
+  */
++package radmin.client.systems.hud;
+ 
+-package meteordevelopment.meteorclient.systems.hud;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.Tag;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.settings.Settings;
++import radmin.client.systems.hud.Alignment;
++import radmin.client.systems.hud.Hud;
++import radmin.client.systems.hud.HudBox;
++import radmin.client.systems.hud.HudElementInfo;
++import radmin.client.systems.hud.HudRenderer;
++import radmin.client.systems.hud.XAnchor;
++import radmin.client.systems.hud.YAnchor;
++import radmin.client.systems.hud.screens.HudEditorScreen;
++import radmin.client.utils.Utils;
++import radmin.client.utils.misc.ISerializable;
++import radmin.client.utils.other.Snapper;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.widgets.WWidget;
+-import meteordevelopment.meteorclient.settings.Settings;
+-import meteordevelopment.meteorclient.systems.hud.screens.HudEditorScreen;
+-import meteordevelopment.meteorclient.utils.Utils;
+-import meteordevelopment.meteorclient.utils.misc.ISerializable;
+-import meteordevelopment.meteorclient.utils.other.Snapper;
+-import net.minecraft.nbt.CompoundTag;
+-
+-public abstract class HudElement implements Snapper.Element, ISerializable<HudElement> {
++public abstract class HudElement
++implements Snapper.Element,
++ISerializable<HudElement> {
+     public final HudElementInfo<?> info;
+     private boolean active;
+-
+     public final Settings settings = new Settings();
+     public final HudBox box = new HudBox(this);
+-
+     public boolean autoAnchors = true;
+-    public int x, y;
++    public int x;
++    public int y;
+ 
+     public HudElement(HudElementInfo<?> info) {
+         this.info = info;
+@@ -30,64 +41,63 @@
+     }
+ 
+     public boolean isActive() {
+-        return active;
++        return this.active;
+     }
+ 
+     public void toggle() {
+-        active = !active;
++        this.active = !this.active;
+     }
+ 
+     public void setSize(double width, double height) {
+-        box.setSize(width, height);
++        this.box.setSize(width, height);
+     }
+ 
+     @Override
+     public void setPos(int x, int y) {
+-        if (autoAnchors) {
+-            box.setPos(x, y);
+-            box.xAnchor = XAnchor.Left;
+-            box.yAnchor = YAnchor.Top;
+-            box.updateAnchors();
++        if (this.autoAnchors) {
++            this.box.setPos(x, y);
++            this.box.xAnchor = XAnchor.Left;
++            this.box.yAnchor = YAnchor.Top;
++            this.box.updateAnchors();
+         } else {
+-            box.setPos(box.x + (x - this.x), box.y + (y - this.y));
++            this.box.setPos(this.box.x + (x - this.x), this.box.y + (y - this.y));
+         }
+-
+-        updatePos();
++        this.updatePos();
+     }
+ 
+     @Override
+     public void move(int deltaX, int deltaY) {
+-        box.move(deltaX, deltaY);
+-        updatePos();
++        this.box.move(deltaX, deltaY);
++        this.updatePos();
+     }
+ 
+     public void updatePos() {
+-        x = box.getRenderX();
+-        y = box.getRenderY();
++        this.x = this.box.getRenderX();
++        this.y = this.box.getRenderY();
+     }
+ 
+     protected double alignX(double width, Alignment alignment) {
+-        return box.alignX(getWidth(), width, alignment);
++        return this.box.alignX(this.getWidth(), width, alignment);
+     }
+ 
+     @Override
+     public int getX() {
+-        return x;
++        return this.x;
+     }
+ 
+     @Override
+     public int getY() {
+-        return y;
++        return this.y;
+     }
+ 
+     @Override
+     public int getWidth() {
+-        return box.width;
++        return this.box.width;
+     }
+ 
+     @Override
+     public int getHeight() {
+-        return box.height;
++        return this.box.height;
+     }
+ 
+     protected boolean isInEditor() {
+@@ -111,37 +121,31 @@
+         return null;
+     }
+ 
+-    // Serialization
+-
+     @Override
+     public CompoundTag toTag() {
+         CompoundTag tag = new CompoundTag();
+-
+-        tag.putString("name", info.name);
+-        tag.putBoolean("active", active);
+-
+-        tag.put("settings", settings.toTag());
+-        tag.put("box", box.toTag());
+-
+-        tag.putBoolean("autoAnchors", autoAnchors);
+-
++        tag.putString("name", this.info.name);
++        tag.putBoolean("active", this.active);
++        tag.put("settings", (Tag)this.settings.toTag());
++        tag.put("box", (Tag)this.box.toTag());
++        tag.putBoolean("autoAnchors", this.autoAnchors);
+         return tag;
+     }
+ 
+     @Override
+     public HudElement fromTag(CompoundTag tag) {
+-        settings.reset();
+-
+-        tag.getBoolean("active").ifPresent(active1 -> active = active1);
+-
+-        settings.fromTag(tag.getCompoundOrEmpty("settings"));
+-        box.fromTag(tag.getCompoundOrEmpty("box"));
+-
+-        tag.getBoolean("autoAnchors").ifPresent(autoAnchors1 -> autoAnchors = autoAnchors1);
+-
+-        x = box.getRenderX();
+-        y = box.getRenderY();
+-
++        this.settings.reset();
++        tag.getBoolean("active").ifPresent(active1 -> {
++            this.active = active1;
++        });
++        this.settings.fromTag(tag.getCompoundOrEmpty("settings"));
++        this.box.fromTag(tag.getCompoundOrEmpty("box"));
++        tag.getBoolean("autoAnchors").ifPresent(autoAnchors1 -> {
++            this.autoAnchors = autoAnchors1;
++        });
++        this.x = this.box.getRenderX();
++        this.y = this.box.getRenderY();
+         return this;
+     }
+ }
++

@@ -1,0 +1,63 @@
+--- upstream261/utils/render/prompts/OkPrompt.java
++++ v1decompiled/utils/render/prompts/OkPrompt.java
+@@ -1,27 +1,28 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.screens.Screen
+  */
++package radmin.client.utils.render.prompts;
+ 
+-package meteordevelopment.meteorclient.utils.render.prompts;
++import net.minecraft.client.gui.screens.Screen;
++import radmin.client.MeteorClient;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.GuiThemes;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.utils.render.prompts.Prompt;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.GuiThemes;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import net.minecraft.client.gui.screens.Screen;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class OkPrompt extends Prompt<OkPrompt> {
+-    private Runnable onOk = () -> {
+-    };
++public class OkPrompt
++extends Prompt<OkPrompt> {
++    private Runnable onOk = () -> {};
+ 
+     private OkPrompt(GuiTheme theme, Screen parent) {
+         super(theme, parent);
+     }
+ 
+     public static OkPrompt create() {
+-        return new OkPrompt(GuiThemes.get(), mc.screen);
++        return new OkPrompt(GuiThemes.get(), MeteorClient.mc.screen);
+     }
+ 
+     public static OkPrompt create(GuiTheme theme, Screen parent) {
+@@ -34,12 +35,13 @@
+     }
+ 
+     @Override
+-    protected void initialiseWidgets(PromptScreen screen) {
+-        WButton okButton = screen.list.add(theme.button("Ok")).expandX().widget();
++    protected void initialiseWidgets(Prompt.PromptScreen screen) {
++        WButton okButton = screen.list.add(this.theme.button("Ok")).expandX().widget();
+         okButton.action = () -> {
+-            dontShowAgain(screen);
+-            onOk.run();
++            this.dontShowAgain(screen);
++            this.onOk.run();
+             screen.onClose();
+         };
+     }
+ }
++

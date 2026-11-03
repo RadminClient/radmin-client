@@ -1,0 +1,19 @@
+--- upstream261/events/game/ResourcePacksReloadedEvent.java
++++ v1decompiled/events/game/ResourcePacksReloadedEvent.java
+@@ -1,9 +1,7 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.events.game;
++package radmin.client.events.game;
+ 
+ public class ResourcePacksReloadedEvent {
+     private static final ResourcePacksReloadedEvent INSTANCE = new ResourcePacksReloadedEvent();
+@@ -12,3 +10,4 @@
+         return INSTANCE;
+     }
+ }
++

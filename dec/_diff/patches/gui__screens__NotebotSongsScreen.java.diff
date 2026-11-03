@@ -1,0 +1,138 @@
+--- upstream261/gui/screens/NotebotSongsScreen.java
++++ v1decompiled/gui/screens/NotebotSongsScreen.java
+@@ -1,33 +1,32 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  org.apache.commons.io.FilenameUtils
+  */
+-
+-package meteordevelopment.meteorclient.gui.screens;
+-
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WindowScreen;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WTable;
+-import meteordevelopment.meteorclient.gui.widgets.input.WTextBox;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.misc.Notebot;
+-import meteordevelopment.meteorclient.utils.Utils;
+-import meteordevelopment.meteorclient.utils.notebot.decoder.SongDecoders;
+-import org.apache.commons.io.FilenameUtils;
++package radmin.client.gui.screens;
+ 
+ import java.io.IOException;
+ import java.nio.file.Files;
+ import java.nio.file.Path;
+ import java.util.concurrent.atomic.AtomicBoolean;
++import org.apache.commons.io.FilenameUtils;
++import radmin.client.MeteorClient;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WindowScreen;
++import radmin.client.gui.widgets.containers.WTable;
++import radmin.client.gui.widgets.input.WTextBox;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.misc.Notebot;
++import radmin.client.utils.Utils;
++import radmin.client.utils.notebot.decoder.SongDecoders;
+ 
+-public class NotebotSongsScreen extends WindowScreen {
++public class NotebotSongsScreen
++extends WindowScreen {
+     private static final Notebot notebot = Modules.get().get(Notebot.class);
+-
+     private WTextBox filter;
+     private String filterText = "";
+-
+     private WTable table;
+ 
+     public NotebotSongsScreen(GuiTheme theme) {
+@@ -36,58 +35,48 @@
+ 
+     @Override
+     public void initWidgets() {
+-        // Random Song
+-        WButton randomSong = add(theme.button("Random Song")).minWidth(400).expandX().widget();
++        WButton randomSong = this.add(this.theme.button("Random Song")).minWidth(400.0).expandX().widget();
+         randomSong.action = notebot::playRandomSong;
+-
+-        // Filter
+-        filter = add(theme.textBox("", "Search for the songs...")).minWidth(400).expandX().widget();
+-        filter.setFocused(true);
+-        filter.action = () -> {
+-            filterText = filter.get().trim();
+-
+-            table.clear();
+-            initSongsTable();
++        this.filter = this.add(this.theme.textBox("", "Search for the songs...")).minWidth(400.0).expandX().widget();
++        this.filter.setFocused(true);
++        this.filter.action = () -> {
++            this.filterText = this.filter.get().trim();
++            this.table.clear();
++            this.initSongsTable();
+         };
+-
+-        table = add(theme.table()).widget();
+-
+-        initSongsTable();
++        this.table = this.add(this.theme.table()).widget();
++        this.initSongsTable();
+     }
+ 
+     private void initSongsTable() {
+         AtomicBoolean noSongsFound = new AtomicBoolean(true);
+         try {
+             Files.list(MeteorClient.FOLDER.toPath().resolve("notebot")).forEach(path -> {
+-                if (SongDecoders.hasDecoder(path)) {
+-                    String name = path.getFileName().toString();
+-
+-                    if (Utils.searchTextDefault(name, filterText, false)) {
+-                        addPath(path);
+-                        noSongsFound.set(false);
+-                    }
++                String name;
++                if (SongDecoders.hasDecoder(path) && Utils.searchTextDefault(name = path.getFileName().toString(), this.filterText, false)) {
++                    this.addPath((Path)path);
++                    noSongsFound.set(false);
+                 }
+             });
+-        } catch (IOException _) {
+-            table.add(theme.label("Missing meteor-client/notebot folder.")).expandCellX();
+-            table.row();
+         }
+-
++        catch (IOException iOException) {
++            this.table.add(this.theme.label("Missing radmin-client/notebot folder.")).expandCellX();
++            this.table.row();
++        }
+         if (noSongsFound.get()) {
+-            table.add(theme.label("No songs found.")).expandCellX().center();
++            this.table.add(this.theme.label("No songs found.")).expandCellX().center();
+         }
+     }
+ 
+     private void addPath(Path path) {
+-        table.add(theme.horizontalSeparator()).expandX().minWidth(400);
+-        table.row();
+-
+-        table.add(theme.label(FilenameUtils.getBaseName(path.getFileName().toString()))).expandCellX();
+-        WButton load = table.add(theme.button("Load")).right().widget();
++        this.table.add(this.theme.horizontalSeparator()).expandX().minWidth(400.0);
++        this.table.row();
++        this.table.add(this.theme.label(FilenameUtils.getBaseName((String)path.getFileName().toString()))).expandCellX();
++        WButton load = this.table.add(this.theme.button("Load")).right().widget();
+         load.action = () -> notebot.loadSong(path.toFile());
+-        WButton preview = table.add(theme.button("Preview")).right().widget();
++        WButton preview = this.table.add(this.theme.button("Preview")).right().widget();
+         preview.action = () -> notebot.previewSong(path.toFile());
+-
+-        table.row();
++        this.table.row();
+     }
+ }
++

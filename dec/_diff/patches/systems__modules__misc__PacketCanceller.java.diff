@@ -1,0 +1,89 @@
+--- upstream261/systems/modules/misc/PacketCanceller.java
++++ v1decompiled/systems/modules/misc/PacketCanceller.java
+@@ -1,53 +1,52 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.network.protocol.Packet
++ *  net.minecraft.network.protocol.PacketType
++ *  org.jetbrains.annotations.NotNull
+  */
++package radmin.client.systems.modules.misc;
+ 
+-package meteordevelopment.meteorclient.systems.modules.misc;
+-
+-import meteordevelopment.meteorclient.events.packets.PacketEvent;
+-import meteordevelopment.meteorclient.settings.PacketListSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
++import java.util.Set;
+ import meteordevelopment.orbit.EventHandler;
+-import meteordevelopment.orbit.EventPriority;
+ import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.PacketType;
+ import org.jetbrains.annotations.NotNull;
++import radmin.client.events.packets.PacketEvent;
++import radmin.client.settings.PacketListSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
+ 
+-import java.util.Set;
+-
+-public class PacketCanceller extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<Set<PacketType<? extends @NotNull Packet<?>>>> s2cPackets = sgGeneral.add(new PacketListSetting.Builder()
+-        .name("S2C-packets")
+-        .description("Server-to-client packets to cancel.")
+-        .clientbound()
+-        .build()
+-    );
+-
+-    private final Setting<Set<PacketType<? extends @NotNull Packet<?>>>> c2sPackets = sgGeneral.add(new PacketListSetting.Builder()
+-        .name("C2S-packets")
+-        .description("Client-to-server packets to cancel.")
+-        .serverbound()
+-        .build()
+-    );
++public class PacketCanceller
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final Setting<Set<PacketType<? extends @NotNull Packet<?>>>> s2cPackets;
++    private final Setting<Set<PacketType<? extends @NotNull Packet<?>>>> c2sPackets;
+ 
+     public PacketCanceller() {
+         super(Categories.Misc, "packet-canceller", "Allows you to cancel certain packets.");
+-        runInMainMenu = true;
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.s2cPackets = this.sgGeneral.add(((PacketListSetting.Builder)((PacketListSetting.Builder)new PacketListSetting.Builder().name("S2C-packets")).description("Server-to-client packets to cancel.")).clientbound().build());
++        this.c2sPackets = this.sgGeneral.add(((PacketListSetting.Builder)((PacketListSetting.Builder)new PacketListSetting.Builder().name("C2S-packets")).description("Client-to-server packets to cancel.")).serverbound().build());
++        this.runInMainMenu = true;
+     }
+ 
+-    @EventHandler(priority = EventPriority.HIGHEST + 1)
++    @EventHandler(priority=201)
+     private void onReceivePacket(PacketEvent.Receive event) {
+-        if (s2cPackets.get().contains(event.packet.type())) event.cancel();
++        if (this.s2cPackets.get().contains(event.packet.type())) {
++            event.cancel();
++        }
+     }
+ 
+-    @EventHandler(priority = EventPriority.HIGHEST + 1)
++    @EventHandler(priority=201)
+     private void onSendPacket(PacketEvent.Send event) {
+-        if (c2sPackets.get().contains(event.packet.type())) event.cancel();
++        if (this.c2sPackets.get().contains(event.packet.type())) {
++            event.cancel();
++        }
+     }
+ }
++

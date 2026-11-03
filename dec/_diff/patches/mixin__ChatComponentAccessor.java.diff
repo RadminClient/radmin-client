@@ -1,0 +1,42 @@
+--- upstream261/mixin/ChatComponentAccessor.java
++++ v1decompiled/mixin/ChatComponentAccessor.java
+@@ -1,22 +1,27 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.components.ChatComponent
++ *  net.minecraft.client.multiplayer.chat.GuiMessage
++ *  net.minecraft.client.multiplayer.chat.GuiMessage$Line
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
++import java.util.List;
+ import net.minecraft.client.gui.components.ChatComponent;
+ import net.minecraft.client.multiplayer.chat.GuiMessage;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-import java.util.List;
++@Mixin(value={ChatComponent.class})
++public interface ChatComponentAccessor {
++    @Accessor(value="trimmedMessages")
++    public List<GuiMessage.Line> meteor$getTrimmedMessages();
+ 
+-@Mixin(ChatComponent.class)
+-public interface ChatComponentAccessor {
+-    @Accessor("trimmedMessages")
+-    List<GuiMessage.Line> meteor$getTrimmedMessages();
++    @Accessor(value="allMessages")
++    public List<GuiMessage> meteor$getAllMessages();
++}
+ 
+-    @Accessor("allMessages")
+-    List<GuiMessage> meteor$getAllMessages();
+-}

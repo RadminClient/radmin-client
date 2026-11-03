@@ -1,0 +1,30 @@
+--- upstream261/events/meteor/CharTypedEvent.java
++++ v1decompiled/events/meteor/CharTypedEvent.java
+@@ -1,20 +1,19 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.events.meteor;
+ 
+-package meteordevelopment.meteorclient.events.meteor;
++import radmin.client.events.Cancellable;
+ 
+-import meteordevelopment.meteorclient.events.Cancellable;
+-
+-public class CharTypedEvent extends Cancellable {
++public class CharTypedEvent
++extends Cancellable {
+     private static final CharTypedEvent INSTANCE = new CharTypedEvent();
+-
+     public char c;
+ 
+     public static CharTypedEvent get(char c) {
+         INSTANCE.setCancelled(false);
+-        INSTANCE.c = c;
++        CharTypedEvent.INSTANCE.c = c;
+         return INSTANCE;
+     }
+ }
++

@@ -1,0 +1,31 @@
+--- upstream261/systems/accounts/UuidToProfileResponse.java
++++ v1decompiled/systems/accounts/UuidToProfileResponse.java
+@@ -1,18 +1,16 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.accounts;
++package radmin.client.systems.accounts;
+ 
+ public class UuidToProfileResponse {
+     public Property[] properties;
+ 
+     public String getPropertyValue(String name) {
+-        for (Property property : properties) {
+-            if (property.name.equals(name)) return property.value;
++        for (Property property : this.properties) {
++            if (!property.name.equals(name)) continue;
++            return property.value;
+         }
+-
+         return null;
+     }
+ 
+@@ -21,3 +19,4 @@
+         public String value;
+     }
+ }
++

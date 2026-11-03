@@ -1,0 +1,89 @@
+--- upstream261/commands/arguments/ProfileArgumentType.java
++++ v1decompiled/commands/arguments/ProfileArgumentType.java
+@@ -1,9 +1,19 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.google.common.collect.Streams
++ *  com.mojang.brigadier.StringReader
++ *  com.mojang.brigadier.arguments.ArgumentType
++ *  com.mojang.brigadier.context.CommandContext
++ *  com.mojang.brigadier.exceptions.CommandSyntaxException
++ *  com.mojang.brigadier.exceptions.DynamicCommandExceptionType
++ *  com.mojang.brigadier.suggestion.Suggestions
++ *  com.mojang.brigadier.suggestion.SuggestionsBuilder
++ *  net.minecraft.commands.SharedSuggestionProvider
++ *  net.minecraft.network.chat.Component
+  */
+-
+-package meteordevelopment.meteorclient.commands.arguments;
++package radmin.client.commands.arguments;
+ 
+ import com.google.common.collect.Streams;
+ import com.mojang.brigadier.StringReader;
+@@ -13,20 +23,18 @@
+ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+ import com.mojang.brigadier.suggestion.Suggestions;
+ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+-import meteordevelopment.meteorclient.systems.profiles.Profile;
+-import meteordevelopment.meteorclient.systems.profiles.Profiles;
+-import net.minecraft.network.chat.Component;
+-
+ import java.util.Collection;
+ import java.util.List;
+ import java.util.concurrent.CompletableFuture;
++import net.minecraft.commands.SharedSuggestionProvider;
++import net.minecraft.network.chat.Component;
++import radmin.client.systems.profiles.Profile;
++import radmin.client.systems.profiles.Profiles;
+ 
+-import static net.minecraft.commands.SharedSuggestionProvider.suggest;
+-
+-public class ProfileArgumentType implements ArgumentType<String> {
++public class ProfileArgumentType
++implements ArgumentType<String> {
+     private static final ProfileArgumentType INSTANCE = new ProfileArgumentType();
+-    private static final DynamicCommandExceptionType NO_SUCH_PROFILE = new DynamicCommandExceptionType(name -> Component.literal("Profile with name " + name + " doesn't exist."));
+-
++    private static final DynamicCommandExceptionType NO_SUCH_PROFILE = new DynamicCommandExceptionType(name -> Component.literal((String)("Profile with name " + String.valueOf(name) + " doesn't exist.")));
+     private static final Collection<String> EXAMPLES = List.of("pvp.meteorclient.com", "anarchy");
+ 
+     public static ProfileArgumentType create() {
+@@ -34,28 +42,27 @@
+     }
+ 
+     public static Profile get(CommandContext<?> context) {
+-        return Profiles.get().get(context.getArgument("profile", String.class));
++        return Profiles.get().get((String)context.getArgument("profile", String.class));
+     }
+ 
+     private ProfileArgumentType() {
+     }
+ 
+-    @Override
+     public String parse(StringReader reader) throws CommandSyntaxException {
+         String argument = reader.getRemaining();
+         reader.setCursor(reader.getTotalLength());
+-        if (Profiles.get().get(argument) == null) throw NO_SUCH_PROFILE.create(argument);
+-
++        if (Profiles.get().get(argument) == null) {
++            throw NO_SUCH_PROFILE.create((Object)argument);
++        }
+         return argument;
+     }
+ 
+-    @Override
+     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+-        return suggest(Streams.stream(Profiles.get()).map(profile -> profile.name.get()), builder);
++        return SharedSuggestionProvider.suggest(Streams.stream((Iterable)Profiles.get()).map(profile -> profile.name.get()), (SuggestionsBuilder)builder);
+     }
+ 
+-    @Override
+     public Collection<String> getExamples() {
+         return EXAMPLES;
+     }
+ }
++

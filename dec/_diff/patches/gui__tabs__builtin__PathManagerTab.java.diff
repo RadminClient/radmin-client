@@ -1,0 +1,74 @@
+--- upstream261/gui/tabs/builtin/PathManagerTab.java
++++ v1decompiled/gui/tabs/builtin/PathManagerTab.java
+@@ -1,19 +1,21 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.screens.Screen
+  */
++package radmin.client.gui.tabs.builtin;
+ 
+-package meteordevelopment.meteorclient.gui.tabs.builtin;
++import net.minecraft.client.gui.screens.Screen;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.tabs.Tab;
++import radmin.client.gui.tabs.TabScreen;
++import radmin.client.gui.tabs.WindowTabScreen;
++import radmin.client.gui.widgets.input.WTextBox;
++import radmin.client.pathing.PathManagers;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.tabs.Tab;
+-import meteordevelopment.meteorclient.gui.tabs.TabScreen;
+-import meteordevelopment.meteorclient.gui.tabs.WindowTabScreen;
+-import meteordevelopment.meteorclient.gui.widgets.input.WTextBox;
+-import meteordevelopment.meteorclient.pathing.PathManagers;
+-import net.minecraft.client.gui.screens.Screen;
+-
+-public class PathManagerTab extends Tab {
++public class PathManagerTab
++extends Tab {
+     public PathManagerTab() {
+         super(PathManagers.get().getName());
+     }
+@@ -28,25 +30,23 @@
+         return screen instanceof PathManagerScreen;
+     }
+ 
+-    private static class PathManagerScreen extends WindowTabScreen {
++    private static class PathManagerScreen
++    extends WindowTabScreen {
+         public PathManagerScreen(GuiTheme theme, Tab tab) {
+             super(theme, tab);
+-
+             PathManagers.get().getSettings().get().onActivated();
+         }
+ 
+         @Override
+         public void initWidgets() {
+-            WTextBox filter = add(theme.textBox("")).minWidth(400).expandX().widget();
++            WTextBox filter = this.add(this.theme.textBox("")).minWidth(400.0).expandX().widget();
+             filter.setFocused(true);
+             filter.action = () -> {
+-                clear();
+-
+-                add(filter);
+-                add(theme.settings(PathManagers.get().getSettings().get(), filter.get().trim())).expandX();
++                this.clear();
++                this.add(filter);
++                this.add(this.theme.settings(PathManagers.get().getSettings().get(), filter.get().trim())).expandX();
+             };
+-
+-            add(theme.settings(PathManagers.get().getSettings().get(), filter.get().trim())).expandX();
++            this.add(this.theme.settings(PathManagers.get().getSettings().get(), filter.get().trim())).expandX();
+         }
+ 
+         @Override
+@@ -55,3 +55,4 @@
+         }
+     }
+ }
++

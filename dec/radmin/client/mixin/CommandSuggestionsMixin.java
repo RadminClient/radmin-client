@@ -1,0 +1,81 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.llamalad7.mixinextras.sugar.Local
+ *  com.mojang.brigadier.ParseResults
+ *  com.mojang.brigadier.StringReader
+ *  com.mojang.brigadier.suggestion.Suggestions
+ *  net.minecraft.client.gui.components.CommandSuggestions
+ *  net.minecraft.client.gui.components.CommandSuggestions$SuggestionsList
+ *  net.minecraft.client.gui.components.EditBox
+ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
+ *  org.jspecify.annotations.Nullable
+ *  org.spongepowered.asm.mixin.Final
+ *  org.spongepowered.asm.mixin.Mixin
+ *  org.spongepowered.asm.mixin.Shadow
+ *  org.spongepowered.asm.mixin.injection.At
+ *  org.spongepowered.asm.mixin.injection.Inject
+ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+ */
+package radmin.client.mixin;
+
+import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.brigadier.ParseResults;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.suggestion.Suggestions;
+import java.util.concurrent.CompletableFuture;
+import net.minecraft.client.gui.components.CommandSuggestions;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+import org.jspecify.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import radmin.client.MeteorClient;
+import radmin.client.commands.Commands;
+import radmin.client.systems.config.Config;
+
+@Mixin(value={CommandSuggestions.class})
+public abstract class CommandSuggestionsMixin {
+    @Shadow
+    private @Nullable ParseResults<ClientSuggestionProvider> currentParse;
+    @Shadow
+    @Final
+    private EditBox input;
+    @Shadow
+    private CommandSuggestions.SuggestionsList suggestions;
+    @Shadow
+    private boolean keepSuggestions;
+    @Shadow
+    private @Nullable CompletableFuture<Suggestions> pendingSuggestions;
+
+    @Shadow
+    protected abstract void updateUsageInfo(ParseResults<ClientSuggestionProvider> var1, Suggestions var2);
+
+    @Inject(method={"updateCommandInfo"}, at={@At(value="INVOKE", target="Lcom/mojang/brigadier/StringReader;canRead()Z", remap=false)}, cancellable=true)
+    public void onRefresh(CallbackInfo ci, @Local(name={"reader"}) StringReader reader) {
+        String prefix = Config.get().prefix.get();
+        int length = prefix.length();
+        if (reader.canRead(length) && reader.getString().startsWith(prefix, reader.getCursor())) {
+            int cursor;
+            reader.setCursor(reader.getCursor() + length);
+            if (this.currentParse == null) {
+                this.currentParse = Commands.DISPATCHER.parse(reader, (Object)MeteorClient.mc.getConnection().getSuggestionsProvider());
+            }
+            if (!((cursor = this.input.getCursorPosition()) < length || this.suggestions != null && this.keepSuggestions)) {
+                this.pendingSuggestions = Commands.DISPATCHER.getCompletionSuggestions(this.currentParse, cursor);
+                this.pendingSuggestions.thenAccept(suggestionResult -> {
+                    if (this.pendingSuggestions.isDone()) {
+                        this.updateUsageInfo(this.currentParse, (Suggestions)suggestionResult);
+                    }
+                });
+            }
+            ci.cancel();
+        }
+    }
+}
+

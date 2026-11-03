@@ -1,0 +1,42 @@
+--- upstream261/events/world/TickEvent.java
++++ v1decompiled/events/world/TickEvent.java
+@@ -1,24 +1,26 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.events.world;
++package radmin.client.events.world;
+ 
+ public class TickEvent {
+-    public static class Pre extends TickEvent {
++
++    public static class Post
++    extends TickEvent {
++        private static final Post INSTANCE = new Post();
++
++        public static Post get() {
++            return INSTANCE;
++        }
++    }
++
++    public static class Pre
++    extends TickEvent {
+         private static final Pre INSTANCE = new Pre();
+ 
+         public static Pre get() {
+             return INSTANCE;
+         }
+     }
++}
+ 
+-    public static class Post extends TickEvent {
+-        private static final Post INSTANCE = new Post();
+-
+-        public static Post get() {
+-            return INSTANCE;
+-        }
+-    }
+-}

@@ -1,0 +1,68 @@
+--- upstream261/gui/screens/settings/PotionSettingScreen.java
++++ v1decompiled/gui/screens/settings/PotionSettingScreen.java
+@@ -1,42 +1,43 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.resources.language.I18n
++ *  net.minecraft.world.item.ItemStack
+  */
++package radmin.client.gui.screens.settings;
+ 
+-package meteordevelopment.meteorclient.gui.screens.settings;
++import net.minecraft.client.resources.language.I18n;
++import net.minecraft.world.item.ItemStack;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WindowScreen;
++import radmin.client.gui.widgets.containers.WTable;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.settings.PotionSetting;
++import radmin.client.utils.misc.MyPotion;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WindowScreen;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WTable;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import meteordevelopment.meteorclient.settings.PotionSetting;
+-import meteordevelopment.meteorclient.utils.misc.MyPotion;
+-import net.minecraft.client.resources.language.I18n;
+-
+-public class PotionSettingScreen extends WindowScreen {
++public class PotionSettingScreen
++extends WindowScreen {
+     private final PotionSetting setting;
+ 
+     public PotionSettingScreen(GuiTheme theme, PotionSetting setting) {
+         super(theme, "Select Potion");
+-
+         this.setting = setting;
+     }
+ 
+     @Override
+     public void initWidgets() {
+-        WTable table = add(theme.table()).expandX().widget();
+-
++        WTable table = this.add(this.theme.table()).expandX().widget();
+         for (MyPotion potion : MyPotion.values()) {
+-            var stack = potion.potion.get();
+-            table.add(theme.itemWithLabel(stack, I18n.get(stack.getItem().getDescriptionId())));
+-
+-            WButton select = table.add(theme.button("Select")).widget();
++            ItemStack stack = potion.potion.get();
++            table.add(this.theme.itemWithLabel(stack, I18n.get((String)stack.getItem().getDescriptionId(), (Object[])new Object[0])));
++            WButton select = table.add(this.theme.button("Select")).widget();
+             select.action = () -> {
+-                setting.set(potion);
+-                onClose();
++                this.setting.set(potion);
++                this.onClose();
+             };
+-
+             table.row();
+         }
+     }
+ }
++

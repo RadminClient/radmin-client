@@ -1,0 +1,180 @@
+--- upstream261/settings/EnchantmentListSetting.java
++++ v1decompiled/settings/EnchantmentListSetting.java
+@@ -1,11 +1,33 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  it.unimi.dsi.fastutil.objects.ObjectOpenHashSet
++ *  java.lang.reflect.AccessFlag
++ *  net.minecraft.client.Minecraft
++ *  net.minecraft.core.Registry
++ *  net.minecraft.core.registries.Registries
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.ListTag
++ *  net.minecraft.nbt.StringTag
++ *  net.minecraft.nbt.Tag
++ *  net.minecraft.resources.Identifier
++ *  net.minecraft.resources.ResourceKey
++ *  net.minecraft.world.item.enchantment.Enchantment
++ *  net.minecraft.world.item.enchantment.Enchantments
+  */
+-
+-package meteordevelopment.meteorclient.settings;
++package radmin.client.settings;
+ 
+ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
++import java.lang.reflect.AccessFlag;
++import java.util.Arrays;
++import java.util.Collection;
++import java.util.List;
++import java.util.Objects;
++import java.util.Optional;
++import java.util.Set;
++import java.util.function.Consumer;
++import java.util.stream.Collectors;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.core.Registry;
+ import net.minecraft.core.registries.Registries;
+@@ -17,37 +39,29 @@
+ import net.minecraft.resources.ResourceKey;
+ import net.minecraft.world.item.enchantment.Enchantment;
+ import net.minecraft.world.item.enchantment.Enchantments;
++import radmin.client.settings.IVisible;
++import radmin.client.settings.Setting;
+ 
+-import java.lang.reflect.AccessFlag;
+-import java.util.*;
+-import java.util.function.Consumer;
+-import java.util.stream.Collectors;
+-
+-public class EnchantmentListSetting extends Setting<Set<ResourceKey<Enchantment>>> {
++public class EnchantmentListSetting
++extends Setting<Set<ResourceKey<Enchantment>>> {
+     public EnchantmentListSetting(String name, String description, Set<ResourceKey<Enchantment>> defaultValue, Consumer<Set<ResourceKey<Enchantment>>> onChanged, Consumer<Setting<Set<ResourceKey<Enchantment>>>> onModuleActivated, IVisible visible) {
+         super(name, description, defaultValue, onChanged, onModuleActivated, visible);
+     }
+ 
+     @Override
+     public void resetImpl() {
+-        value = new ObjectOpenHashSet<>(defaultValue);
++        this.value = new ObjectOpenHashSet((Collection)this.defaultValue);
+     }
+ 
+     @Override
+     protected Set<ResourceKey<Enchantment>> parseImpl(String str) {
+         String[] values = str.split(",");
+-        Set<ResourceKey<Enchantment>> enchs = new ObjectOpenHashSet<>(values.length);
+-
++        ObjectOpenHashSet enchs = new ObjectOpenHashSet(values.length);
+         for (String value : values) {
+             String name = value.trim();
+-
+-            Identifier id;
+-            if (name.contains(":")) id = Identifier.parse(name);
+-            else id = Identifier.withDefaultNamespace(name);
+-
+-            enchs.add(ResourceKey.create(Registries.ENCHANTMENT, id));
++            Identifier id = name.contains(":") ? Identifier.parse((String)name) : Identifier.withDefaultNamespace((String)name);
++            enchs.add(ResourceKey.create((ResourceKey)Registries.ENCHANTMENT, (Identifier)id));
+         }
+-
+         return enchs;
+     }
+ 
+@@ -58,69 +72,57 @@
+ 
+     @Override
+     public Iterable<Identifier> getIdentifierSuggestions() {
+-        return Optional.ofNullable(Minecraft.getInstance().getConnection())
+-            .flatMap(networkHandler -> networkHandler.registryAccess().lookup(Registries.ENCHANTMENT))
+-            .map(Registry::keySet).orElse(Set.of());
++        return Optional.ofNullable(Minecraft.getInstance().getConnection()).flatMap(networkHandler -> networkHandler.registryAccess().lookup(Registries.ENCHANTMENT)).map(Registry::keySet).orElse(Set.of());
+     }
+ 
+     @Override
+     public CompoundTag save(CompoundTag tag) {
+         ListTag valueTag = new ListTag();
+-        for (ResourceKey<Enchantment> ench : get()) {
+-            valueTag.add(StringTag.valueOf(ench.identifier().toString()));
++        for (ResourceKey ench : (Set)this.get()) {
++            valueTag.add((Object)StringTag.valueOf((String)ench.identifier().toString()));
+         }
+-        tag.put("value", valueTag);
+-
++        tag.put("value", (Tag)valueTag);
+         return tag;
+     }
+ 
+     @Override
+     public Set<ResourceKey<Enchantment>> load(CompoundTag tag) {
+-        get().clear();
+-
++        ((Set)this.get()).clear();
+         for (Tag tagI : tag.getListOrEmpty("value")) {
+-            get().add(ResourceKey.create(Registries.ENCHANTMENT, Identifier.parse(tagI.asString().orElse(""))));
++            ((Set)this.get()).add(ResourceKey.create((ResourceKey)Registries.ENCHANTMENT, (Identifier)Identifier.parse((String)tagI.asString().orElse(""))));
+         }
+-
+-        return get();
++        return (Set)this.get();
+     }
+ 
+-    @SuppressWarnings({"unchecked", "rawtypes"})
+-    public static class Builder extends SettingBuilder<Builder, Set<ResourceKey<Enchantment>>, EnchantmentListSetting> {
+-        private static final Set<ResourceKey<Enchantment>> VANILLA_DEFAULTS;
++    public static class Builder
++    extends Setting.SettingBuilder<Builder, Set<ResourceKey<Enchantment>>, EnchantmentListSetting> {
++        private static final Set<ResourceKey<Enchantment>> VANILLA_DEFAULTS = Arrays.stream(Enchantments.class.getDeclaredFields()).filter(field -> field.accessFlags().containsAll(List.of(AccessFlag.PUBLIC, AccessFlag.STATIC, AccessFlag.FINAL))).filter(field -> field.getType() == ResourceKey.class).map(field -> {
++            try {
++                return field.get(null);
++            }
++            catch (IllegalAccessException illegalAccessException) {
++                return null;
++            }
++        }).filter(Objects::nonNull).map(ResourceKey.class::cast).filter(registryKey -> registryKey.registryKey() == Registries.ENCHANTMENT).collect(Collectors.toSet());
+ 
+         public Builder() {
+-            super(new ObjectOpenHashSet<>());
++            super(new ObjectOpenHashSet());
+         }
+ 
+         public Builder vanillaDefaults() {
+-            return defaultValue(VANILLA_DEFAULTS);
++            return (Builder)this.defaultValue(VANILLA_DEFAULTS);
+         }
+ 
++        @Override
+         @SafeVarargs
+-        public final Builder defaultValue(ResourceKey<Enchantment>... defaults) {
+-            return defaultValue(defaults != null ? new ObjectOpenHashSet<>(defaults) : new ObjectOpenHashSet<>());
++        public final Builder defaultValue(ResourceKey<Enchantment> ... defaults) {
++            return (Builder)this.defaultValue(defaults != null ? new ObjectOpenHashSet((Object[])defaults) : new ObjectOpenHashSet());
+         }
+ 
+         @Override
+         public EnchantmentListSetting build() {
+-            return new EnchantmentListSetting(name, description, defaultValue, onChanged, onModuleActivated, visible);
+-        }
+-
+-        static {
+-            VANILLA_DEFAULTS = (Set) Arrays.stream(Enchantments.class.getDeclaredFields())
+-                .filter(field -> field.accessFlags().containsAll(List.of(AccessFlag.PUBLIC, AccessFlag.STATIC, AccessFlag.FINAL)))
+-                .filter(field -> field.getType() == ResourceKey.class)
+-                .map(field -> {
+-                    try {
+-                        return field.get(null);
+-                    } catch (IllegalAccessException _) {
+-                        return null;
+-                    }
+-                }).filter(Objects::nonNull)
+-                .map(ResourceKey.class::cast)
+-                .filter(registryKey -> registryKey.registryKey() == Registries.ENCHANTMENT)
+-                .collect(Collectors.toSet());
++            return new EnchantmentListSetting(this.name, this.description, (Set)this.defaultValue, this.onChanged, this.onModuleActivated, this.visible);
+         }
+     }
+ }
++

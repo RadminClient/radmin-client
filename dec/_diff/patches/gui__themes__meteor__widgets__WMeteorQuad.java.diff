@@ -1,0 +1,33 @@
+--- upstream261/gui/themes/meteor/widgets/WMeteorQuad.java
++++ v1decompiled/gui/themes/meteor/widgets/WMeteorQuad.java
+@@ -1,21 +1,21 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.themes.meteor.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.themes.meteor.widgets;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.widgets.WQuad;
++import radmin.client.utils.render.color.Color;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.gui.widgets.WQuad;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
+-
+-public class WMeteorQuad extends WQuad {
++public class WMeteorQuad
++extends WQuad {
+     public WMeteorQuad(Color color) {
+         super(color);
+     }
+ 
+     @Override
+     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        renderer.quad(x, y, width, height, color);
++        renderer.quad(this.x, this.y, this.width, this.height, this.color);
+     }
+ }
++

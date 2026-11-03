@@ -1,0 +1,148 @@
+--- upstream261/utils/misc/ByteCountDataOutput.java
++++ v1decompiled/utils/misc/ByteCountDataOutput.java
+@@ -1,110 +1,113 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  org.jetbrains.annotations.NotNull
+  */
+-
+-package meteordevelopment.meteorclient.utils.misc;
+-
+-import org.jetbrains.annotations.NotNull;
++package radmin.client.utils.misc;
+ 
+ import java.io.DataOutput;
+ import java.io.IOException;
++import org.jetbrains.annotations.NotNull;
+ 
+-public class ByteCountDataOutput implements DataOutput {
++public class ByteCountDataOutput
++implements DataOutput {
+     public static final ByteCountDataOutput INSTANCE = new ByteCountDataOutput();
+-
+     private int count;
+ 
+     public int getCount() {
+-        return count;
++        return this.count;
+     }
+ 
+     public void reset() {
+-        count = 0;
++        this.count = 0;
+     }
+ 
+     @Override
+     public void write(int b) throws IOException {
+-        count++;
++        ++this.count;
+     }
+ 
+     @Override
+     public void write(byte[] b) throws IOException {
+-        count += b.length;
++        this.count += b.length;
+     }
+ 
+     @Override
+     public void write(byte @NotNull [] b, int off, int len) throws IOException {
+-        count += len;
++        this.count += len;
+     }
+ 
+     @Override
+     public void writeBoolean(boolean v) {
+-        count++;
++        ++this.count;
+     }
+ 
+     @Override
+     public void writeByte(int v) {
+-        count++;
++        ++this.count;
+     }
+ 
+     @Override
+     public void writeShort(int v) {
+-        count += 2;
++        this.count += 2;
+     }
+ 
+     @Override
+     public void writeChar(int v) {
+-        count += 2;
++        this.count += 2;
+     }
+ 
+     @Override
+     public void writeInt(int v) {
+-        count += 4;
++        this.count += 4;
+     }
+ 
+     @Override
+     public void writeLong(long v) {
+-        count += 8;
++        this.count += 8;
+     }
+ 
+     @Override
+     public void writeFloat(float v) {
+-        count += 4;
++        this.count += 4;
+     }
+ 
+     @Override
+     public void writeDouble(double v) {
+-        count += 8;
++        this.count += 8;
+     }
+ 
+     @Override
+     public void writeBytes(String s) {
+-        count += s.length();
++        this.count += s.length();
+     }
+ 
+     @Override
+     public void writeChars(String s) {
+-        count += s.length() * 2;
++        this.count += s.length() * 2;
+     }
+ 
+     @Override
+     public void writeUTF(@NotNull String s) {
+-        count += 2 + getUTFLength(s);
++        this.count = (int)((long)this.count + (2L + this.getUTFLength(s)));
+     }
+ 
+     long getUTFLength(String s) {
+-        long utflen = 0;
+-        for (int cpos = 0; cpos < s.length(); cpos++) {
++        long utflen = 0L;
++        for (int cpos = 0; cpos < s.length(); ++cpos) {
+             char c = s.charAt(cpos);
+-            if (c >= 0x0001 && c <= 0x007F) {
+-                utflen++;
+-            } else if (c > 0x07FF) {
+-                utflen += 3;
+-            } else {
+-                utflen += 2;
++            if (c >= '\u0001' && c <= '\u007f') {
++                ++utflen;
++                continue;
+             }
++            if (c > '\u07ff') {
++                utflen += 3L;
++                continue;
++            }
++            utflen += 2L;
+         }
+         return utflen;
+     }
+ }
++

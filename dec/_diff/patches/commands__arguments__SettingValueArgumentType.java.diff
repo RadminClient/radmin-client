@@ -1,0 +1,108 @@
+--- upstream261/commands/arguments/SettingValueArgumentType.java
++++ v1decompiled/commands/arguments/SettingValueArgumentType.java
+@@ -1,9 +1,18 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.StringReader
++ *  com.mojang.brigadier.arguments.ArgumentType
++ *  com.mojang.brigadier.context.CommandContext
++ *  com.mojang.brigadier.exceptions.CommandSyntaxException
++ *  com.mojang.brigadier.suggestion.Suggestions
++ *  com.mojang.brigadier.suggestion.SuggestionsBuilder
++ *  net.minecraft.commands.SharedSuggestionProvider
++ *  net.minecraft.resources.Identifier
++ *  org.jetbrains.annotations.NotNull
+  */
+-
+-package meteordevelopment.meteorclient.commands.arguments;
++package radmin.client.commands.arguments;
+ 
+ import com.mojang.brigadier.StringReader;
+ import com.mojang.brigadier.arguments.ArgumentType;
+@@ -11,15 +20,16 @@
+ import com.mojang.brigadier.exceptions.CommandSyntaxException;
+ import com.mojang.brigadier.suggestion.Suggestions;
+ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.Settings;
++import java.util.concurrent.CompletableFuture;
+ import net.minecraft.commands.SharedSuggestionProvider;
+ import net.minecraft.resources.Identifier;
+ import org.jetbrains.annotations.NotNull;
++import radmin.client.commands.arguments.SettingArgumentType;
++import radmin.client.settings.Setting;
++import radmin.client.settings.Settings;
+ 
+-import java.util.concurrent.CompletableFuture;
+-
+-public class SettingValueArgumentType implements ArgumentType<String> {
++public class SettingValueArgumentType
++implements ArgumentType<String> {
+     private static final SettingValueArgumentType INSTANCE = new SettingValueArgumentType();
+ 
+     public static SettingValueArgumentType create() {
+@@ -27,50 +37,46 @@
+     }
+ 
+     public static String get(CommandContext<?> context) {
+-        return context.getArgument("value", String.class);
++        return (String)context.getArgument("value", String.class);
+     }
+ 
+     private SettingValueArgumentType() {
+     }
+ 
+-    @Override
+     public String parse(StringReader reader) throws CommandSyntaxException {
+         String text = reader.getRemaining();
+         reader.setCursor(reader.getTotalLength());
+         return text;
+     }
+ 
+-    @Override
+     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+         Setting<?> setting;
+-
+         try {
+             setting = SettingArgumentType.get(context);
+-        } catch (CommandSyntaxException _) {
++        }
++        catch (CommandSyntaxException commandSyntaxException) {
+             return Suggestions.empty();
+         }
+-
+-        return suggest(builder, setting);
++        return SettingValueArgumentType.suggest(builder, setting);
+     }
+ 
+     public static <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder, Settings settings) {
+         Setting<?> setting;
+-
+         try {
+             setting = SettingArgumentType.get(context, settings);
+-        } catch (CommandSyntaxException _) {
++        }
++        catch (CommandSyntaxException commandSyntaxException) {
+             return Suggestions.empty();
+         }
+-
+-        return suggest(builder, setting);
++        return SettingValueArgumentType.suggest(builder, setting);
+     }
+ 
+     public static CompletableFuture<Suggestions> suggest(SuggestionsBuilder builder, @NotNull Setting<?> setting) {
+         Iterable<Identifier> identifiers = setting.getIdentifierSuggestions();
+         if (identifiers != null) {
+-            return SharedSuggestionProvider.suggestResource(identifiers, builder);
++            return SharedSuggestionProvider.suggestResource(identifiers, (SuggestionsBuilder)builder);
+         }
+-
+-        return SharedSuggestionProvider.suggest(setting.getSuggestions(), builder);
++        return SharedSuggestionProvider.suggest(setting.getSuggestions(), (SuggestionsBuilder)builder);
+     }
+ }
++

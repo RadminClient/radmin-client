@@ -1,0 +1,100 @@
+--- upstream261/commands/arguments/PlayerArgumentType.java
++++ v1decompiled/commands/arguments/PlayerArgumentType.java
+@@ -1,9 +1,19 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.StringReader
++ *  com.mojang.brigadier.arguments.ArgumentType
++ *  com.mojang.brigadier.context.CommandContext
++ *  com.mojang.brigadier.exceptions.CommandSyntaxException
++ *  com.mojang.brigadier.exceptions.DynamicCommandExceptionType
++ *  com.mojang.brigadier.suggestion.Suggestions
++ *  com.mojang.brigadier.suggestion.SuggestionsBuilder
++ *  net.minecraft.commands.SharedSuggestionProvider
++ *  net.minecraft.network.chat.Component
++ *  net.minecraft.world.entity.player.Player
+  */
+-
+-package meteordevelopment.meteorclient.commands.arguments;
++package radmin.client.commands.arguments;
+ 
+ import com.mojang.brigadier.StringReader;
+ import com.mojang.brigadier.arguments.ArgumentType;
+@@ -12,20 +22,18 @@
+ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+ import com.mojang.brigadier.suggestion.Suggestions;
+ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
++import java.util.Collection;
++import java.util.List;
++import java.util.concurrent.CompletableFuture;
+ import net.minecraft.commands.SharedSuggestionProvider;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.world.entity.player.Player;
++import radmin.client.MeteorClient;
+ 
+-import java.util.Collection;
+-import java.util.List;
+-import java.util.concurrent.CompletableFuture;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class PlayerArgumentType implements ArgumentType<Player> {
++public class PlayerArgumentType
++implements ArgumentType<Player> {
+     private static final PlayerArgumentType INSTANCE = new PlayerArgumentType();
+-    private static final DynamicCommandExceptionType NO_SUCH_PLAYER = new DynamicCommandExceptionType(name -> Component.literal("Player with name " + name + " doesn't exist."));
+-
++    private static final DynamicCommandExceptionType NO_SUCH_PLAYER = new DynamicCommandExceptionType(name -> Component.literal((String)("Player with name " + String.valueOf(name) + " doesn't exist.")));
+     private static final Collection<String> EXAMPLES = List.of("seasnail8169", "MineGame159");
+ 
+     public static PlayerArgumentType create() {
+@@ -33,35 +41,32 @@
+     }
+ 
+     public static Player get(CommandContext<?> context) {
+-        return context.getArgument("player", Player.class);
++        return (Player)context.getArgument("player", Player.class);
+     }
+ 
+     private PlayerArgumentType() {
+     }
+ 
+-    @Override
+     public Player parse(StringReader reader) throws CommandSyntaxException {
+         String argument = reader.readString();
+         Player playerEntity = null;
+-
+-        for (Player p : mc.level.players()) {
+-            if (p.getName().getString().equalsIgnoreCase(argument)) {
+-                playerEntity = p;
+-                break;
+-            }
++        for (Player p : MeteorClient.mc.level.players()) {
++            if (!p.getName().getString().equalsIgnoreCase(argument)) continue;
++            playerEntity = p;
++            break;
+         }
+-        if (playerEntity == null) throw NO_SUCH_PLAYER.create(argument);
+-
++        if (playerEntity == null) {
++            throw NO_SUCH_PLAYER.create((Object)argument);
++        }
+         return playerEntity;
+     }
+ 
+-    @Override
+     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+-        return SharedSuggestionProvider.suggest(mc.level.players().stream().map(abstractClientPlayerEntity -> abstractClientPlayerEntity.getName().getString()), builder);
++        return SharedSuggestionProvider.suggest(MeteorClient.mc.level.players().stream().map(abstractClientPlayerEntity -> abstractClientPlayerEntity.getName().getString()), (SuggestionsBuilder)builder);
+     }
+ 
+-    @Override
+     public Collection<String> getExamples() {
+         return EXAMPLES;
+     }
+ }
++

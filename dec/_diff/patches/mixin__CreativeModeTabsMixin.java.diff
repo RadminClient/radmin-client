@@ -1,0 +1,37 @@
+--- upstream261/mixin/CreativeModeTabsMixin.java
++++ v1decompiled/mixin/CreativeModeTabsMixin.java
+@@ -1,21 +1,26 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.llamalad7.mixinextras.injector.ModifyReturnValue
++ *  net.minecraft.world.item.CreativeModeTabs
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.injection.At
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.render.BetterTooltips;
+ import net.minecraft.world.item.CreativeModeTabs;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.injection.At;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.render.BetterTooltips;
+ 
+-@Mixin(CreativeModeTabs.class)
++@Mixin(value={CreativeModeTabs.class})
+ public abstract class CreativeModeTabsMixin {
+-    @ModifyReturnValue(method = "tryRebuildTabContents", at = @At("RETURN"))
++    @ModifyReturnValue(method={"tryRebuildTabContents"}, at={@At(value="RETURN")})
+     private static boolean modifyReturn(boolean original) {
+         return original || Modules.get().get(BetterTooltips.class).updateTooltips();
+     }
+ }
++

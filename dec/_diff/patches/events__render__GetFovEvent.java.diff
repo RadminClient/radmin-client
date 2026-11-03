@@ -1,0 +1,24 @@
+--- upstream261/events/render/GetFovEvent.java
++++ v1decompiled/events/render/GetFovEvent.java
+@@ -1,17 +1,15 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.events.render;
++package radmin.client.events.render;
+ 
+ public class GetFovEvent {
+     private static final GetFovEvent INSTANCE = new GetFovEvent();
+-
+     public float fov;
+ 
+     public static GetFovEvent get(float fov) {
+-        INSTANCE.fov = fov;
++        GetFovEvent.INSTANCE.fov = fov;
+         return INSTANCE;
+     }
+ }
++

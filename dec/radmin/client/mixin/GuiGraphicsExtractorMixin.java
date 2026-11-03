@@ -1,0 +1,59 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.llamalad7.mixinextras.injector.ModifyReceiver
+ *  com.llamalad7.mixinextras.sugar.Local
+ *  net.minecraft.client.gui.Font
+ *  net.minecraft.client.gui.GuiGraphicsExtractor
+ *  net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
+ *  net.minecraft.network.chat.Component
+ *  net.minecraft.resources.Identifier
+ *  net.minecraft.world.inventory.tooltip.TooltipComponent
+ *  org.jetbrains.annotations.Nullable
+ *  org.spongepowered.asm.mixin.Mixin
+ *  org.spongepowered.asm.mixin.injection.At
+ *  org.spongepowered.asm.mixin.injection.At$Shift
+ *  org.spongepowered.asm.mixin.injection.Inject
+ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+ */
+package radmin.client.mixin;
+
+import com.llamalad7.mixinextras.injector.ModifyReceiver;
+import com.llamalad7.mixinextras.sugar.Local;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import radmin.client.utils.tooltip.MeteorTooltipData;
+
+@Mixin(value={GuiGraphicsExtractor.class})
+public abstract class GuiGraphicsExtractorMixin {
+    @Inject(method={"setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"}, at={@At(value="INVOKE", target="Ljava/util/Optional;ifPresent(Ljava/util/function/Consumer;)V", shift=At.Shift.BEFORE)})
+    private void onDrawTooltip(Font font, List<Component> texts, Optional<TooltipComponent> optionalImage, int xo, int yo, @Nullable Identifier style, CallbackInfo ci, @Local(name={"components"}) List<ClientTooltipComponent> components) {
+        TooltipComponent tooltipComponent;
+        if (optionalImage.isPresent() && (tooltipComponent = optionalImage.get()) instanceof MeteorTooltipData) {
+            MeteorTooltipData meteorTooltipData = (MeteorTooltipData)tooltipComponent;
+            components.add(meteorTooltipData.getComponent());
+        }
+    }
+
+    @ModifyReceiver(method={"setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"}, at={@At(value="INVOKE", target="Ljava/util/Optional;ifPresent(Ljava/util/function/Consumer;)V")})
+    private Optional<TooltipComponent> onDrawTooltip_modifyIfPresentReceiver(Optional<TooltipComponent> data, Consumer<TooltipComponent> action) {
+        if (data.isPresent() && data.get() instanceof MeteorTooltipData) {
+            return Optional.empty();
+        }
+        return data;
+    }
+}
+

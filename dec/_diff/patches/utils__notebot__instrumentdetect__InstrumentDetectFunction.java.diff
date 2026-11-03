@@ -1,0 +1,34 @@
+--- upstream261/utils/notebot/instrumentdetect/InstrumentDetectFunction.java
++++ v1decompiled/utils/notebot/instrumentdetect/InstrumentDetectFunction.java
+@@ -1,21 +1,18 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.BlockPos
++ *  net.minecraft.world.level.block.state.BlockState
++ *  net.minecraft.world.level.block.state.properties.NoteBlockInstrument
+  */
++package radmin.client.utils.notebot.instrumentdetect;
+ 
+-package meteordevelopment.meteorclient.utils.notebot.instrumentdetect;
+-
++import net.minecraft.core.BlockPos;
+ import net.minecraft.world.level.block.state.BlockState;
+ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+-import net.minecraft.core.BlockPos;
+ 
+ public interface InstrumentDetectFunction {
+-    /**
+-     * Detects an instrument for noteblock
+-     *
+-     * @param noteBlock Noteblock state
+-     * @param blockPos  Noteblock position
+-     * @return Detected instrument
+-     */
+-    NoteBlockInstrument detectInstrument(BlockState noteBlock, BlockPos blockPos);
++    public NoteBlockInstrument detectInstrument(BlockState var1, BlockPos var2);
+ }
++

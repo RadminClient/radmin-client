@@ -1,0 +1,155 @@
+--- upstream261/systems/modules/render/blockesp/ESPBlockData.java
++++ v1decompiled/systems/modules/render/blockesp/ESPBlockData.java
+@@ -1,37 +1,42 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.Tag
++ *  net.minecraft.world.level.block.Block
+  */
++package radmin.client.systems.modules.render.blockesp;
+ 
+-package meteordevelopment.meteorclient.systems.modules.render.blockesp;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.Tag;
++import net.minecraft.world.level.block.Block;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WidgetScreen;
++import radmin.client.renderer.ShapeMode;
++import radmin.client.settings.BlockDataSetting;
++import radmin.client.settings.GenericSetting;
++import radmin.client.settings.IBlockData;
++import radmin.client.settings.IGeneric;
++import radmin.client.systems.modules.render.blockesp.ESPBlockDataScreen;
++import radmin.client.utils.misc.IChangeable;
++import radmin.client.utils.render.color.SettingColor;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WidgetScreen;
+-import meteordevelopment.meteorclient.renderer.ShapeMode;
+-import meteordevelopment.meteorclient.settings.BlockDataSetting;
+-import meteordevelopment.meteorclient.settings.GenericSetting;
+-import meteordevelopment.meteorclient.settings.IBlockData;
+-import meteordevelopment.meteorclient.settings.IGeneric;
+-import meteordevelopment.meteorclient.utils.misc.IChangeable;
+-import meteordevelopment.meteorclient.utils.render.color.SettingColor;
+-import net.minecraft.nbt.CompoundTag;
+-import net.minecraft.world.level.block.Block;
+-
+-public class ESPBlockData implements IGeneric<ESPBlockData>, IChangeable, IBlockData<ESPBlockData> {
++public class ESPBlockData
++implements IGeneric<ESPBlockData>,
++IChangeable,
++IBlockData<ESPBlockData> {
+     public ShapeMode shapeMode;
+     public SettingColor lineColor;
+     public SettingColor sideColor;
+-
+     public boolean tracer;
+     public SettingColor tracerColor;
+-
+     private boolean changed;
+ 
+     public ESPBlockData(ShapeMode shapeMode, SettingColor lineColor, SettingColor sideColor, boolean tracer, SettingColor tracerColor) {
+         this.shapeMode = shapeMode;
+         this.lineColor = lineColor;
+         this.sideColor = sideColor;
+-
+         this.tracer = tracer;
+         this.tracerColor = tracerColor;
+     }
+@@ -48,65 +53,56 @@
+ 
+     @Override
+     public boolean isChanged() {
+-        return changed;
++        return this.changed;
+     }
+ 
+     public void changed() {
+-        changed = true;
++        this.changed = true;
+     }
+ 
+     public void tickRainbow() {
+-        lineColor.update();
+-        sideColor.update();
+-        tracerColor.update();
++        this.lineColor.update();
++        this.sideColor.update();
++        this.tracerColor.update();
+     }
+ 
+     @Override
+     public ESPBlockData set(ESPBlockData value) {
+-        shapeMode = value.shapeMode;
+-        lineColor.set(value.lineColor);
+-        sideColor.set(value.sideColor);
+-
+-        tracer = value.tracer;
+-        tracerColor.set(value.tracerColor);
+-
+-        changed = value.changed;
+-
++        this.shapeMode = value.shapeMode;
++        this.lineColor.set(value.lineColor);
++        this.sideColor.set(value.sideColor);
++        this.tracer = value.tracer;
++        this.tracerColor.set(value.tracerColor);
++        this.changed = value.changed;
+         return this;
+     }
+ 
+     @Override
+     public ESPBlockData copy() {
+-        return new ESPBlockData(shapeMode, new SettingColor(lineColor), new SettingColor(sideColor), tracer, new SettingColor(tracerColor));
++        return new ESPBlockData(this.shapeMode, new SettingColor(this.lineColor), new SettingColor(this.sideColor), this.tracer, new SettingColor(this.tracerColor));
+     }
+ 
+     @Override
+     public CompoundTag toTag() {
+         CompoundTag tag = new CompoundTag();
+-
+-        tag.putString("shapeMode", shapeMode.name());
+-        tag.put("lineColor", lineColor.toTag());
+-        tag.put("sideColor", sideColor.toTag());
+-
+-        tag.putBoolean("tracer", tracer);
+-        tag.put("tracerColor", tracerColor.toTag());
+-
+-        tag.putBoolean("changed", changed);
+-
++        tag.putString("shapeMode", this.shapeMode.name());
++        tag.put("lineColor", (Tag)this.lineColor.toTag());
++        tag.put("sideColor", (Tag)this.sideColor.toTag());
++        tag.putBoolean("tracer", this.tracer);
++        tag.put("tracerColor", (Tag)this.tracerColor.toTag());
++        tag.putBoolean("changed", this.changed);
+         return tag;
+     }
+ 
+     @Override
+     public ESPBlockData fromTag(CompoundTag tag) {
+-        shapeMode = ShapeMode.valueOf(tag.getStringOr("shapeMode", ""));
+-        lineColor.fromTag(tag.getCompoundOrEmpty("lineColor"));
+-        sideColor.fromTag(tag.getCompoundOrEmpty("sideColor"));
+-
+-        tracer = tag.getBooleanOr("tracer", false);
+-        tracerColor.fromTag(tag.getCompoundOrEmpty("tracerColor"));
+-
+-        changed = tag.getBooleanOr("changed", false);
+-
++        this.shapeMode = ShapeMode.valueOf(tag.getStringOr("shapeMode", ""));
++        this.lineColor.fromTag(tag.getCompoundOrEmpty("lineColor"));
++        this.sideColor.fromTag(tag.getCompoundOrEmpty("sideColor"));
++        this.tracer = tag.getBooleanOr("tracer", false);
++        this.tracerColor.fromTag(tag.getCompoundOrEmpty("tracerColor"));
++        this.changed = tag.getBooleanOr("changed", false);
+         return this;
+     }
+ }
++

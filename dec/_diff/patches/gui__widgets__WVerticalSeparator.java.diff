@@ -1,0 +1,25 @@
+--- upstream261/gui/widgets/WVerticalSeparator.java
++++ v1decompiled/gui/widgets/WVerticalSeparator.java
+@@ -1,14 +1,16 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.widgets;
++import radmin.client.gui.widgets.WWidget;
+ 
+-public class WVerticalSeparator extends WWidget {
++public class WVerticalSeparator
++extends WWidget {
+     @Override
+     protected void onCalculateSize() {
+-        width = theme.scale(3);
+-        height = 1;
++        this.width = this.theme.scale(3.0);
++        this.height = 1.0;
+     }
+ }
++

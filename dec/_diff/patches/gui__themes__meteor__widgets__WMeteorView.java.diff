@@ -1,0 +1,33 @@
+--- upstream261/gui/themes/meteor/widgets/WMeteorView.java
++++ v1decompiled/gui/themes/meteor/widgets/WMeteorView.java
+@@ -1,19 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.themes.meteor.widgets;
+ 
+-package meteordevelopment.meteorclient.gui.themes.meteor.widgets;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.themes.meteor.MeteorWidget;
++import radmin.client.gui.widgets.containers.WView;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.gui.themes.meteor.MeteorWidget;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WView;
+-
+-public class WMeteorView extends WView implements MeteorWidget {
++public class WMeteorView
++extends WView
++implements MeteorWidget {
+     @Override
+     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        if (canScroll && hasScrollBar) {
+-            renderer.quad(handleX(), handleY(), handleWidth(), handleHeight(), theme().scrollbarColor.get(focused, handleMouseOver));
++        if (this.canScroll && this.hasScrollBar) {
++            renderer.quad(this.handleX(), this.handleY(), this.handleWidth(), this.handleHeight(), this.theme().scrollbarColor.get(this.focused, this.handleMouseOver));
+         }
+     }
+ }
++

@@ -1,0 +1,114 @@
+--- upstream261/gui/screens/settings/BlockSettingScreen.java
++++ v1decompiled/gui/screens/settings/BlockSettingScreen.java
+@@ -1,74 +1,70 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.core.registries.BuiltInRegistries
++ *  net.minecraft.world.level.block.Block
++ *  net.minecraft.world.level.block.Blocks
++ *  org.apache.commons.lang3.Strings
+  */
++package radmin.client.gui.screens.settings;
+ 
+-package meteordevelopment.meteorclient.gui.screens.settings;
+-
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WindowScreen;
+-import meteordevelopment.meteorclient.gui.widgets.WItemWithLabel;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WTable;
+-import meteordevelopment.meteorclient.gui.widgets.input.WTextBox;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import meteordevelopment.meteorclient.settings.BlockSetting;
+-import meteordevelopment.meteorclient.utils.misc.Names;
+-import meteordevelopment.meteorclient.utils.render.DisplayItemUtils;
+ import net.minecraft.core.registries.BuiltInRegistries;
+ import net.minecraft.world.level.block.Block;
+ import net.minecraft.world.level.block.Blocks;
+ import org.apache.commons.lang3.Strings;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WindowScreen;
++import radmin.client.gui.widgets.WItemWithLabel;
++import radmin.client.gui.widgets.containers.WTable;
++import radmin.client.gui.widgets.input.WTextBox;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.settings.BlockSetting;
++import radmin.client.utils.misc.Names;
++import radmin.client.utils.render.DisplayItemUtils;
+ 
+-public class BlockSettingScreen extends WindowScreen {
++public class BlockSettingScreen
++extends WindowScreen {
+     private final BlockSetting setting;
+-
+     private WTable table;
+-
+     private WTextBox filter;
+     private String filterText = "";
+ 
+     public BlockSettingScreen(GuiTheme theme, BlockSetting setting) {
+         super(theme, "Select Block");
+-
+         this.setting = setting;
+     }
+ 
+     @Override
+     public void initWidgets() {
+-        filter = add(theme.textBox("")).minWidth(400).expandX().widget();
+-        filter.setFocused(true);
+-        filter.action = () -> {
+-            filterText = filter.get().trim();
+-
+-            table.clear();
+-            initTable();
++        this.filter = this.add(this.theme.textBox("")).minWidth(400.0).expandX().widget();
++        this.filter.setFocused(true);
++        this.filter.action = () -> {
++            this.filterText = this.filter.get().trim();
++            this.table.clear();
++            this.initTable();
+         };
+-
+-        table = add(theme.table()).expandX().widget();
+-
+-        initTable();
++        this.table = this.add(this.theme.table()).expandX().widget();
++        this.initTable();
+     }
+ 
+     private void initTable() {
+         for (Block block : BuiltInRegistries.BLOCK) {
+-            if (setting.filter != null && !setting.filter.test(block)) continue;
+-            if (skipValue(block)) continue;
+-
+-            WItemWithLabel item = theme.itemWithLabel(DisplayItemUtils.toStack(block), Names.get(block));
+-            if (!filterText.isEmpty() && !Strings.CI.contains(item.getLabelText(), filterText)) continue;
+-            table.add(item);
+-
+-            WButton select = table.add(theme.button("Select")).expandCellX().right().widget();
++            if (this.setting.filter != null && !this.setting.filter.test(block) || this.skipValue(block)) continue;
++            WItemWithLabel item = this.theme.itemWithLabel(DisplayItemUtils.toStack(block), Names.get(block));
++            if (!this.filterText.isEmpty() && !Strings.CI.contains((CharSequence)item.getLabelText(), (CharSequence)this.filterText)) continue;
++            this.table.add(item);
++            WButton select = this.table.add(this.theme.button("Select")).expandCellX().right().widget();
+             select.action = () -> {
+-                setting.set(block);
+-                onClose();
++                this.setting.set(block);
++                this.onClose();
+             };
+-
+-            table.row();
++            this.table.row();
+         }
+     }
+ 
+     protected boolean skipValue(Block value) {
+-        return value == Blocks.AIR || BuiltInRegistries.BLOCK.getKey(value).getPath().endsWith("_wall_banner");
++        return value == Blocks.AIR || BuiltInRegistries.BLOCK.getKey((Object)value).getPath().endsWith("_wall_banner");
+     }
+ }
++

@@ -1,0 +1,204 @@
+--- upstream261/utils/render/MeteorToast.java
++++ v1decompiled/utils/render/MeteorToast.java
+@@ -1,48 +1,68 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.Font
++ *  net.minecraft.client.gui.GuiGraphicsExtractor
++ *  net.minecraft.client.gui.components.toasts.Toast
++ *  net.minecraft.client.gui.components.toasts.Toast$Visibility
++ *  net.minecraft.client.gui.components.toasts.ToastManager
++ *  net.minecraft.client.renderer.RenderPipelines
++ *  net.minecraft.client.resources.sounds.SimpleSoundInstance
++ *  net.minecraft.client.resources.sounds.SoundInstance
++ *  net.minecraft.network.chat.Component
++ *  net.minecraft.network.chat.Style
++ *  net.minecraft.network.chat.TextColor
++ *  net.minecraft.resources.Identifier
++ *  net.minecraft.sounds.SoundEvent
++ *  net.minecraft.sounds.SoundEvents
++ *  net.minecraft.world.item.Item
++ *  net.minecraft.world.item.ItemStack
++ *  org.jetbrains.annotations.NotNull
++ *  org.jetbrains.annotations.Nullable
+  */
++package radmin.client.utils.render;
+ 
+-package meteordevelopment.meteorclient.utils.render;
+-
+-import meteordevelopment.meteorclient.utils.render.DisplayItemUtils;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
+ import net.minecraft.client.gui.Font;
+ import net.minecraft.client.gui.GuiGraphicsExtractor;
+ import net.minecraft.client.gui.components.toasts.Toast;
+ import net.minecraft.client.gui.components.toasts.ToastManager;
+ import net.minecraft.client.renderer.RenderPipelines;
+ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
++import net.minecraft.client.resources.sounds.SoundInstance;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.chat.Style;
+ import net.minecraft.network.chat.TextColor;
+ import net.minecraft.resources.Identifier;
++import net.minecraft.sounds.SoundEvent;
+ import net.minecraft.sounds.SoundEvents;
+ import net.minecraft.world.item.Item;
+ import net.minecraft.world.item.ItemStack;
+ import org.jetbrains.annotations.NotNull;
+ import org.jetbrains.annotations.Nullable;
++import radmin.client.MeteorClient;
++import radmin.client.utils.render.DisplayItemUtils;
++import radmin.client.utils.render.color.Color;
+ 
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class MeteorToast implements Toast {
++public class MeteorToast
++implements Toast {
+     private static final int TITLE_COLOR = Color.fromRGBA(145, 61, 226, 255);
+     private static final int TEXT_COLOR = Color.fromRGBA(220, 220, 220, 255);
+-    private static final Identifier TEXTURE = Identifier.parse("toast/advancement");
+-    private static final long DEFAULT_DURATION = 6000;
+-    private static final SimpleSoundInstance DEFAULT_SOUND = SimpleSoundInstance.forUI(SoundEvents.NOTE_BLOCK_CHIME.value(), 1.2f, 1);
+-
+-    // Toast fields
+-    private final @NotNull Component title;
+-    private final @Nullable Component text;
+-    private final @Nullable ItemStack icon;
+-    private final @Nullable SimpleSoundInstance customSound;
++    private static final Identifier TEXTURE = Identifier.parse((String)"toast/advancement");
++    private static final long DEFAULT_DURATION = 6000L;
++    private static final SimpleSoundInstance DEFAULT_SOUND = SimpleSoundInstance.forUI((SoundEvent)((SoundEvent)SoundEvents.NOTE_BLOCK_CHIME.value()), (float)1.2f, (float)1.0f);
++    @NotNull
++    private final Component title;
++    @Nullable
++    private final Component text;
++    @Nullable
++    private final ItemStack icon;
++    @Nullable
++    private final SimpleSoundInstance customSound;
+     private final long duration;
+-
+-    // State variables
+     private boolean playedSound;
+-    private long start = -1;
+-    private Visibility visibility = Visibility.HIDE;
++    private long start = -1L;
++    private Toast.Visibility visibility = Toast.Visibility.HIDE;
+ 
+     private MeteorToast(Builder builder) {
+         this.title = builder.title;
+@@ -52,21 +72,52 @@
+         this.duration = builder.duration;
+     }
+ 
++    public Toast.Visibility getWantedVisibility() {
++        return this.visibility;
++    }
++
++    public void update(ToastManager manager, long time) {
++        if (this.start == -1L) {
++            this.start = time;
++        }
++        Toast.Visibility visibility = this.visibility = time - this.start >= this.duration ? Toast.Visibility.HIDE : Toast.Visibility.SHOW;
++        if (!this.playedSound) {
++            MeteorClient.mc.getSoundManager().play((SoundInstance)this.customSound);
++            this.playedSound = true;
++        }
++    }
++
++    public void extractRenderState(GuiGraphicsExtractor graphics, Font font, long fullyVisibleForMs) {
++        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURE, 0, 0, this.width(), this.height());
++        int textX = this.icon != null ? 28 : 12;
++        int titleY = 12;
++        if (this.text != null) {
++            graphics.text(font, this.text, textX, 18, TEXT_COLOR, false);
++            titleY = 7;
++        }
++        graphics.text(font, this.title, textX, titleY, TITLE_COLOR, false);
++        if (this.icon != null) {
++            graphics.item(this.icon, 8, 8);
++        }
++    }
++
+     public static class Builder {
+-        private final @NotNull Component title;
+-        private @Nullable Component text;
+-        private @Nullable ItemStack icon;
+-        private @Nullable SimpleSoundInstance customSound = DEFAULT_SOUND;
+-        private long duration = DEFAULT_DURATION;
++        @NotNull
++        private final Component title;
++        @Nullable
++        private Component text;
++        @Nullable
++        private ItemStack icon;
++        @Nullable
++        private SimpleSoundInstance customSound = DEFAULT_SOUND;
++        private long duration = 6000L;
+ 
+         public Builder(@NotNull String title) {
+-            this.title = Component.literal(title).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(TITLE_COLOR)));
++            this.title = Component.literal((String)title).setStyle(Style.EMPTY.withColor(TextColor.fromRgb((int)TITLE_COLOR)));
+         }
+ 
+         public Builder text(@Nullable String text) {
+-            this.text = text != null && !text.trim().isEmpty() ?
+-                Component.literal(text).setStyle(Style.EMPTY.withColor(TextColor.fromRgb(TEXT_COLOR))) :
+-                null;
++            this.text = text != null && !text.trim().isEmpty() ? Component.literal((String)text).setStyle(Style.EMPTY.withColor(TextColor.fromRgb((int)TEXT_COLOR))) : null;
+             return this;
+         }
+ 
+@@ -81,7 +132,7 @@
+         }
+ 
+         public Builder duration(long duration) {
+-            this.duration = Math.max(0, duration);
++            this.duration = Math.max(0L, duration);
+             return this;
+         }
+ 
+@@ -89,38 +140,5 @@
+             return new MeteorToast(this);
+         }
+     }
++}
+ 
+-    @Override
+-    public Visibility getWantedVisibility() {
+-        return this.visibility;
+-    }
+-
+-    @Override
+-    public void update(ToastManager manager, long time) {
+-        if (start == -1) start = time;
+-
+-        visibility = time - start >= duration ? Visibility.HIDE : Visibility.SHOW;
+-
+-        if (!playedSound) {
+-            mc.getSoundManager().play(customSound);
+-            playedSound = true;
+-        }
+-    }
+-
+-    @Override
+-    public void extractRenderState(GuiGraphicsExtractor graphics, Font font, long fullyVisibleForMs) {
+-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TEXTURE, 0, 0, width(), height());
+-
+-        int textX = icon != null ? 28 : 12;
+-        int titleY = 12;
+-
+-        if (text != null) {
+-            graphics.text(font, text, textX, 18, TEXT_COLOR, false);
+-            titleY = 7;
+-        }
+-
+-        graphics.text(font, title, textX, titleY, TITLE_COLOR, false);
+-
+-        if (icon != null) graphics.item(icon, 8, 8);
+-    }
+-}

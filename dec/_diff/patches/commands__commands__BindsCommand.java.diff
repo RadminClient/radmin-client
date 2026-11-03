@@ -1,0 +1,103 @@
+--- upstream261/commands/commands/BindsCommand.java
++++ v1decompiled/commands/commands/BindsCommand.java
+@@ -1,63 +1,61 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.builder.LiteralArgumentBuilder
++ *  net.minecraft.ChatFormatting
++ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
++ *  net.minecraft.network.chat.Component
++ *  net.minecraft.network.chat.HoverEvent
++ *  net.minecraft.network.chat.HoverEvent$ShowText
++ *  net.minecraft.network.chat.MutableComponent
+  */
+-
+-package meteordevelopment.meteorclient.commands.commands;
++package radmin.client.commands.commands;
+ 
+ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+-import meteordevelopment.meteorclient.commands.Command;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.utils.Utils;
+-import meteordevelopment.meteorclient.utils.player.ChatUtils;
++import java.util.List;
+ import net.minecraft.ChatFormatting;
+ import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+ import net.minecraft.network.chat.Component;
+ import net.minecraft.network.chat.HoverEvent;
+ import net.minecraft.network.chat.MutableComponent;
++import radmin.client.commands.Command;
++import radmin.client.systems.modules.Module;
++import radmin.client.systems.modules.Modules;
++import radmin.client.utils.Utils;
++import radmin.client.utils.player.ChatUtils;
+ 
+-import java.util.List;
+-
+-public class BindsCommand extends Command {
++public class BindsCommand
++extends Command {
+     public BindsCommand() {
+-        super("binds", "List of all bound modules.");
++        super("binds", "List of all bound modules.", new String[0]);
+     }
+ 
+     @Override
+     public void build(LiteralArgumentBuilder<ClientSuggestionProvider> builder) {
+-        builder.executes(_ -> {
+-            // Modules
+-            List<Module> modules = Modules.get().getAll().stream()
+-                .filter(module -> module.keybind.isSet())
+-                .toList();
+-
++        builder.executes(commandContext -> {
++            List<Module> modules = Modules.get().getAll().stream().filter(module -> module.keybind.isSet()).toList();
+             ChatUtils.info("--- Bound Modules ((highlight)%d(default)) ---", modules.size());
+-
+-            for (Module module : modules) {
+-                HoverEvent hoverEvent = new HoverEvent.ShowText(getTooltip(module));
+-
+-                MutableComponent text = Component.literal(module.title).withStyle(ChatFormatting.WHITE);
+-                text.setStyle(text.getStyle().withHoverEvent(hoverEvent));
+-
+-                MutableComponent sep = Component.literal(" - ");
+-                sep.setStyle(sep.getStyle().withHoverEvent(hoverEvent));
+-                text.append(sep.withStyle(ChatFormatting.GRAY));
+-
+-                MutableComponent key = Component.literal(module.keybind.toString());
+-                key.setStyle(key.getStyle().withHoverEvent(hoverEvent));
+-                text.append(key.withStyle(ChatFormatting.GRAY));
+-
+-                ChatUtils.sendMsg(text);
++            for (Module module2 : modules) {
++                HoverEvent.ShowText hoverEvent = new HoverEvent.ShowText((Component)this.getTooltip(module2));
++                MutableComponent text = Component.literal((String)module2.title).withStyle(ChatFormatting.WHITE);
++                text.setStyle(text.getStyle().withHoverEvent((HoverEvent)hoverEvent));
++                MutableComponent sep = Component.literal((String)" - ");
++                sep.setStyle(sep.getStyle().withHoverEvent((HoverEvent)hoverEvent));
++                text.append((Component)sep.withStyle(ChatFormatting.GRAY));
++                MutableComponent key = Component.literal((String)module2.keybind.toString());
++                key.setStyle(key.getStyle().withHoverEvent((HoverEvent)hoverEvent));
++                text.append((Component)key.withStyle(ChatFormatting.GRAY));
++                ChatUtils.sendMsg((Component)text);
+             }
+-
+-            return SINGLE_SUCCESS;
++            return 1;
+         });
+     }
+ 
+     private MutableComponent getTooltip(Module module) {
+-        MutableComponent tooltip = Component.literal(Utils.nameToTitle(module.title)).withStyle(ChatFormatting.BLUE, ChatFormatting.BOLD).append("\n\n");
+-        tooltip.append(Component.literal(module.description).withStyle(ChatFormatting.WHITE));
++        MutableComponent tooltip = Component.literal((String)Utils.nameToTitle(module.title)).withStyle(new ChatFormatting[]{ChatFormatting.BLUE, ChatFormatting.BOLD}).append("\n\n");
++        tooltip.append((Component)Component.literal((String)module.description).withStyle(ChatFormatting.WHITE));
+         return tooltip;
+     }
+ }
++

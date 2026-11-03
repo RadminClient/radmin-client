@@ -1,0 +1,86 @@
+--- upstream261/gui/widgets/containers/WVerticalList.java
++++ v1decompiled/gui/widgets/containers/WVerticalList.java
+@@ -1,55 +1,50 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.widgets.containers;
+ 
+-package meteordevelopment.meteorclient.gui.widgets.containers;
++import radmin.client.gui.utils.Cell;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.gui.widgets.containers.WContainer;
+ 
+-import meteordevelopment.meteorclient.gui.utils.Cell;
+-
+-public class WVerticalList extends WContainer {
+-    public double spacing = 3;
+-
++public class WVerticalList
++extends WContainer {
++    public double spacing = 3.0;
+     protected double widthRemove;
+ 
+     protected double spacing() {
+-        return theme.scale(spacing);
++        return this.theme.scale(this.spacing);
+     }
+ 
+     @Override
+     protected void onCalculateSize() {
+-        width = 0;
+-        height = 0;
+-
+-        for (int i = 0; i < cells.size(); i++) {
+-            Cell<?> cell = cells.get(i);
+-
+-            if (i > 0) height += spacing();
+-
+-            width = Math.max(width, cell.padLeft() + cell.widget().width + cell.padRight());
+-            height += cell.padTop() + cell.widget().height + cell.padBottom();
++        this.width = 0.0;
++        this.height = 0.0;
++        for (int i = 0; i < this.cells.size(); ++i) {
++            Cell cell = (Cell)this.cells.get(i);
++            if (i > 0) {
++                this.height += this.spacing();
++            }
++            this.width = Math.max(this.width, cell.padLeft() + ((WWidget)cell.widget()).width + cell.padRight());
++            this.height += cell.padTop() + ((WWidget)cell.widget()).height + cell.padBottom();
+         }
+     }
+ 
+     @Override
+     protected void onCalculateWidgetPositions() {
+         double y = this.y;
+-
+-        for (int i = 0; i < cells.size(); i++) {
+-            Cell<?> cell = cells.get(i);
+-
+-            if (i > 0) y += spacing();
+-            y += cell.padTop();
+-
+-            cell.x = x + cell.padLeft();
+-            cell.y = y;
+-
+-            cell.width = width - widthRemove - cell.padLeft() - cell.padRight();
+-            cell.height = cell.widget().height;
+-
++        for (int i = 0; i < this.cells.size(); ++i) {
++            Cell cell = (Cell)this.cells.get(i);
++            if (i > 0) {
++                y += this.spacing();
++            }
++            cell.x = this.x + cell.padLeft();
++            cell.y = y += cell.padTop();
++            cell.width = this.width - this.widthRemove - cell.padLeft() - cell.padRight();
++            cell.height = ((WWidget)cell.widget()).height;
+             cell.alignWidget();
+-
+             y += cell.height + cell.padBottom();
+         }
+     }
+ }
++

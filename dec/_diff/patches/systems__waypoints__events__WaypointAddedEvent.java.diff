@@ -1,0 +1,18 @@
+--- upstream261/systems/waypoints/events/WaypointAddedEvent.java
++++ v1decompiled/systems/waypoints/events/WaypointAddedEvent.java
+@@ -1,11 +1,10 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.systems.waypoints.events;
+ 
+-package meteordevelopment.meteorclient.systems.waypoints.events;
+-
+-import meteordevelopment.meteorclient.systems.waypoints.Waypoint;
++import radmin.client.systems.waypoints.Waypoint;
+ 
+ public record WaypointAddedEvent(Waypoint waypoint) {
+ }
++

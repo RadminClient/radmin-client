@@ -1,0 +1,55 @@
+--- upstream261/events/render/Render3DEvent.java
++++ v1decompiled/events/render/Render3DEvent.java
+@@ -1,33 +1,36 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.vertex.PoseStack
+  */
++package radmin.client.events.render;
+ 
+-package meteordevelopment.meteorclient.events.render;
+-
+-import meteordevelopment.meteorclient.renderer.Renderer3D;
+-import meteordevelopment.meteorclient.utils.Utils;
+ import com.mojang.blaze3d.vertex.PoseStack;
++import radmin.client.renderer.Renderer3D;
++import radmin.client.utils.Utils;
+ 
+ public class Render3DEvent {
+     private static final Render3DEvent INSTANCE = new Render3DEvent();
+-
+     public PoseStack matrices;
+     public Renderer3D renderer;
+     public Renderer3D depthRenderer;
+     public double frameTime;
+     public float tickDelta;
+-    public double offsetX, offsetY, offsetZ;
++    public double offsetX;
++    public double offsetY;
++    public double offsetZ;
+ 
+     public static Render3DEvent get(PoseStack matrices, Renderer3D renderer, Renderer3D depthRenderer, float tickDelta, double offsetX, double offsetY, double offsetZ) {
+-        INSTANCE.matrices = matrices;
+-        INSTANCE.renderer = renderer;
+-        INSTANCE.depthRenderer = depthRenderer;
+-        INSTANCE.frameTime = Utils.frameTime;
+-        INSTANCE.tickDelta = tickDelta;
+-        INSTANCE.offsetX = offsetX;
+-        INSTANCE.offsetY = offsetY;
+-        INSTANCE.offsetZ = offsetZ;
++        Render3DEvent.INSTANCE.matrices = matrices;
++        Render3DEvent.INSTANCE.renderer = renderer;
++        Render3DEvent.INSTANCE.depthRenderer = depthRenderer;
++        Render3DEvent.INSTANCE.frameTime = Utils.frameTime;
++        Render3DEvent.INSTANCE.tickDelta = tickDelta;
++        Render3DEvent.INSTANCE.offsetX = offsetX;
++        Render3DEvent.INSTANCE.offsetY = offsetY;
++        Render3DEvent.INSTANCE.offsetZ = offsetZ;
+         return INSTANCE;
+     }
+ }
++

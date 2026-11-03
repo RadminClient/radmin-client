@@ -1,0 +1,561 @@
+--- upstream261/systems/modules/misc/DiscordPresence.java
++++ v1decompiled/systems/modules/misc/DiscordPresence.java
+@@ -1,31 +1,56 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.discordipc.DiscordIPC
++ *  meteordevelopment.discordipc.RichPresence
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.client.gui.screens.ConnectScreen
++ *  net.minecraft.client.gui.screens.DirectJoinServerScreen
++ *  net.minecraft.client.gui.screens.LevelLoadingScreen
++ *  net.minecraft.client.gui.screens.ManageServerScreen
++ *  net.minecraft.client.gui.screens.TitleScreen
++ *  net.minecraft.client.gui.screens.WinScreen
++ *  net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen
++ *  net.minecraft.client.gui.screens.options.AccessibilityOptionsScreen
++ *  net.minecraft.client.gui.screens.options.ChatOptionsScreen
++ *  net.minecraft.client.gui.screens.options.LanguageSelectScreen
++ *  net.minecraft.client.gui.screens.options.OptionsScreen
++ *  net.minecraft.client.gui.screens.options.SkinCustomizationScreen
++ *  net.minecraft.client.gui.screens.options.SoundOptionsScreen
++ *  net.minecraft.client.gui.screens.options.VideoSettingsScreen
++ *  net.minecraft.client.gui.screens.options.controls.ControlsScreen
++ *  net.minecraft.client.gui.screens.packs.PackSelectionScreen
++ *  net.minecraft.client.gui.screens.worldselection.AbstractGameRulesScreen
++ *  net.minecraft.client.gui.screens.worldselection.CreateWorldScreen
++ *  net.minecraft.client.gui.screens.worldselection.EditWorldScreen
++ *  net.minecraft.client.gui.screens.worldselection.SelectWorldScreen
++ *  net.minecraft.realms.RealmsScreen
++ *  net.minecraft.util.Tuple
++ *  net.minecraft.util.Util
++ *  org.meteordev.starscript.Script
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules.misc;
+-
+-//Created by squidoodly
+-
++package radmin.client.systems.modules.misc;
++
++import java.util.ArrayList;
++import java.util.List;
+ import meteordevelopment.discordipc.DiscordIPC;
+ import meteordevelopment.discordipc.RichPresence;
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WidgetScreen;
+-import meteordevelopment.meteorclient.gui.utils.StarscriptTextBoxRenderer;
+-import meteordevelopment.meteorclient.gui.widgets.WWidget;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import meteordevelopment.meteorclient.settings.*;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.utils.Utils;
+-import meteordevelopment.meteorclient.utils.misc.MeteorStarscript;
+ import meteordevelopment.orbit.EventHandler;
+-import net.minecraft.client.gui.screens.*;
++import net.minecraft.client.gui.screens.ConnectScreen;
++import net.minecraft.client.gui.screens.DirectJoinServerScreen;
++import net.minecraft.client.gui.screens.LevelLoadingScreen;
++import net.minecraft.client.gui.screens.ManageServerScreen;
++import net.minecraft.client.gui.screens.TitleScreen;
++import net.minecraft.client.gui.screens.WinScreen;
+ import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+-import net.minecraft.client.gui.screens.options.*;
++import net.minecraft.client.gui.screens.options.AccessibilityOptionsScreen;
++import net.minecraft.client.gui.screens.options.ChatOptionsScreen;
++import net.minecraft.client.gui.screens.options.LanguageSelectScreen;
++import net.minecraft.client.gui.screens.options.OptionsScreen;
++import net.minecraft.client.gui.screens.options.SkinCustomizationScreen;
++import net.minecraft.client.gui.screens.options.SoundOptionsScreen;
++import net.minecraft.client.gui.screens.options.VideoSettingsScreen;
+ import net.minecraft.client.gui.screens.options.controls.ControlsScreen;
+ import net.minecraft.client.gui.screens.packs.PackSelectionScreen;
+ import net.minecraft.client.gui.screens.worldselection.AbstractGameRulesScreen;
+@@ -36,140 +61,93 @@
+ import net.minecraft.util.Tuple;
+ import net.minecraft.util.Util;
+ import org.meteordev.starscript.Script;
+-
+-import java.util.ArrayList;
+-import java.util.List;
+-
+-public class DiscordPresence extends Module {
+-    public enum SelectMode {
+-        Random,
+-        Sequential
+-    }
+-
+-    private final SettingGroup sgLine1 = settings.createGroup("Line 1");
+-    private final SettingGroup sgLine2 = settings.createGroup("Line 2");
+-
+-    // Line 1
+-
+-    private final Setting<List<String>> line1Strings = sgLine1.add(new StringListSetting.Builder()
+-        .name("line-1-messages")
+-        .description("Messages used for the first line.")
+-        .defaultValue("{player}", "{server}")
+-        .onChanged(_ -> recompileLine1())
+-        .renderer(StarscriptTextBoxRenderer.class)
+-        .build()
+-    );
+-
+-    private final Setting<Integer> line1UpdateDelay = sgLine1.add(new IntSetting.Builder()
+-        .name("line-1-update-delay")
+-        .description("How fast to update the first line in ticks.")
+-        .defaultValue(200)
+-        .min(10)
+-        .sliderRange(10, 200)
+-        .build()
+-    );
+-
+-    private final Setting<SelectMode> line1SelectMode = sgLine1.add(new EnumSetting.Builder<SelectMode>()
+-        .name("line-1-select-mode")
+-        .description("How to select messages for the first line.")
+-        .defaultValue(SelectMode.Sequential)
+-        .build()
+-    );
+-
+-    // Line 2
+-
+-    private final Setting<List<String>> line2Strings = sgLine2.add(new StringListSetting.Builder()
+-        .name("line-2-messages")
+-        .description("Messages used for the second line.")
+-        .defaultValue("Meteor on Crack!", "{round(server.tps, 1)} TPS", "Playing on {server.difficulty} difficulty.", "{server.player_count} Players online")
+-        .onChanged(_ -> recompileLine2())
+-        .renderer(StarscriptTextBoxRenderer.class)
+-        .build()
+-    );
+-
+-    private final Setting<Integer> line2UpdateDelay = sgLine2.add(new IntSetting.Builder()
+-        .name("line-2-update-delay")
+-        .description("How fast to update the second line in ticks.")
+-        .defaultValue(60)
+-        .min(10)
+-        .sliderRange(10, 200)
+-        .build()
+-    );
+-
+-    private final Setting<SelectMode> line2SelectMode = sgLine2.add(new EnumSetting.Builder<SelectMode>()
+-        .name("line-2-select-mode")
+-        .description("How to select messages for the second line.")
+-        .defaultValue(SelectMode.Sequential)
+-        .build()
+-    );
+-
++import radmin.client.MeteorClient;
++import radmin.client.events.game.OpenScreenEvent;
++import radmin.client.events.world.TickEvent;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WidgetScreen;
++import radmin.client.gui.utils.StarscriptTextBoxRenderer;
++import radmin.client.gui.widgets.WWidget;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.settings.EnumSetting;
++import radmin.client.settings.IntSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.settings.StringListSetting;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.utils.Utils;
++import radmin.client.utils.misc.MeteorStarscript;
++
++public class DiscordPresence
++extends Module {
++    private final SettingGroup sgLine1;
++    private final SettingGroup sgLine2;
++    private final Setting<List<String>> line1Strings;
++    private final Setting<Integer> line1UpdateDelay;
++    private final Setting<SelectMode> line1SelectMode;
++    private final Setting<List<String>> line2Strings;
++    private final Setting<Integer> line2UpdateDelay;
++    private final Setting<SelectMode> line2SelectMode;
+     private static final RichPresence rpc = new RichPresence();
+     private SmallImage currentSmallImage;
+     private int ticks;
+-    private boolean forceUpdate, lastWasInMainMenu;
+-
+-    private final List<Script> line1Scripts = new ArrayList<>();
+-    private int line1Ticks, line1I;
+-
+-    private final List<Script> line2Scripts = new ArrayList<>();
+-    private int line2Ticks, line2I;
+-
+-    public static final List<Tuple<String, String>> customStates = new ArrayList<>();
+-
+-    static {
+-        registerCustomState("com.terraformersmc.modmenu.gui", "Browsing mods");
+-        registerCustomState("me.jellysquid.mods.sodium.client", "Changing options");
+-    }
++    private boolean forceUpdate;
++    private boolean lastWasInMainMenu;
++    private final List<Script> line1Scripts;
++    private int line1Ticks;
++    private int line1I;
++    private final List<Script> line2Scripts;
++    private int line2Ticks;
++    private int line2I;
++    public static final List<Tuple<String, String>> customStates = new ArrayList<Tuple<String, String>>();
+ 
+     public DiscordPresence() {
+-        super(Categories.Misc, "discord-presence", "Displays Meteor as your presence on Discord.");
+-
+-        runInMainMenu = true;
+-    }
+-
+-    /**
+-     * Registers a custom state to be used when the current screen is a class in the specified package.
+-     */
++        super(Categories.Misc, "discord-presence", "Displays Radmin Client as your presence on Discord.");
++        this.sgLine1 = this.settings.createGroup("Line 1");
++        this.sgLine2 = this.settings.createGroup("Line 2");
++        this.line1Strings = this.sgLine1.add(((StringListSetting.Builder)((StringListSetting.Builder)((StringListSetting.Builder)new StringListSetting.Builder().name("line-1-messages")).description("Messages used for the first line.")).defaultValue("{player}", "{server}").onChanged(list -> this.recompileLine1())).renderer(StarscriptTextBoxRenderer.class).build());
++        this.line1UpdateDelay = this.sgLine1.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("line-1-update-delay")).description("How fast to update the first line in ticks.")).defaultValue(200)).min(10).sliderRange(10, 200).build());
++        this.line1SelectMode = this.sgLine1.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("line-1-select-mode")).description("How to select messages for the first line.")).defaultValue(SelectMode.Sequential)).build());
++        this.line2Strings = this.sgLine2.add(((StringListSetting.Builder)((StringListSetting.Builder)((StringListSetting.Builder)new StringListSetting.Builder().name("line-2-messages")).description("Messages used for the second line.")).defaultValue("Meteor on Crack!", "{round(server.tps, 1)} TPS", "Playing on {server.difficulty} difficulty.", "{server.player_count} Players online").onChanged(list -> this.recompileLine2())).renderer(StarscriptTextBoxRenderer.class).build());
++        this.line2UpdateDelay = this.sgLine2.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("line-2-update-delay")).description("How fast to update the second line in ticks.")).defaultValue(60)).min(10).sliderRange(10, 200).build());
++        this.line2SelectMode = this.sgLine2.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("line-2-select-mode")).description("How to select messages for the second line.")).defaultValue(SelectMode.Sequential)).build());
++        this.line1Scripts = new ArrayList<Script>();
++        this.line2Scripts = new ArrayList<Script>();
++        this.runInMainMenu = true;
++    }
++
+     public static void registerCustomState(String packageName, String state) {
+-        for (var pair : customStates) {
+-            if (pair.getA().equals(packageName)) {
+-                pair.setB(state);
+-                return;
+-            }
+-        }
+-
+-        customStates.add(new Tuple<>(packageName, state));
+-    }
+-
+-    /**
+-     * The package name must match exactly to the one provided through {@link #registerCustomState(String, String)}.
+-     */
++        for (Tuple<String, String> pair : customStates) {
++            if (!((String)pair.getA()).equals(packageName)) continue;
++            pair.setB((Object)state);
++            return;
++        }
++        customStates.add((Tuple<String, String>)new Tuple((Object)packageName, (Object)state));
++    }
++
+     public static void unregisterCustomState(String packageName) {
+-        customStates.removeIf(pair -> pair.getA().equals(packageName));
++        customStates.removeIf(pair -> ((String)pair.getA()).equals(packageName));
+     }
+ 
+     @Override
+     public void onActivate() {
+-        DiscordIPC.start(835240968533049424L, null);
+-
++        DiscordIPC.start((long)835240968533049424L, null);
+         rpc.setStart(System.currentTimeMillis() / 1000L);
+-
+-        String largeText = "%s %s".formatted(MeteorClient.NAME, MeteorClient.VERSION);
+-        if (!MeteorClient.BUILD_NUMBER.isEmpty()) largeText += " Build: " + MeteorClient.BUILD_NUMBER;
+-        rpc.setLargeImage("meteor_client", largeText);
+-
+-        currentSmallImage = SmallImage.Snail;
+-
+-        recompileLine1();
+-        recompileLine2();
+-
+-        ticks = 0;
+-        line1Ticks = 0;
+-        line2Ticks = 0;
+-        lastWasInMainMenu = false;
+-
+-        line1I = 0;
+-        line2I = 0;
++        Object largeText = "%s %s".formatted(MeteorClient.NAME, MeteorClient.VERSION);
++        if (!MeteorClient.BUILD_NUMBER.isEmpty()) {
++            largeText = (String)largeText + " Build: " + MeteorClient.BUILD_NUMBER;
++        }
++        rpc.setLargeImage("meteor_client", (String)largeText);
++        this.currentSmallImage = SmallImage.Snail;
++        this.recompileLine1();
++        this.recompileLine2();
++        this.ticks = 0;
++        this.line1Ticks = 0;
++        this.line2Ticks = 0;
++        this.lastWasInMainMenu = false;
++        this.line1I = 0;
++        this.line2I = 0;
+     }
+ 
+     @Override
+@@ -179,145 +157,169 @@
+ 
+     private void recompile(List<String> messages, List<Script> scripts) {
+         scripts.clear();
+-
+         for (String message : messages) {
+             Script script = MeteorStarscript.compile(message);
+-            if (script != null) scripts.add(script);
+-        }
+-
+-        forceUpdate = true;
++            if (script == null) continue;
++            scripts.add(script);
++        }
++        this.forceUpdate = true;
+     }
+ 
+     private void recompileLine1() {
+-        recompile(line1Strings.get(), line1Scripts);
++        this.recompile(this.line1Strings.get(), this.line1Scripts);
+     }
+ 
+     private void recompileLine2() {
+-        recompile(line2Strings.get(), line2Scripts);
++        this.recompile(this.line2Strings.get(), this.line2Scripts);
+     }
+ 
+     @EventHandler
+     private void onTick(TickEvent.Post event) {
+         boolean update = false;
+-
+-        // Image
+-        if (ticks >= 200 || forceUpdate) {
+-            currentSmallImage = currentSmallImage.next();
+-            currentSmallImage.apply();
++        if (this.ticks >= 200 || this.forceUpdate) {
++            this.currentSmallImage = this.currentSmallImage.next();
++            this.currentSmallImage.apply();
+             update = true;
+-
+-            ticks = 0;
+-        } else ticks++;
+-
++            this.ticks = 0;
++        } else {
++            ++this.ticks;
++        }
+         if (Utils.canUpdate()) {
+-            // Line 1
+-            if (line1Ticks >= line1UpdateDelay.get() || forceUpdate) {
+-                if (!line1Scripts.isEmpty()) {
+-                    int i = Utils.random(0, line1Scripts.size());
+-                    if (line1SelectMode.get() == SelectMode.Sequential) {
+-                        if (line1I >= line1Scripts.size()) line1I = 0;
+-                        i = line1I++;
+-                    }
+-
+-                    String message = MeteorStarscript.run(line1Scripts.get(i));
+-                    if (message != null) rpc.setDetails(message);
++            String message;
++            int i;
++            if (this.line1Ticks >= this.line1UpdateDelay.get() || this.forceUpdate) {
++                if (!this.line1Scripts.isEmpty()) {
++                    i = Utils.random(0, this.line1Scripts.size());
++                    if (this.line1SelectMode.get() == SelectMode.Sequential) {
++                        if (this.line1I >= this.line1Scripts.size()) {
++                            this.line1I = 0;
++                        }
++                        i = this.line1I++;
++                    }
++                    if ((message = MeteorStarscript.run(this.line1Scripts.get(i))) != null) {
++                        rpc.setDetails(message);
++                    }
+                 }
+                 update = true;
+-
+-                line1Ticks = 0;
+-            } else line1Ticks++;
+-
+-            // Line 2
+-            if (line2Ticks >= line2UpdateDelay.get() || forceUpdate) {
+-                if (!line2Scripts.isEmpty()) {
+-                    int i = Utils.random(0, line2Scripts.size());
+-                    if (line2SelectMode.get() == SelectMode.Sequential) {
+-                        if (line2I >= line2Scripts.size()) line2I = 0;
+-                        i = line2I++;
+-                    }
+-
+-                    String message = MeteorStarscript.run(line2Scripts.get(i));
+-                    if (message != null) rpc.setState(message);
++                this.line1Ticks = 0;
++            } else {
++                ++this.line1Ticks;
++            }
++            if (this.line2Ticks >= this.line2UpdateDelay.get() || this.forceUpdate) {
++                if (!this.line2Scripts.isEmpty()) {
++                    i = Utils.random(0, this.line2Scripts.size());
++                    if (this.line2SelectMode.get() == SelectMode.Sequential) {
++                        if (this.line2I >= this.line2Scripts.size()) {
++                            this.line2I = 0;
++                        }
++                        i = this.line2I++;
++                    }
++                    if ((message = MeteorStarscript.run(this.line2Scripts.get(i))) != null) {
++                        rpc.setState(message);
++                    }
+                 }
+                 update = true;
+-
+-                line2Ticks = 0;
+-            } else line2Ticks++;
+-        } else {
+-            if (!lastWasInMainMenu) {
+-                rpc.setDetails(MeteorClient.NAME + " " + (MeteorClient.BUILD_NUMBER.isEmpty() ? MeteorClient.VERSION : MeteorClient.VERSION + " " + MeteorClient.BUILD_NUMBER));
+-
+-                if (mc.screen instanceof TitleScreen) rpc.setState("Looking at title screen");
+-                else if (mc.screen instanceof SelectWorldScreen) rpc.setState("Selecting world");
+-                else if (mc.screen instanceof CreateWorldScreen || mc.screen instanceof AbstractGameRulesScreen)
+-                    rpc.setState("Creating world");
+-                else if (mc.screen instanceof EditWorldScreen) rpc.setState("Editing world");
+-                else if (mc.screen instanceof LevelLoadingScreen) rpc.setState("Loading world");
+-                else if (mc.screen instanceof JoinMultiplayerScreen) rpc.setState("Selecting server");
+-                else if (mc.screen instanceof ManageServerScreen) rpc.setState("Adding server");
+-                else if (mc.screen instanceof ConnectScreen || mc.screen instanceof DirectJoinServerScreen)
+-                    rpc.setState("Connecting to server");
+-                else if (mc.screen instanceof WidgetScreen) rpc.setState("Browsing Meteor's GUI");
+-                else if (mc.screen instanceof OptionsScreen || mc.screen instanceof SkinCustomizationScreen || mc.screen instanceof SoundOptionsScreen || mc.screen instanceof VideoSettingsScreen || mc.screen instanceof ControlsScreen || mc.screen instanceof LanguageSelectScreen || mc.screen instanceof ChatOptionsScreen || mc.screen instanceof PackSelectionScreen || mc.screen instanceof AccessibilityOptionsScreen)
+-                    rpc.setState("Changing options");
+-                else if (mc.screen instanceof WinScreen) rpc.setState("Reading credits");
+-                else if (mc.screen instanceof RealmsScreen) rpc.setState("Browsing Realms");
+-                else {
+-                    boolean setState = false;
+-                    if (mc.screen != null) {
+-                        String className = mc.screen.getClass().getName();
+-                        for (var pair : customStates) {
+-                            if (className.startsWith(pair.getA())) {
+-                                rpc.setState(pair.getB());
+-                                setState = true;
+-                                break;
+-                            }
+-                        }
+-                    }
+-                    if (!setState) rpc.setState("In main menu");
++                this.line2Ticks = 0;
++            } else {
++                ++this.line2Ticks;
++            }
++        } else if (!this.lastWasInMainMenu) {
++            rpc.setDetails(MeteorClient.NAME + " " + String.valueOf(MeteorClient.BUILD_NUMBER.isEmpty() ? MeteorClient.VERSION : String.valueOf(MeteorClient.VERSION) + " " + MeteorClient.BUILD_NUMBER));
++            if (this.mc.screen instanceof TitleScreen) {
++                rpc.setState("Looking at title screen");
++            } else if (this.mc.screen instanceof SelectWorldScreen) {
++                rpc.setState("Selecting world");
++            } else if (this.mc.screen instanceof CreateWorldScreen || this.mc.screen instanceof AbstractGameRulesScreen) {
++                rpc.setState("Creating world");
++            } else if (this.mc.screen instanceof EditWorldScreen) {
++                rpc.setState("Editing world");
++            } else if (this.mc.screen instanceof LevelLoadingScreen) {
++                rpc.setState("Loading world");
++            } else if (this.mc.screen instanceof JoinMultiplayerScreen) {
++                rpc.setState("Selecting server");
++            } else if (this.mc.screen instanceof ManageServerScreen) {
++                rpc.setState("Adding server");
++            } else if (this.mc.screen instanceof ConnectScreen || this.mc.screen instanceof DirectJoinServerScreen) {
++                rpc.setState("Connecting to server");
++            } else if (this.mc.screen instanceof WidgetScreen) {
++                rpc.setState("Browsing Meteor's GUI");
++            } else if (this.mc.screen instanceof OptionsScreen || this.mc.screen instanceof SkinCustomizationScreen || this.mc.screen instanceof SoundOptionsScreen || this.mc.screen instanceof VideoSettingsScreen || this.mc.screen instanceof ControlsScreen || this.mc.screen instanceof LanguageSelectScreen || this.mc.screen instanceof ChatOptionsScreen || this.mc.screen instanceof PackSelectionScreen || this.mc.screen instanceof AccessibilityOptionsScreen) {
++                rpc.setState("Changing options");
++            } else if (this.mc.screen instanceof WinScreen) {
++                rpc.setState("Reading credits");
++            } else if (this.mc.screen instanceof RealmsScreen) {
++                rpc.setState("Browsing Realms");
++            } else {
++                boolean setState = false;
++                if (this.mc.screen != null) {
++                    String className = this.mc.screen.getClass().getName();
++                    for (Tuple<String, String> pair : customStates) {
++                        if (!className.startsWith((String)pair.getA())) continue;
++                        rpc.setState((String)pair.getB());
++                        setState = true;
++                        break;
++                    }
+                 }
+-
+-                update = true;
++                if (!setState) {
++                    rpc.setState("In main menu");
++                }
+             }
+-        }
+-
+-        // Update
+-        if (update) DiscordIPC.setActivity(rpc);
+-        forceUpdate = false;
+-        lastWasInMainMenu = !Utils.canUpdate();
++            update = true;
++        }
++        if (update) {
++            DiscordIPC.setActivity((RichPresence)rpc);
++        }
++        this.forceUpdate = false;
++        this.lastWasInMainMenu = !Utils.canUpdate();
+     }
+ 
+     @EventHandler
+     private void onOpenScreen(OpenScreenEvent event) {
+-        if (!Utils.canUpdate()) lastWasInMainMenu = false;
++        if (!Utils.canUpdate()) {
++            this.lastWasInMainMenu = false;
++        }
+     }
+ 
+     @Override
+     public WWidget getWidget(GuiTheme theme) {
+         WButton help = theme.button("Open documentation.");
+-        help.action = () -> Util.getPlatform().openUri("https://github.com/MeteorDevelopment/meteor-client/wiki/Starscript");
+-
++        help.action = () -> Util.getPlatform().openUri("https://github.com/MeteorDevelopment/radmin-client/wiki/Starscript");
+         return help;
+     }
+ 
+-    private enum SmallImage {
++    static {
++        DiscordPresence.registerCustomState("com.terraformersmc.modmenu.gui", "Browsing mods");
++        DiscordPresence.registerCustomState("me.jellysquid.mods.sodium.client", "Changing options");
++    }
++
++    public static enum SelectMode {
++        Random,
++        Sequential;
++
++    }
++
++    private static enum SmallImage {
+         MineGame("minegame", "MineGame159"),
+         Snail("seasnail", "seasnail8169");
+ 
+-        private final String key, text;
+-
+-        SmallImage(String key, String text) {
++        private final String key;
++        private final String text;
++
++        private SmallImage(String key, String text) {
+             this.key = key;
+             this.text = text;
+         }
+ 
+         void apply() {
+-            rpc.setSmallImage(key, text);
++            rpc.setSmallImage(this.key, this.text);
+         }
+ 
+         SmallImage next() {
+-            if (this == MineGame) return Snail;
++            if (this == MineGame) {
++                return Snail;
++            }
+             return MineGame;
+         }
+     }
+ }
++

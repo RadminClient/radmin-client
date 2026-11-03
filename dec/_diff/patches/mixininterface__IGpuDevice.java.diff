@@ -1,0 +1,36 @@
+--- upstream261/mixininterface/IGpuDevice.java
++++ v1decompiled/mixininterface/IGpuDevice.java
+@@ -1,24 +1,19 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.systems.RenderPassBackend
+  */
+-
+-package meteordevelopment.meteorclient.mixininterface;
++package radmin.client.mixininterface;
+ 
+ import com.mojang.blaze3d.systems.RenderPassBackend;
+ 
+ public interface IGpuDevice {
+-    /**
+-     * Currently there can only be a single scissor pushed at once.
+-     */
+-    void meteor$pushScissor(int x, int y, int width, int height);
++    public void meteor$pushScissor(int var1, int var2, int var3, int var4);
+ 
+-    void meteor$popScissor();
++    public void meteor$popScissor();
+ 
+-    /**
+-     * This is an *INTERNAL* method, it shouldn't be called.
+-     */
+     @Deprecated
+-    @SuppressWarnings("DeprecatedIsStillUsed")
+-    void meteor$onCreateRenderPass(RenderPassBackend backend);
++    public void meteor$onCreateRenderPass(RenderPassBackend var1);
+ }
++

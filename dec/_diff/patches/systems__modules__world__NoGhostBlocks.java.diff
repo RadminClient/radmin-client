@@ -1,0 +1,94 @@
+--- upstream261/systems/modules/world/NoGhostBlocks.java
++++ v1decompiled/systems/modules/world/NoGhostBlocks.java
+@@ -1,55 +1,55 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.world.entity.player.Player
++ *  net.minecraft.world.level.Level
++ *  net.minecraft.world.level.block.state.BlockState
+  */
++package radmin.client.systems.modules.world;
+ 
+-package meteordevelopment.meteorclient.systems.modules.world;
++import meteordevelopment.orbit.EventHandler;
++import net.minecraft.world.entity.player.Player;
++import net.minecraft.world.level.Level;
++import net.minecraft.world.level.block.state.BlockState;
++import radmin.client.events.entity.player.BreakBlockEvent;
++import radmin.client.events.entity.player.PlaceBlockEvent;
++import radmin.client.settings.BoolSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
+ 
+-import meteordevelopment.meteorclient.events.entity.player.BreakBlockEvent;
+-import meteordevelopment.meteorclient.events.entity.player.PlaceBlockEvent;
+-import meteordevelopment.meteorclient.settings.BoolSetting;
+-import meteordevelopment.meteorclient.settings.Setting;
+-import meteordevelopment.meteorclient.settings.SettingGroup;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.orbit.EventHandler;
+-import net.minecraft.world.level.block.state.BlockState;
+-
+-public class NoGhostBlocks extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    private final Setting<Boolean> breaking = sgGeneral.add(new BoolSetting.Builder()
+-        .name("breaking")
+-        .description("Whether to apply for block breaking actions.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    public final Setting<Boolean> placing = sgGeneral.add(new BoolSetting.Builder()
+-        .name("placing")
+-        .description("Whether to apply for block placement actions.")
+-        .defaultValue(true)
+-        .build()
+-    );
++public class NoGhostBlocks
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final Setting<Boolean> breaking;
++    public final Setting<Boolean> placing;
+ 
+     public NoGhostBlocks() {
+         super(Categories.World, "no-ghost-blocks", "Attempts to prevent ghost blocks arising.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.breaking = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("breaking")).description("Whether to apply for block breaking actions.")).defaultValue(true)).build());
++        this.placing = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("placing")).description("Whether to apply for block placement actions.")).defaultValue(true)).build());
+     }
+ 
+     @EventHandler
+     private void onBreakBlock(BreakBlockEvent event) {
+-        if (mc.isLocalServer() || !breaking.get()) return;
+-
++        if (this.mc.isLocalServer() || !this.breaking.get().booleanValue()) {
++            return;
++        }
+         event.cancel();
+-
+-        BlockState blockState = mc.level.getBlockState(event.blockPos);
+-        blockState.getBlock().playerWillDestroy(mc.level, event.blockPos, blockState, mc.player);
++        BlockState blockState = this.mc.level.getBlockState(event.blockPos);
++        blockState.getBlock().playerWillDestroy((Level)this.mc.level, event.blockPos, blockState, (Player)this.mc.player);
+     }
+ 
+     @EventHandler
+     private void onPlaceBlock(PlaceBlockEvent event) {
+-        if (!placing.get()) return;
+-
++        if (!this.placing.get().booleanValue()) {
++            return;
++        }
+         event.cancel();
+     }
+ }
++

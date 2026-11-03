@@ -1,0 +1,57 @@
+--- upstream261/mixin/MobEffectFogEnvironmentMixin.java
++++ v1decompiled/mixin/MobEffectFogEnvironmentMixin.java
+@@ -1,13 +1,19 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.llamalad7.mixinextras.injector.ModifyReturnValue
++ *  net.minecraft.client.renderer.fog.environment.MobEffectFogEnvironment
++ *  net.minecraft.core.Holder
++ *  net.minecraft.world.effect.MobEffect
++ *  net.minecraft.world.effect.MobEffects
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Shadow
++ *  org.spongepowered.asm.mixin.injection.At
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.render.NoRender;
+ import net.minecraft.client.renderer.fog.environment.MobEffectFogEnvironment;
+ import net.minecraft.core.Holder;
+ import net.minecraft.world.effect.MobEffect;
+@@ -15,17 +21,24 @@
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Shadow;
+ import org.spongepowered.asm.mixin.injection.At;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.render.NoRender;
+ 
+-@Mixin(MobEffectFogEnvironment.class)
++@Mixin(value={MobEffectFogEnvironment.class})
+ public abstract class MobEffectFogEnvironmentMixin {
+     @Shadow
+     public abstract Holder<MobEffect> getMobEffect();
+ 
+-    @ModifyReturnValue(method = "isApplicable", at = @At("RETURN"))
++    @ModifyReturnValue(method={"isApplicable"}, at={@At(value="RETURN")})
+     private boolean modifyShouldApply(boolean original) {
+         NoRender noRender = Modules.get().get(NoRender.class);
+-        if (getMobEffect() == MobEffects.BLINDNESS) return original && !noRender.noBlindness();
+-        if (getMobEffect() == MobEffects.DARKNESS) return original && !noRender.noDarkness();
++        if (this.getMobEffect() == MobEffects.BLINDNESS) {
++            return original && !noRender.noBlindness();
++        }
++        if (this.getMobEffect() == MobEffects.DARKNESS) {
++            return original && !noRender.noDarkness();
++        }
+         return original;
+     }
+ }
++

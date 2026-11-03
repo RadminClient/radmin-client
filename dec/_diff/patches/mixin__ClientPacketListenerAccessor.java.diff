@@ -1,0 +1,71 @@
+--- upstream261/mixin/ClientPacketListenerAccessor.java
++++ v1decompiled/mixin/ClientPacketListenerAccessor.java
+@@ -1,39 +1,49 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.multiplayer.ClientPacketListener
++ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
++ *  net.minecraft.core.RegistryAccess$Frozen
++ *  net.minecraft.network.chat.LastSeenMessagesTracker
++ *  net.minecraft.network.chat.SignedMessageChain$Encoder
++ *  net.minecraft.network.protocol.game.ClientboundCommandsPacket$NodeBuilder
++ *  net.minecraft.world.flag.FeatureFlagSet
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
++import net.minecraft.client.multiplayer.ClientPacketListener;
+ import net.minecraft.client.multiplayer.ClientSuggestionProvider;
+-import net.minecraft.client.multiplayer.ClientPacketListener;
++import net.minecraft.core.RegistryAccess;
+ import net.minecraft.network.chat.LastSeenMessagesTracker;
+ import net.minecraft.network.chat.SignedMessageChain;
+ import net.minecraft.network.protocol.game.ClientboundCommandsPacket;
+-import net.minecraft.core.RegistryAccess;
+ import net.minecraft.world.flag.FeatureFlagSet;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ 
+-@Mixin(ClientPacketListener.class)
++@Mixin(value={ClientPacketListener.class})
+ public interface ClientPacketListenerAccessor {
+-    @Accessor("serverChunkRadius")
+-    int meteor$getServerChunkRadius();
++    @Accessor(value="serverChunkRadius")
++    public int meteor$getServerChunkRadius();
+ 
+-    @Accessor("signedMessageEncoder")
+-    SignedMessageChain.Encoder meteor$getSignedMessageEncoder();
++    @Accessor(value="signedMessageEncoder")
++    public SignedMessageChain.Encoder meteor$getSignedMessageEncoder();
+ 
+-    @Accessor("lastSeenMessages")
+-    LastSeenMessagesTracker meteor$getLastSeenMessages();
++    @Accessor(value="lastSeenMessages")
++    public LastSeenMessagesTracker meteor$getLastSeenMessages();
+ 
+-    @Accessor("registryAccess")
+-    RegistryAccess.Frozen meteor$getRegistryAccess();
++    @Accessor(value="registryAccess")
++    public RegistryAccess.Frozen meteor$getRegistryAccess();
+ 
+-    @Accessor("enabledFeatures")
+-    FeatureFlagSet meteor$getEnabledFeatures();
++    @Accessor(value="enabledFeatures")
++    public FeatureFlagSet meteor$getEnabledFeatures();
+ 
+-    @Accessor("COMMAND_NODE_BUILDER")
+-    static ClientboundCommandsPacket.NodeBuilder<ClientSuggestionProvider> meteor$getCommandNodeFactory() {
++    @Accessor(value="COMMAND_NODE_BUILDER")
++    public static ClientboundCommandsPacket.NodeBuilder<ClientSuggestionProvider> meteor$getCommandNodeFactory() {
+         return null;
+     }
+ }
++

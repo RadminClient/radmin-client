@@ -1,0 +1,309 @@
+--- upstream261/gui/utils/Cell.java
++++ v1decompiled/gui/utils/Cell.java
+@@ -1,193 +1,210 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  org.jetbrains.annotations.Nullable
+  */
+-
+-package meteordevelopment.meteorclient.gui.utils;
+-
+-import meteordevelopment.meteorclient.gui.widgets.WWidget;
++package radmin.client.gui.utils;
++
+ import org.jetbrains.annotations.Nullable;
++import radmin.client.gui.utils.AlignmentX;
++import radmin.client.gui.utils.AlignmentY;
++import radmin.client.gui.widgets.WWidget;
+ 
+ public class Cell<T extends WWidget> {
+     private final T widget;
+-
+-    public double x, y;
+-    public double width, height;
+-
++    public double x;
++    public double y;
++    public double width;
++    public double height;
+     private AlignmentX alignX = AlignmentX.Left;
+     private AlignmentY alignY = AlignmentY.Top;
+-
+-    private double padTop, padRight, padBottom, padLeft;
++    private double padTop;
++    private double padRight;
++    private double padBottom;
++    private double padLeft;
+     private double marginTop;
+-
+     private boolean expandWidgetX;
+     private boolean expandWidgetY;
+-
+     public boolean expandCellX;
+-
+-    public @Nullable String group;
++    @Nullable
++    public String group;
+ 
+     public Cell(T widget) {
+         this.widget = widget;
+     }
+ 
+     public T widget() {
+-        return widget;
++        return this.widget;
+     }
+ 
+     public void move(double deltaX, double deltaY) {
+-        x += deltaX;
+-        y += deltaY;
+-
+-        widget.move(deltaX, deltaY);
++        this.x += deltaX;
++        this.y += deltaY;
++        ((WWidget)this.widget).move(deltaX, deltaY);
+     }
+ 
+     public Cell<T> minWidth(double width) {
+-        widget.minWidth = width;
+-        return this;
+-    }
+-
+-    // Alignment
++        ((WWidget)this.widget).minWidth = width;
++        return this;
++    }
+ 
+     public Cell<T> centerX() {
+-        alignX = AlignmentX.Center;
++        this.alignX = AlignmentX.Center;
+         return this;
+     }
+ 
+     public Cell<T> right() {
+-        alignX = AlignmentX.Right;
++        this.alignX = AlignmentX.Right;
+         return this;
+     }
+ 
+     public Cell<T> centerY() {
+-        alignY = AlignmentY.Center;
++        this.alignY = AlignmentY.Center;
+         return this;
+     }
+ 
+     public Cell<T> bottom() {
+-        alignY = AlignmentY.Bottom;
++        this.alignY = AlignmentY.Bottom;
+         return this;
+     }
+ 
+     public Cell<T> center() {
+-        alignX = AlignmentX.Center;
+-        alignY = AlignmentY.Center;
++        this.alignX = AlignmentX.Center;
++        this.alignY = AlignmentY.Center;
+         return this;
+     }
+ 
+     public Cell<T> top() {
+-        alignY = AlignmentY.Top;
+-        return this;
+-    }
+-
+-    // Padding
++        this.alignY = AlignmentY.Top;
++        return this;
++    }
+ 
+     public Cell<T> padTop(double pad) {
+-        padTop = pad;
+-        return this;
+-    }
++        this.padTop = pad;
++        return this;
++    }
++
+     public Cell<T> padRight(double pad) {
+-        padRight = pad;
+-        return this;
+-    }
++        this.padRight = pad;
++        return this;
++    }
++
+     public Cell<T> padBottom(double pad) {
+-        padBottom = pad;
+-        return this;
+-    }
++        this.padBottom = pad;
++        return this;
++    }
++
+     public Cell<T> padLeft(double pad) {
+-        padLeft = pad;
++        this.padLeft = pad;
+         return this;
+     }
+ 
+     public Cell<T> padHorizontal(double pad) {
+-        padRight = padLeft = pad;
+-        return this;
+-    }
++        this.padRight = this.padLeft = pad;
++        return this;
++    }
++
+     public Cell<T> padVertical(double pad) {
+-        padTop = padBottom = pad;
+-        return this;
+-    }
++        this.padTop = this.padBottom = pad;
++        return this;
++    }
++
+     public Cell<T> pad(double pad) {
+-        padTop = padRight = padBottom = padLeft = pad;
++        this.padBottom = this.padLeft = pad;
++        this.padRight = this.padLeft;
++        this.padTop = this.padLeft;
+         return this;
+     }
+ 
+     public double padTop() {
+-        return s(padTop);
+-    }
++        return this.s(this.padTop);
++    }
++
+     public double padRight() {
+-        return s(padRight);
+-    }
++        return this.s(this.padRight);
++    }
++
+     public double padBottom() {
+-        return s(padBottom);
+-    }
++        return this.s(this.padBottom);
++    }
++
+     public double padLeft() {
+-        return s(padLeft);
+-    }
+-
+-    // Margin
++        return this.s(this.padLeft);
++    }
+ 
+     public Cell<T> marginTop(double m) {
+-        marginTop = m;
+-        return this;
+-    }
+-
+-    // Expand
++        this.marginTop = m;
++        return this;
++    }
+ 
+     public Cell<T> expandWidgetX() {
+-        expandWidgetX = true;
++        this.expandWidgetX = true;
+         return this;
+     }
+ 
+     public Cell<T> expandWidgetY() {
+-        expandWidgetY = true;
++        this.expandWidgetY = true;
+         return this;
+     }
+ 
+     public Cell<T> expandCellX() {
+-        expandCellX = true;
++        this.expandCellX = true;
+         return this;
+     }
+ 
+     public Cell<T> expandX() {
+-        expandWidgetX = true;
+-        expandCellX = true;
+-        return this;
+-    }
+-
+-    // Other
+-
+-    /// Makes this cell's width match the largest cell in the group
++        this.expandWidgetX = true;
++        this.expandCellX = true;
++        return this;
++    }
++
+     public Cell<T> group(String group) {
+         this.group = group;
+         return this;
+     }
+ 
+     public void alignWidget() {
+-        if (expandWidgetX) {
+-            widget.x = x;
+-            widget.width = width;
++        if (this.expandWidgetX) {
++            ((WWidget)this.widget).x = this.x;
++            ((WWidget)this.widget).width = this.width;
+         } else {
+-            switch (alignX) {
+-                case Left -> widget.x = x;
+-                case Center -> widget.x = x + width / 2 - widget.width / 2;
+-                case Right -> widget.x = x + width - widget.width;
++            switch (this.alignX) {
++                case Left: {
++                    ((WWidget)this.widget).x = this.x;
++                    break;
++                }
++                case Center: {
++                    ((WWidget)this.widget).x = this.x + this.width / 2.0 - ((WWidget)this.widget).width / 2.0;
++                    break;
++                }
++                case Right: {
++                    ((WWidget)this.widget).x = this.x + this.width - ((WWidget)this.widget).width;
++                }
+             }
+         }
+-
+-        if (expandWidgetY) {
+-            widget.y = y;
+-            widget.height = height;
++        if (this.expandWidgetY) {
++            ((WWidget)this.widget).y = this.y;
++            ((WWidget)this.widget).height = this.height;
+         } else {
+-            switch (alignY) {
+-                case Top -> widget.y = y + s(marginTop);
+-                case Center -> widget.y = y + height / 2 - widget.height / 2;
+-                case Bottom -> widget.y = y + height - widget.height;
++            switch (this.alignY) {
++                case Top: {
++                    ((WWidget)this.widget).y = this.y + this.s(this.marginTop);
++                    break;
++                }
++                case Center: {
++                    ((WWidget)this.widget).y = this.y + this.height / 2.0 - ((WWidget)this.widget).height / 2.0;
++                    break;
++                }
++                case Bottom: {
++                    ((WWidget)this.widget).y = this.y + this.height - ((WWidget)this.widget).height;
++                }
+             }
+         }
+     }
+ 
+     private double s(double value) {
+-        return widget.theme.scale(value);
++        return ((WWidget)this.widget).theme.scale(value);
+     }
+ }
++

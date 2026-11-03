@@ -1,0 +1,30 @@
+--- upstream261/gui/widgets/pressable/WTriangle.java
++++ v1decompiled/gui/widgets/pressable/WTriangle.java
+@@ -1,18 +1,19 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.widgets.pressable;
+ 
+-package meteordevelopment.meteorclient.gui.widgets.pressable;
++import radmin.client.gui.widgets.pressable.WPressable;
+ 
+-public abstract class WTriangle extends WPressable {
++public abstract class WTriangle
++extends WPressable {
+     public double rotation;
+ 
+     @Override
+     protected void onCalculateSize() {
+-        double s = theme.textHeight();
+-
+-        width = s;
+-        height = s;
++        double s;
++        this.width = s = this.theme.textHeight();
++        this.height = s;
+     }
+ }
++

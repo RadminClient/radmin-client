@@ -1,0 +1,48 @@
+--- upstream261/commands/commands/DismountCommand.java
++++ v1decompiled/commands/commands/DismountCommand.java
+@@ -1,27 +1,35 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.builder.LiteralArgumentBuilder
++ *  net.minecraft.client.multiplayer.ClientSuggestionProvider
++ *  net.minecraft.network.protocol.Packet
++ *  net.minecraft.network.protocol.game.ServerboundPlayerInputPacket
++ *  net.minecraft.world.entity.player.Input
+  */
+-
+-package meteordevelopment.meteorclient.commands.commands;
++package radmin.client.commands.commands;
+ 
+ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+-import meteordevelopment.meteorclient.commands.Command;
+ import net.minecraft.client.multiplayer.ClientSuggestionProvider;
++import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.game.ServerboundPlayerInputPacket;
+ import net.minecraft.world.entity.player.Input;
++import radmin.client.commands.Command;
+ 
+-public class DismountCommand extends Command {
++public class DismountCommand
++extends Command {
+     public DismountCommand() {
+-        super("dismount", "Dismounts you from entity you are riding.");
++        super("dismount", "Dismounts you from entity you are riding.", new String[0]);
+     }
+ 
+     @Override
+     public void build(LiteralArgumentBuilder<ClientSuggestionProvider> builder) {
+-        builder.executes(_ -> {
++        builder.executes(commandContext -> {
+             Input sneak = new Input(false, false, false, false, false, true, false);
+-            mc.getConnection().send(new ServerboundPlayerInputPacket(sneak));
+-            return SINGLE_SUCCESS;
++            mc.getConnection().send((Packet)new ServerboundPlayerInputPacket(sneak));
++            return 1;
+         });
+     }
+ }
++

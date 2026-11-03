@@ -1,0 +1,111 @@
+--- upstream261/commands/arguments/CommandArgumentType.java
++++ v1decompiled/commands/arguments/CommandArgumentType.java
+@@ -1,9 +1,18 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.StringReader
++ *  com.mojang.brigadier.arguments.ArgumentType
++ *  com.mojang.brigadier.context.CommandContext
++ *  com.mojang.brigadier.exceptions.CommandSyntaxException
++ *  com.mojang.brigadier.exceptions.DynamicCommandExceptionType
++ *  com.mojang.brigadier.suggestion.Suggestions
++ *  com.mojang.brigadier.suggestion.SuggestionsBuilder
++ *  net.minecraft.commands.SharedSuggestionProvider
++ *  net.minecraft.network.chat.Component
+  */
+-
+-package meteordevelopment.meteorclient.commands.arguments;
++package radmin.client.commands.arguments;
+ 
+ import com.mojang.brigadier.StringReader;
+ import com.mojang.brigadier.arguments.ArgumentType;
+@@ -12,20 +21,19 @@
+ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+ import com.mojang.brigadier.suggestion.Suggestions;
+ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+-import meteordevelopment.meteorclient.commands.Command;
+-import meteordevelopment.meteorclient.commands.Commands;
++import java.util.Collection;
++import java.util.LinkedHashSet;
++import java.util.concurrent.CompletableFuture;
+ import net.minecraft.commands.SharedSuggestionProvider;
+ import net.minecraft.network.chat.Component;
++import radmin.client.commands.Command;
++import radmin.client.commands.Commands;
+ 
+-import java.util.Collection;
+-import java.util.LinkedHashSet;
+-import java.util.Set;
+-import java.util.concurrent.CompletableFuture;
+-
+-public class CommandArgumentType implements ArgumentType<Command> {
++public class CommandArgumentType
++implements ArgumentType<Command> {
+     private static final CommandArgumentType INSTANCE = new CommandArgumentType();
+-    private static final DynamicCommandExceptionType NO_SUCH_COMMAND = new DynamicCommandExceptionType(name -> Component.literal("Command with name " + name + " doesn't exist."));
+-    private static final Collection<String> EXAMPLES = Commands.COMMANDS.stream().limit(3).map(Command::getName).toList();
++    private static final DynamicCommandExceptionType NO_SUCH_COMMAND = new DynamicCommandExceptionType(name -> Component.literal((String)("Command with name " + String.valueOf(name) + " doesn't exist.")));
++    private static final Collection<String> EXAMPLES = Commands.COMMANDS.stream().limit(3L).map(Command::getName).toList();
+ 
+     private CommandArgumentType() {
+     }
+@@ -35,43 +43,40 @@
+     }
+ 
+     public static Command get(CommandContext<?> context) {
+-        return context.getArgument("command", Command.class);
++        return (Command)context.getArgument("command", Command.class);
+     }
+ 
+-    @Override
+     public Command parse(StringReader reader) throws CommandSyntaxException {
+         String name = reader.readString();
+-
+         Command command = Commands.get(name);
+-
+         if (command == null) {
+             for (Command c : Commands.COMMANDS) {
+                 for (String alias : c.getAliases()) {
+-                    if (alias.equals(name)) {
+-                        command = c;
+-                        break;
+-                    }
++                    if (!alias.equals(name)) continue;
++                    command = c;
++                    break;
+                 }
+-                if (command != null) break;
++                if (command == null) continue;
++                break;
+             }
+         }
+-
+-        if (command == null) throw NO_SUCH_COMMAND.create(name);
++        if (command == null) {
++            throw NO_SUCH_COMMAND.create((Object)name);
++        }
+         return command;
+     }
+ 
+-    @Override
+     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+-        Set<String> suggestions = new LinkedHashSet<>();
++        LinkedHashSet<String> suggestions = new LinkedHashSet<String>();
+         for (Command c : Commands.COMMANDS) {
+             suggestions.add(c.getName());
+             suggestions.addAll(c.getAliases());
+         }
+-        return SharedSuggestionProvider.suggest(suggestions, builder);
++        return SharedSuggestionProvider.suggest(suggestions, (SuggestionsBuilder)builder);
+     }
+ 
+-    @Override
+     public Collection<String> getExamples() {
+         return EXAMPLES;
+     }
+ }
++

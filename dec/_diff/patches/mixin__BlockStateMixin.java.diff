@@ -1,0 +1,54 @@
+--- upstream261/mixin/BlockStateMixin.java
++++ v1decompiled/mixin/BlockStateMixin.java
+@@ -1,12 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.InteractionResult
++ *  net.minecraft.world.entity.player.Player
++ *  net.minecraft.world.level.Level
++ *  net.minecraft.world.level.block.Block
++ *  net.minecraft.world.level.block.state.BlockBehaviour$BlockStateBase
++ *  net.minecraft.world.level.block.state.BlockState
++ *  net.minecraft.world.level.block.state.properties.Property
++ *  net.minecraft.world.phys.BlockHitResult
++ *  org.jspecify.annotations.NonNull
++ *  org.spongepowered.asm.mixin.Mixin
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.events.world.BlockActivateEvent;
+ import net.minecraft.world.InteractionResult;
+ import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.level.Level;
+@@ -17,16 +25,19 @@
+ import net.minecraft.world.phys.BlockHitResult;
+ import org.jspecify.annotations.NonNull;
+ import org.spongepowered.asm.mixin.Mixin;
++import radmin.client.MeteorClient;
++import radmin.client.events.world.BlockActivateEvent;
+ 
+-@Mixin(BlockState.class)
+-public abstract class BlockStateMixin extends BlockBehaviour.BlockStateBase {
++@Mixin(value={BlockState.class})
++public abstract class BlockStateMixin
++extends BlockBehaviour.BlockStateBase {
+     protected BlockStateMixin(Block owner, Property<?>[] propertyKeys, Comparable<?>[] propertyValues) {
+-        super(owner, propertyKeys, propertyValues);
++        super(owner, propertyKeys, (Comparable[])propertyValues);
+     }
+ 
+-    @Override
+     public @NonNull InteractionResult useWithoutItem(@NonNull Level level, @NonNull Player player, @NonNull BlockHitResult hitResult) {
+-        MeteorClient.EVENT_BUS.post(BlockActivateEvent.get((BlockState) (Object) this));
++        MeteorClient.EVENT_BUS.post((Object)BlockActivateEvent.get((BlockState)this));
+         return super.useWithoutItem(level, player, hitResult);
+     }
+ }
++

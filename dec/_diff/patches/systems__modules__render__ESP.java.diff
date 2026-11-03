@@ -1,0 +1,731 @@
+--- upstream261/systems/modules/render/ESP.java
++++ v1decompiled/systems/modules/render/ESP.java
+@@ -1,460 +1,350 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.util.Mth
++ *  net.minecraft.world.entity.Entity
++ *  net.minecraft.world.entity.EntityType
++ *  net.minecraft.world.entity.MobCategory
++ *  net.minecraft.world.entity.player.Player
++ *  net.minecraft.world.phys.AABB
++ *  net.minecraft.world.phys.EntityHitResult
++ *  net.minecraft.world.phys.HitResult
++ *  org.joml.Vector3d
+  */
+-
+-package meteordevelopment.meteorclient.systems.modules.render;
+-
+-import meteordevelopment.meteorclient.events.render.Render2DEvent;
+-import meteordevelopment.meteorclient.events.render.Render3DEvent;
+-import meteordevelopment.meteorclient.renderer.Renderer2D;
+-import meteordevelopment.meteorclient.renderer.ShapeMode;
+-import meteordevelopment.meteorclient.settings.*;
+-import meteordevelopment.meteorclient.systems.config.Config;
+-import meteordevelopment.meteorclient.systems.friends.Friends;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.utils.entity.EntityUtils;
+-import meteordevelopment.meteorclient.utils.player.PlayerUtils;
+-import meteordevelopment.meteorclient.utils.render.NametagUtils;
+-import meteordevelopment.meteorclient.utils.render.WireframeEntityRenderer;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
+-import meteordevelopment.meteorclient.utils.render.color.SettingColor;
++package radmin.client.systems.modules.render;
++
++import java.util.Set;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.util.Mth;
+ import net.minecraft.world.entity.Entity;
+ import net.minecraft.world.entity.EntityType;
++import net.minecraft.world.entity.MobCategory;
+ import net.minecraft.world.entity.player.Player;
+ import net.minecraft.world.phys.AABB;
+ import net.minecraft.world.phys.EntityHitResult;
++import net.minecraft.world.phys.HitResult;
+ import org.joml.Vector3d;
+-
+-import java.util.Set;
+-
+-public class ESP extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-    private final SettingGroup sgColors = settings.createGroup("Colors");
+-
+-    // General
+-
+-    public final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
+-        .name("mode")
+-        .description("Rendering mode.")
+-        .defaultValue(Mode.Shader)
+-        .build()
+-    );
+-
+-    public final Setting<Boolean> highlightTarget = sgGeneral.add(new BoolSetting.Builder()
+-        .name("highlight-target")
+-        .description("highlights the currently targeted entity differently")
+-        .defaultValue(false)
+-        .build()
+-    );
+-
+-    public final Setting<Boolean> targetHitbox = sgGeneral.add(new BoolSetting.Builder()
+-        .name("target-hitbox")
+-        .description("draw the hitbox of the target entity")
+-        .defaultValue(true)
+-        .visible(highlightTarget::get)
+-        .build()
+-    );
+-
+-    public final Setting<Integer> outlineWidth = sgGeneral.add(new IntSetting.Builder()
+-        .name("outline-width")
+-        .description("The width of the shader outline.")
+-        .visible(() -> mode.get() == Mode.Shader)
+-        .defaultValue(2)
+-        .range(1, 10)
+-        .sliderRange(1, 5)
+-        .build()
+-    );
+-
+-    public final Setting<Double> glowMultiplier = sgGeneral.add(new DoubleSetting.Builder()
+-        .name("glow-multiplier")
+-        .description("Multiplier for glow effect")
+-        .visible(() -> mode.get() == Mode.Shader)
+-        .decimalPlaces(3)
+-        .defaultValue(3.5)
+-        .min(0)
+-        .sliderMax(10)
+-        .build()
+-    );
+-
+-    public final Setting<Boolean> ignoreSelf = sgGeneral.add(new BoolSetting.Builder()
+-        .name("ignore-self")
+-        .description("Ignores yourself drawing the shader.")
+-        .defaultValue(true)
+-        .build()
+-    );
+-
+-    public final Setting<ShapeMode> shapeMode = sgGeneral.add(new EnumSetting.Builder<ShapeMode>()
+-        .name("shape-mode")
+-        .description("How the shapes are rendered.")
+-        .visible(() -> mode.get() != Mode.Glow)
+-        .defaultValue(ShapeMode.Both)
+-        .build()
+-    );
+-
+-    public final Setting<Double> fillOpacity = sgGeneral.add(new DoubleSetting.Builder()
+-        .name("fill-opacity")
+-        .description("The opacity of the shape fill.")
+-        .visible(() -> shapeMode.get() != ShapeMode.Lines && mode.get() != Mode.Glow)
+-        .defaultValue(0.3)
+-        .range(0, 1)
+-        .sliderMax(1)
+-        .build()
+-    );
+-
+-    private final Setting<Double> fadeDistance = sgGeneral.add(new DoubleSetting.Builder()
+-        .name("fade-distance")
+-        .description("The distance from an entity where the color begins to fade.")
+-        .defaultValue(3)
+-        .min(0)
+-        .sliderMax(12)
+-        .build()
+-    );
+-
+-    private final Setting<Set<EntityType<?>>> entities = sgGeneral.add(new EntityTypeListSetting.Builder()
+-        .name("entities")
+-        .description("Select specific entities.")
+-        .defaultValue(EntityType.PLAYER)
+-        .build()
+-    );
+-
+-    // Colors
+-
+-    public final Setting<ESPColorMode> colorMode = sgColors.add(new EnumSetting.Builder<ESPColorMode>()
+-        .name("color-mode")
+-        .description("Determines the colors used for entities.")
+-        .defaultValue(ESPColorMode.EntityType)
+-        .build()
+-    );
+-
+-    public final Setting<Boolean> friendOverride = sgColors.add(new BoolSetting.Builder()
+-        .name("show-friend-colors")
+-        .description("Whether or not to override the distance/health color of friends with the friend color.")
+-        .defaultValue(true)
+-        .visible(() -> colorMode.get() == ESPColorMode.Distance || colorMode.get() == ESPColorMode.Health)
+-        .build()
+-    );
+-
+-    private final Setting<SettingColor> nonLivingEntityColor = sgColors.add(new ColorSetting.Builder()
+-        .name("non-living-entity-color")
+-        .description("The color used for non living entities such as dropped items.")
+-        .defaultValue(new SettingColor(25, 25, 25))
+-        .visible(() -> colorMode.get() == ESPColorMode.Health)
+-        .build()
+-    );
+-
+-    private final Setting<SettingColor> playersColor = sgColors.add(new ColorSetting.Builder()
+-        .name("players-color")
+-        .description("The other player's color.")
+-        .defaultValue(new SettingColor(255, 255, 255))
+-        .visible(() -> colorMode.get() == ESPColorMode.EntityType)
+-        .build()
+-    );
+-
+-    private final Setting<SettingColor> animalsColor = sgColors.add(new ColorSetting.Builder()
+-        .name("animals-color")
+-        .description("The animal's color.")
+-        .defaultValue(new SettingColor(25, 255, 25, 255))
+-        .visible(() -> colorMode.get() == ESPColorMode.EntityType)
+-        .build()
+-    );
+-
+-    private final Setting<SettingColor> waterAnimalsColor = sgColors.add(new ColorSetting.Builder()
+-        .name("water-animals-color")
+-        .description("The water animal's color.")
+-        .defaultValue(new SettingColor(25, 25, 255, 255))
+-        .visible(() -> colorMode.get() == ESPColorMode.EntityType)
+-        .build()
+-    );
+-
+-    private final Setting<SettingColor> monstersColor = sgColors.add(new ColorSetting.Builder()
+-        .name("monsters-color")
+-        .description("The monster's color.")
+-        .defaultValue(new SettingColor(255, 25, 25, 255))
+-        .visible(() -> colorMode.get() == ESPColorMode.EntityType)
+-        .build()
+-    );
+-
+-    private final Setting<SettingColor> ambientColor = sgColors.add(new ColorSetting.Builder()
+-        .name("ambient-color")
+-        .description("The ambient's color.")
+-        .defaultValue(new SettingColor(25, 25, 25, 255))
+-        .visible(() -> colorMode.get() == ESPColorMode.EntityType)
+-        .build()
+-    );
+-
+-    private final Setting<SettingColor> miscColor = sgColors.add(new ColorSetting.Builder()
+-        .name("misc-color")
+-        .description("The misc color.")
+-        .defaultValue(new SettingColor(175, 175, 175, 255))
+-        .visible(() -> colorMode.get() == ESPColorMode.EntityType)
+-        .build()
+-    );
+-
+-    private final Setting<SettingColor> targetColor = sgColors.add(new ColorSetting.Builder()
+-        .name("target-color")
+-        .description("The target color.")
+-        .defaultValue(new SettingColor(200, 200, 200, 255))
+-        .visible(highlightTarget::get)
+-        .build()
+-    );
+-
+-    private final Setting<SettingColor> targetHitboxColor = sgColors.add(new ColorSetting.Builder()
+-        .name("target-hitbox-color")
+-        .description("The target hitbox color.")
+-        .defaultValue(new SettingColor(100, 200, 200, 255))
+-        .visible(() -> highlightTarget.get() && targetHitbox.get())
+-        .build()
+-    );
+-
+-    private final Color lineColor = new Color();
+-    private final Color sideColor = new Color();
+-    private final Color baseColor = new Color();
+-
+-    private final Vector3d pos1 = new Vector3d();
+-    private final Vector3d pos2 = new Vector3d();
+-    private final Vector3d pos = new Vector3d();
+-
++import radmin.client.events.render.Render2DEvent;
++import radmin.client.events.render.Render3DEvent;
++import radmin.client.renderer.Renderer2D;
++import radmin.client.renderer.ShapeMode;
++import radmin.client.settings.BoolSetting;
++import radmin.client.settings.ColorSetting;
++import radmin.client.settings.DoubleSetting;
++import radmin.client.settings.EntityTypeListSetting;
++import radmin.client.settings.EnumSetting;
++import radmin.client.settings.IntSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.config.Config;
++import radmin.client.systems.friends.Friends;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.utils.entity.EntityUtils;
++import radmin.client.utils.player.PlayerUtils;
++import radmin.client.utils.render.NametagUtils;
++import radmin.client.utils.render.WireframeEntityRenderer;
++import radmin.client.utils.render.color.Color;
++import radmin.client.utils.render.color.SettingColor;
++
++public class ESP
++extends Module {
++    private final SettingGroup sgGeneral;
++    private final SettingGroup sgColors;
++    public final Setting<Mode> mode;
++    public final Setting<Boolean> highlightTarget;
++    public final Setting<Boolean> targetHitbox;
++    public final Setting<Integer> outlineWidth;
++    public final Setting<Double> glowMultiplier;
++    public final Setting<Boolean> ignoreSelf;
++    public final Setting<ShapeMode> shapeMode;
++    public final Setting<Double> fillOpacity;
++    private final Setting<Double> fadeDistance;
++    private final Setting<Set<EntityType<?>>> entities;
++    public final Setting<ESPColorMode> colorMode;
++    public final Setting<Boolean> friendOverride;
++    private final Setting<SettingColor> nonLivingEntityColor;
++    private final Setting<SettingColor> playersColor;
++    private final Setting<SettingColor> animalsColor;
++    private final Setting<SettingColor> waterAnimalsColor;
++    private final Setting<SettingColor> monstersColor;
++    private final Setting<SettingColor> ambientColor;
++    private final Setting<SettingColor> miscColor;
++    private final Setting<SettingColor> targetColor;
++    private final Setting<SettingColor> targetHitboxColor;
++    private final Color lineColor;
++    private final Color sideColor;
++    private final Color baseColor;
++    private final Vector3d pos1;
++    private final Vector3d pos2;
++    private final Vector3d pos;
+     private int count;
+ 
+     public ESP() {
+         super(Categories.Render, "esp", "Renders entities through walls.");
+-    }
+-
+-    // Box
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.sgColors = this.settings.createGroup("Colors");
++        this.mode = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("mode")).description("Rendering mode.")).defaultValue(Mode.Shader)).build());
++        this.highlightTarget = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("highlight-target")).description("highlights the currently targeted entity differently")).defaultValue(false)).build());
++        this.targetHitbox = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("target-hitbox")).description("draw the hitbox of the target entity")).defaultValue(true)).visible(this.highlightTarget::get)).build());
++        this.outlineWidth = this.sgGeneral.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("outline-width")).description("The width of the shader outline.")).visible(() -> this.mode.get() == Mode.Shader)).defaultValue(2)).range(1, 10).sliderRange(1, 5).build());
++        this.glowMultiplier = this.sgGeneral.add(((DoubleSetting.Builder)((DoubleSetting.Builder)((DoubleSetting.Builder)new DoubleSetting.Builder().name("glow-multiplier")).description("Multiplier for glow effect")).visible(() -> this.mode.get() == Mode.Shader)).decimalPlaces(3).defaultValue(3.5).min(0.0).sliderMax(10.0).build());
++        this.ignoreSelf = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("ignore-self")).description("Ignores yourself drawing the shader.")).defaultValue(true)).build());
++        this.shapeMode = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("shape-mode")).description("How the shapes are rendered.")).visible(() -> this.mode.get() != Mode.Glow)).defaultValue(ShapeMode.Both)).build());
++        this.fillOpacity = this.sgGeneral.add(((DoubleSetting.Builder)((DoubleSetting.Builder)((DoubleSetting.Builder)new DoubleSetting.Builder().name("fill-opacity")).description("The opacity of the shape fill.")).visible(() -> this.shapeMode.get() != ShapeMode.Lines && this.mode.get() != Mode.Glow)).defaultValue(0.3).range(0.0, 1.0).sliderMax(1.0).build());
++        this.fadeDistance = this.sgGeneral.add(((DoubleSetting.Builder)((DoubleSetting.Builder)new DoubleSetting.Builder().name("fade-distance")).description("The distance from an entity where the color begins to fade.")).defaultValue(3.0).min(0.0).sliderMax(12.0).build());
++        this.entities = this.sgGeneral.add(((EntityTypeListSetting.Builder)((EntityTypeListSetting.Builder)new EntityTypeListSetting.Builder().name("entities")).description("Select specific entities.")).defaultValue(EntityType.PLAYER).build());
++        this.colorMode = this.sgColors.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("color-mode")).description("Determines the colors used for entities.")).defaultValue(ESPColorMode.EntityType)).build());
++        this.friendOverride = this.sgColors.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("show-friend-colors")).description("Whether or not to override the distance/health color of friends with the friend color.")).defaultValue(true)).visible(() -> this.colorMode.get() == ESPColorMode.Distance || this.colorMode.get() == ESPColorMode.Health)).build());
++        this.nonLivingEntityColor = this.sgColors.add(((ColorSetting.Builder)((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("non-living-entity-color")).description("The color used for non living entities such as dropped items.")).defaultValue(new SettingColor(25, 25, 25)).visible(() -> this.colorMode.get() == ESPColorMode.Health)).build());
++        this.playersColor = this.sgColors.add(((ColorSetting.Builder)((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("players-color")).description("The other player's color.")).defaultValue(new SettingColor(255, 255, 255)).visible(() -> this.colorMode.get() == ESPColorMode.EntityType)).build());
++        this.animalsColor = this.sgColors.add(((ColorSetting.Builder)((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("animals-color")).description("The animal's color.")).defaultValue(new SettingColor(25, 255, 25, 255)).visible(() -> this.colorMode.get() == ESPColorMode.EntityType)).build());
++        this.waterAnimalsColor = this.sgColors.add(((ColorSetting.Builder)((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("water-animals-color")).description("The water animal's color.")).defaultValue(new SettingColor(25, 25, 255, 255)).visible(() -> this.colorMode.get() == ESPColorMode.EntityType)).build());
++        this.monstersColor = this.sgColors.add(((ColorSetting.Builder)((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("monsters-color")).description("The monster's color.")).defaultValue(new SettingColor(255, 25, 25, 255)).visible(() -> this.colorMode.get() == ESPColorMode.EntityType)).build());
++        this.ambientColor = this.sgColors.add(((ColorSetting.Builder)((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("ambient-color")).description("The ambient's color.")).defaultValue(new SettingColor(25, 25, 25, 255)).visible(() -> this.colorMode.get() == ESPColorMode.EntityType)).build());
++        this.miscColor = this.sgColors.add(((ColorSetting.Builder)((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("misc-color")).description("The misc color.")).defaultValue(new SettingColor(175, 175, 175, 255)).visible(() -> this.colorMode.get() == ESPColorMode.EntityType)).build());
++        this.targetColor = this.sgColors.add(((ColorSetting.Builder)((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("target-color")).description("The target color.")).defaultValue(new SettingColor(200, 200, 200, 255)).visible(this.highlightTarget::get)).build());
++        this.targetHitboxColor = this.sgColors.add(((ColorSetting.Builder)((ColorSetting.Builder)((ColorSetting.Builder)new ColorSetting.Builder().name("target-hitbox-color")).description("The target hitbox color.")).defaultValue(new SettingColor(100, 200, 200, 255)).visible(() -> this.highlightTarget.get() != false && this.targetHitbox.get() != false)).build());
++        this.lineColor = new Color();
++        this.sideColor = new Color();
++        this.baseColor = new Color();
++        this.pos1 = new Vector3d();
++        this.pos2 = new Vector3d();
++        this.pos = new Vector3d();
++    }
+ 
+     @EventHandler
+     private void onRender3D(Render3DEvent event) {
+-        if (mode.get() == Mode._2D) return;
+-
+-        count = 0;
+-
++        HitResult hitResult;
++        if (this.mode.get() == Mode._2D) {
++            return;
++        }
++        this.count = 0;
+         Entity target = null;
+-        if (highlightTarget.get() && targetHitbox.get() && mc.hitResult instanceof EntityHitResult hr)
++        if (this.highlightTarget.get().booleanValue() && this.targetHitbox.get().booleanValue() && (hitResult = this.mc.hitResult) instanceof EntityHitResult) {
++            EntityHitResult hr = (EntityHitResult)hitResult;
+             target = hr.getEntity();
+-
+-        for (Entity entity : mc.level.entitiesForRendering()) {
+-            if (target != entity && shouldSkip(entity)) continue;
+-            if (target == entity || mode.get() == Mode.Box || mode.get() == Mode.Wireframe)
+-                drawBoundingBox(event, entity);
+-            count++;
++        }
++        for (Entity entity : this.mc.level.entitiesForRendering()) {
++            if (target != entity && this.shouldSkip(entity)) continue;
++            if (target == entity || this.mode.get() == Mode.Box || this.mode.get() == Mode.Wireframe) {
++                this.drawBoundingBox(event, entity);
++            }
++            ++this.count;
+         }
+     }
+ 
+     private void drawBoundingBox(Render3DEvent event, Entity entity) {
+-        Color color = getColor(entity);
++        Color color = this.getColor(entity);
+         if (color != null) {
+-            lineColor.set(color);
+-            sideColor.set(color).a((int) (sideColor.a * fillOpacity.get()));
+-        }
+-
+-        if (mode.get() == Mode.Wireframe) {
+-            WireframeEntityRenderer.render(event, entity, 1, sideColor, lineColor, shapeMode.get());
+-        }
+-
+-        boolean target = drawAsTarget(entity);
+-
+-        if (mode.get() == Mode.Box || (targetHitbox.get() && target)) {
+-            double x = Mth.lerp(event.tickDelta, entity.xOld, entity.getX()) - entity.getX();
+-            double y = Mth.lerp(event.tickDelta, entity.yOld, entity.getY()) - entity.getY();
+-            double z = Mth.lerp(event.tickDelta, entity.zOld, entity.getZ()) - entity.getZ();
+-
+-            ShapeMode shape = shapeMode.get();
+-            if (target && mode.get() != Mode.Box) shape = ShapeMode.Lines;
+-            if (target) lineColor.set(targetHitboxColor.get());
+-
++            this.lineColor.set(color);
++            this.sideColor.set(color).a((int)((double)this.sideColor.a * this.fillOpacity.get()));
++        }
++        if (this.mode.get() == Mode.Wireframe) {
++            WireframeEntityRenderer.render(event, entity, 1.0, this.sideColor, this.lineColor, this.shapeMode.get());
++        }
++        boolean target = this.drawAsTarget(entity);
++        if (this.mode.get() == Mode.Box || this.targetHitbox.get().booleanValue() && target) {
++            double x = Mth.lerp((double)event.tickDelta, (double)entity.xOld, (double)entity.getX()) - entity.getX();
++            double y = Mth.lerp((double)event.tickDelta, (double)entity.yOld, (double)entity.getY()) - entity.getY();
++            double z = Mth.lerp((double)event.tickDelta, (double)entity.zOld, (double)entity.getZ()) - entity.getZ();
++            ShapeMode shape = this.shapeMode.get();
++            if (target && this.mode.get() != Mode.Box) {
++                shape = ShapeMode.Lines;
++            }
++            if (target) {
++                this.lineColor.set(this.targetHitboxColor.get());
++            }
+             AABB box = entity.getBoundingBox();
+-            event.renderer.box(x + box.minX, y + box.minY, z + box.minZ, x + box.maxX, y + box.maxY, z + box.maxZ, sideColor, lineColor, shape, 0);
+-        }
+-    }
+-
+-    // 2D
++            event.renderer.box(x + box.minX, y + box.minY, z + box.minZ, x + box.maxX, y + box.maxY, z + box.maxZ, this.sideColor, this.lineColor, shape, 0);
++        }
++    }
+ 
+     @EventHandler
+     private void onRender2D(Render2DEvent event) {
+-        if (mode.get() != Mode._2D) return;
+-
++        if (this.mode.get() != Mode._2D) {
++            return;
++        }
+         Renderer2D.COLOR.begin();
+-        count = 0;
+-
+-        for (Entity entity : mc.level.entitiesForRendering()) {
+-            if (shouldSkip(entity)) continue;
+-
++        this.count = 0;
++        for (Entity entity : this.mc.level.entitiesForRendering()) {
++            if (this.shouldSkip(entity)) continue;
+             AABB box = entity.getBoundingBox();
+-
+-            double x = Mth.lerp(event.tickDelta, entity.xOld, entity.getX()) - entity.getX();
+-            double y = Mth.lerp(event.tickDelta, entity.yOld, entity.getY()) - entity.getY();
+-            double z = Mth.lerp(event.tickDelta, entity.zOld, entity.getZ()) - entity.getZ();
+-
+-            // Check corners
+-            pos1.set(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+-            pos2.set(0, 0, 0);
+-
+-            //     Bottom
+-            if (checkCorner(box.minX + x, box.minY + y, box.minZ + z, pos1, pos2)) continue;
+-            if (checkCorner(box.maxX + x, box.minY + y, box.minZ + z, pos1, pos2)) continue;
+-            if (checkCorner(box.minX + x, box.minY + y, box.maxZ + z, pos1, pos2)) continue;
+-            if (checkCorner(box.maxX + x, box.minY + y, box.maxZ + z, pos1, pos2)) continue;
+-
+-            //     Top
+-            if (checkCorner(box.minX + x, box.maxY + y, box.minZ + z, pos1, pos2)) continue;
+-            if (checkCorner(box.maxX + x, box.maxY + y, box.minZ + z, pos1, pos2)) continue;
+-            if (checkCorner(box.minX + x, box.maxY + y, box.maxZ + z, pos1, pos2)) continue;
+-            if (checkCorner(box.maxX + x, box.maxY + y, box.maxZ + z, pos1, pos2)) continue;
+-
+-            // Setup color
+-            Color color = getColor(entity);
++            double x = Mth.lerp((double)event.tickDelta, (double)entity.xOld, (double)entity.getX()) - entity.getX();
++            double y = Mth.lerp((double)event.tickDelta, (double)entity.yOld, (double)entity.getY()) - entity.getY();
++            double z = Mth.lerp((double)event.tickDelta, (double)entity.zOld, (double)entity.getZ()) - entity.getZ();
++            this.pos1.set(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
++            this.pos2.set(0.0, 0.0, 0.0);
++            if (this.checkCorner(box.minX + x, box.minY + y, box.minZ + z, this.pos1, this.pos2) || this.checkCorner(box.maxX + x, box.minY + y, box.minZ + z, this.pos1, this.pos2) || this.checkCorner(box.minX + x, box.minY + y, box.maxZ + z, this.pos1, this.pos2) || this.checkCorner(box.maxX + x, box.minY + y, box.maxZ + z, this.pos1, this.pos2) || this.checkCorner(box.minX + x, box.maxY + y, box.minZ + z, this.pos1, this.pos2) || this.checkCorner(box.maxX + x, box.maxY + y, box.minZ + z, this.pos1, this.pos2) || this.checkCorner(box.minX + x, box.maxY + y, box.maxZ + z, this.pos1, this.pos2) || this.checkCorner(box.maxX + x, box.maxY + y, box.maxZ + z, this.pos1, this.pos2)) continue;
++            Color color = this.getColor(entity);
+             if (color != null) {
+-                lineColor.set(color);
+-                sideColor.set(color).a((int) (sideColor.a * fillOpacity.get()));
+-            }
+-
+-            // Render
+-            if (shapeMode.get() != ShapeMode.Lines && sideColor.a > 0) {
+-                Renderer2D.COLOR.quad(pos1.x, pos1.y, pos2.x - pos1.x, pos2.y - pos1.y, sideColor);
+-            }
+-
+-            if (shapeMode.get() != ShapeMode.Sides) {
+-                Renderer2D.COLOR.line(pos1.x, pos1.y, pos1.x, pos2.y, lineColor);
+-                Renderer2D.COLOR.line(pos2.x, pos1.y, pos2.x, pos2.y, lineColor);
+-                Renderer2D.COLOR.line(pos1.x, pos1.y, pos2.x, pos1.y, lineColor);
+-                Renderer2D.COLOR.line(pos1.x, pos2.y, pos2.x, pos2.y, lineColor);
+-            }
+-
+-            count++;
+-        }
+-
++                this.lineColor.set(color);
++                this.sideColor.set(color).a((int)((double)this.sideColor.a * this.fillOpacity.get()));
++            }
++            if (this.shapeMode.get() != ShapeMode.Lines && this.sideColor.a > 0) {
++                Renderer2D.COLOR.quad(this.pos1.x, this.pos1.y, this.pos2.x - this.pos1.x, this.pos2.y - this.pos1.y, this.sideColor);
++            }
++            if (this.shapeMode.get() != ShapeMode.Sides) {
++                Renderer2D.COLOR.line(this.pos1.x, this.pos1.y, this.pos1.x, this.pos2.y, this.lineColor);
++                Renderer2D.COLOR.line(this.pos2.x, this.pos1.y, this.pos2.x, this.pos2.y, this.lineColor);
++                Renderer2D.COLOR.line(this.pos1.x, this.pos1.y, this.pos2.x, this.pos1.y, this.lineColor);
++                Renderer2D.COLOR.line(this.pos1.x, this.pos2.y, this.pos2.x, this.pos2.y, this.lineColor);
++            }
++            ++this.count;
++        }
+         Renderer2D.COLOR.render();
+     }
+ 
+     public boolean forceRender() {
+-        return isActive() && (mode.get() == Mode.Shader || mode.get() == Mode.Glow);
++        return this.isActive() && (this.mode.get() == Mode.Shader || this.mode.get() == Mode.Glow);
+     }
+ 
+     private boolean checkCorner(double x, double y, double z, Vector3d min, Vector3d max) {
+-        pos.set(x, y, z);
+-        if (!NametagUtils.to2D(pos, 1)) return true;
+-
+-        // Check Min
+-        if (pos.x < min.x) min.x = pos.x;
+-        if (pos.y < min.y) min.y = pos.y;
+-        if (pos.z < min.z) min.z = pos.z;
+-
+-        // Check Max
+-        if (pos.x > max.x) max.x = pos.x;
+-        if (pos.y > max.y) max.y = pos.y;
+-        if (pos.z > max.z) max.z = pos.z;
+-
++        this.pos.set(x, y, z);
++        if (!NametagUtils.to2D(this.pos, 1.0)) {
++            return true;
++        }
++        if (this.pos.x < min.x) {
++            min.x = this.pos.x;
++        }
++        if (this.pos.y < min.y) {
++            min.y = this.pos.y;
++        }
++        if (this.pos.z < min.z) {
++            min.z = this.pos.z;
++        }
++        if (this.pos.x > max.x) {
++            max.x = this.pos.x;
++        }
++        if (this.pos.y > max.y) {
++            max.y = this.pos.y;
++        }
++        if (this.pos.z > max.z) {
++            max.z = this.pos.z;
++        }
+         return false;
+     }
+ 
+-    // Utils
+-
+     public boolean drawAsTarget(Entity entity) {
+-        return highlightTarget.get() && mc.hitResult instanceof EntityHitResult hr && hr.getEntity() == entity;
++        EntityHitResult hr;
++        HitResult hitResult;
++        return this.highlightTarget.get() != false && (hitResult = this.mc.hitResult) instanceof EntityHitResult && (hr = (EntityHitResult)hitResult).getEntity() == entity;
+     }
+ 
+     public boolean shouldSkip(Entity entity) {
+-        if (drawAsTarget(entity)) return false;
+-        if (!entities.get().contains(entity.getType())) return true;
+-        if (entity == mc.player && ignoreSelf.get()) return true;
+-        if (entity == mc.getCameraEntity() && mc.options.getCameraType().isFirstPerson()) return true;
++        if (this.drawAsTarget(entity)) {
++            return false;
++        }
++        if (!this.entities.get().contains(entity.getType())) {
++            return true;
++        }
++        if (entity == this.mc.player && this.ignoreSelf.get().booleanValue()) {
++            return true;
++        }
++        if (entity == this.mc.getCameraEntity() && this.mc.options.getCameraType().isFirstPerson()) {
++            return true;
++        }
+         return !EntityUtils.isInRenderDistance(entity);
+     }
+ 
+     public boolean shouldSkip(EntityType<?> entityType) {
+-        return !entities.get().contains(entityType);
++        return !this.entities.get().contains(entityType);
+     }
+ 
+     public Color getColor(Entity entity) {
+         Color color;
+-        double alpha = 1;
+-
+-        if (drawAsTarget(entity)) {
+-            color = targetColor.get();
++        double alpha = 1.0;
++        if (this.drawAsTarget(entity)) {
++            color = this.targetColor.get();
+         } else {
+-            if (!entities.get().contains(entity.getType())) return null;
+-
+-            alpha = getFadeAlpha(entity);
+-            if (alpha == 0) return null;
+-
+-            color = getEntityTypeColor(entity);
+-        }
+-
+-        return baseColor.set(color.r, color.g, color.b, (int) (color.a * alpha));
++            if (!this.entities.get().contains(entity.getType())) {
++                return null;
++            }
++            alpha = this.getFadeAlpha(entity);
++            if (alpha == 0.0) {
++                return null;
++            }
++            color = this.getEntityTypeColor(entity);
++        }
++        return this.baseColor.set(color.r, color.g, color.b, (int)((double)color.a * alpha));
+     }
+ 
+     private double getFadeAlpha(Entity entity) {
+-        double dist = PlayerUtils.squaredDistanceToCamera(entity.getX(), entity.getY() + entity.getEyeHeight(entity.getPose()), entity.getZ());
+-        double fadeDist = Math.pow(fadeDistance.get(), 2);
+-        double alpha = 1;
+-        if (dist <= fadeDist * fadeDist) alpha = (float) (Math.sqrt(dist) / fadeDist);
+-        if (alpha <= 0.075) alpha = 0;
++        double dist = PlayerUtils.squaredDistanceToCamera(entity.getX(), entity.getY() + (double)entity.getEyeHeight(entity.getPose()), entity.getZ());
++        double fadeDist = Math.pow(this.fadeDistance.get(), 2.0);
++        double alpha = 1.0;
++        if (dist <= fadeDist * fadeDist) {
++            alpha = (float)(Math.sqrt(dist) / fadeDist);
++        }
++        if (alpha <= 0.075) {
++            alpha = 0.0;
++        }
+         return alpha;
+     }
+ 
+     public Color getEntityTypeColor(Entity entity) {
+-        if (colorMode.get() == ESPColorMode.EntityType) {
+-            if (entity instanceof Player player) {
+-                return PlayerUtils.getPlayerColor(player, playersColor.get());
+-            } else {
+-                return switch (entity.getType().getCategory()) {
+-                    case CREATURE -> animalsColor.get();
+-                    case WATER_AMBIENT, WATER_CREATURE, UNDERGROUND_WATER_CREATURE, AXOLOTLS -> waterAnimalsColor.get();
+-                    case MONSTER -> monstersColor.get();
+-                    case AMBIENT -> ambientColor.get();
+-                    default -> miscColor.get();
+-                };
+-            }
+-        }
+-
+-        if (friendOverride.get() && entity instanceof Player player
+-            && Friends.get().isFriend(player)) {
+-            return Config.get().friendColor.get();
+-        }
+-
+-        if (colorMode.get() == ESPColorMode.Health)
+-            return EntityUtils.getColorFromHealth(entity, nonLivingEntityColor.get());
+-        else return EntityUtils.getColorFromDistance(entity);
++        if (this.colorMode.get() == ESPColorMode.EntityType) {
++            if (entity instanceof Player) {
++                Player player = (Player)entity;
++                return PlayerUtils.getPlayerColor(player, this.playersColor.get());
++            }
++            return switch (entity.getType().getCategory()) {
++                case MobCategory.CREATURE -> this.animalsColor.get();
++                case MobCategory.WATER_AMBIENT, MobCategory.WATER_CREATURE, MobCategory.UNDERGROUND_WATER_CREATURE, MobCategory.AXOLOTLS -> this.waterAnimalsColor.get();
++                case MobCategory.MONSTER -> this.monstersColor.get();
++                case MobCategory.AMBIENT -> this.ambientColor.get();
++                default -> this.miscColor.get();
++            };
++        }
++        if (this.friendOverride.get().booleanValue() && entity instanceof Player) {
++            Player player = (Player)entity;
++            if (Friends.get().isFriend(player)) {
++                return Config.get().friendColor.get();
++            }
++        }
++        if (this.colorMode.get() == ESPColorMode.Health) {
++            return EntityUtils.getColorFromHealth(entity, this.nonLivingEntityColor.get());
++        }
++        return EntityUtils.getColorFromDistance(entity);
+     }
+ 
+     @Override
+     public String getInfoString() {
+-        return Integer.toString(count);
++        return Integer.toString(this.count);
+     }
+ 
+     public boolean isShader() {
+-        return isActive() && mode.get() == Mode.Shader;
++        return this.isActive() && this.mode.get() == Mode.Shader;
+     }
+ 
+     public boolean isGlow() {
+-        return isActive() && mode.get() == Mode.Glow;
+-    }
+-
+-    public enum ESPColorMode {
+-        EntityType,
+-        Distance,
+-        Health;
+-
+-        @Override
+-        public String toString() {
+-            return this == EntityType ? "Entity Type" : super.toString();
+-        }
+-    }
+-
+-    public enum Mode {
++        return this.isActive() && this.mode.get() == Mode.Glow;
++    }
++
++    public static enum Mode {
+         Box,
+         Wireframe,
+         _2D,
+         Shader,
+         Glow;
+ 
+-        @Override
++
+         public String toString() {
+             return this == _2D ? "2D" : super.toString();
+         }
+     }
++
++    public static enum ESPColorMode {
++        EntityType,
++        Distance,
++        Health;
++
++
++        public String toString() {
++            return this == EntityType ? "Entity Type" : super.toString();
++        }
++    }
+ }
++

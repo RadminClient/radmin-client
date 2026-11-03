@@ -1,0 +1,22 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package radmin.client.gui.themes.meteor.widgets.pressable;
+
+import radmin.client.gui.renderer.GuiRenderer;
+import radmin.client.gui.themes.meteor.MeteorWidget;
+import radmin.client.gui.widgets.WWidget;
+import radmin.client.gui.widgets.pressable.WMinus;
+
+public class WMeteorMinus
+extends WMinus
+implements MeteorWidget {
+    @Override
+    protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+        double pad = this.pad();
+        double s = this.theme.scale(3.0);
+        this.renderBackground(renderer, (WWidget)this, this.pressed, this.mouseOver);
+        renderer.quad(this.x + pad, this.y + this.height / 2.0 - s / 2.0, this.width - pad * 2.0, s, this.theme().minusColor.get());
+    }
+}
+

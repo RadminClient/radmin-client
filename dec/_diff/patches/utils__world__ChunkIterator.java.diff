@@ -1,0 +1,86 @@
+--- upstream261/utils/world/ChunkIterator.java
++++ v1decompiled/utils/world/ChunkIterator.java
+@@ -1,57 +1,56 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.level.chunk.ChunkAccess
+  */
+-
+-package meteordevelopment.meteorclient.utils.world;
+-
+-import meteordevelopment.meteorclient.mixin.ClientChunkCacheAccessor;
+-import meteordevelopment.meteorclient.mixin.ClientChunkMapAccessor;
+-import net.minecraft.world.level.chunk.ChunkAccess;
++package radmin.client.utils.world;
+ 
+ import java.util.Iterator;
++import net.minecraft.world.level.chunk.ChunkAccess;
++import radmin.client.MeteorClient;
++import radmin.client.mixin.ClientChunkCacheAccessor;
++import radmin.client.mixin.ClientChunkMapAccessor;
+ 
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class ChunkIterator implements Iterator<ChunkAccess> {
+-    private final ClientChunkMapAccessor map = (ClientChunkMapAccessor) (Object) ((ClientChunkCacheAccessor) mc.level.getChunkSource()).meteor$getStorage();
++public class ChunkIterator
++implements Iterator<ChunkAccess> {
++    private final ClientChunkMapAccessor map;
+     private final boolean onlyWithLoadedNeighbours;
+-
+-    private int i = 0;
++    private int i;
+     private ChunkAccess chunk;
+ 
+     public ChunkIterator(boolean onlyWithLoadedNeighbours) {
++        this.map = (ClientChunkMapAccessor)((ClientChunkCacheAccessor)MeteorClient.mc.level.getChunkSource()).meteor$getStorage();
++        this.i = 0;
+         this.onlyWithLoadedNeighbours = onlyWithLoadedNeighbours;
+-
+-        getNext();
++        this.getNext();
+     }
+ 
+     private ChunkAccess getNext() {
+-        ChunkAccess prev = chunk;
+-        chunk = null;
+-
+-        while (i < map.meteor$getChunks().length()) {
+-            chunk = map.meteor$getChunks().get(i++);
+-            if (chunk != null && (!onlyWithLoadedNeighbours || isInRadius(chunk))) break;
++        ChunkAccess prev = this.chunk;
++        this.chunk = null;
++        while (this.i < this.map.meteor$getChunks().length()) {
++            this.chunk = (ChunkAccess)this.map.meteor$getChunks().get(this.i++);
++            if (this.chunk == null || this.onlyWithLoadedNeighbours && !this.isInRadius(this.chunk)) continue;
++            break;
+         }
+-
+         return prev;
+     }
+ 
+     private boolean isInRadius(ChunkAccess chunk) {
+         int x = chunk.getPos().x();
+         int z = chunk.getPos().z();
+-
+-        return mc.level.getChunkSource().hasChunk(x + 1, z) && mc.level.getChunkSource().hasChunk(x - 1, z) && mc.level.getChunkSource().hasChunk(x, z + 1) && mc.level.getChunkSource().hasChunk(x, z - 1);
++        return MeteorClient.mc.level.getChunkSource().hasChunk(x + 1, z) && MeteorClient.mc.level.getChunkSource().hasChunk(x - 1, z) && MeteorClient.mc.level.getChunkSource().hasChunk(x, z + 1) && MeteorClient.mc.level.getChunkSource().hasChunk(x, z - 1);
+     }
+ 
+     @Override
+     public boolean hasNext() {
+-        return chunk != null;
++        return this.chunk != null;
+     }
+ 
+     @Override
+     public ChunkAccess next() {
+-        return getNext();
++        return this.getNext();
+     }
+ }
++

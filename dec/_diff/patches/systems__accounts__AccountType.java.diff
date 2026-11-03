@@ -1,0 +1,21 @@
+--- upstream261/systems/accounts/AccountType.java
++++ v1decompiled/systems/accounts/AccountType.java
+@@ -1,13 +1,13 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.systems.accounts;
++package radmin.client.systems.accounts;
+ 
+ public enum AccountType {
+     Cracked,
+     Microsoft,
+     TheAltening,
+-    Session
++    Session;
++
+ }
++

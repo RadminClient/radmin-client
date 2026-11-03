@@ -1,0 +1,36 @@
+--- upstream261/commands/arguments/DirectionArgumentType.java
++++ v1decompiled/commands/arguments/DirectionArgumentType.java
+@@ -1,21 +1,27 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.serialization.Codec
++ *  net.minecraft.commands.arguments.StringRepresentableArgument
++ *  net.minecraft.core.Direction
+  */
++package radmin.client.commands.arguments;
+ 
+-package meteordevelopment.meteorclient.commands.arguments;
+-
++import com.mojang.serialization.Codec;
+ import net.minecraft.commands.arguments.StringRepresentableArgument;
+ import net.minecraft.core.Direction;
+ 
+-public class DirectionArgumentType extends StringRepresentableArgument<Direction> {
++public class DirectionArgumentType
++extends StringRepresentableArgument<Direction> {
+     private static final DirectionArgumentType INSTANCE = new DirectionArgumentType();
+ 
+     private DirectionArgumentType() {
+-        super(Direction.CODEC, Direction::values);
++        super((Codec)Direction.CODEC, Direction::values);
+     }
+ 
+     public static DirectionArgumentType create() {
+         return INSTANCE;
+     }
+ }
++

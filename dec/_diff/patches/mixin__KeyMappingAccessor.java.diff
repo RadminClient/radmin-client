@@ -1,0 +1,60 @@
+--- upstream261/mixin/KeyMappingAccessor.java
++++ v1decompiled/mixin/KeyMappingAccessor.java
+@@ -1,34 +1,39 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.platform.InputConstants$Key
++ *  net.minecraft.client.KeyMapping
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Accessor
++ *  org.spongepowered.asm.mixin.gen.Invoker
+  */
++package radmin.client.mixin;
+ 
+-package meteordevelopment.meteorclient.mixin;
+-
++import com.mojang.blaze3d.platform.InputConstants;
++import java.util.Map;
+ import net.minecraft.client.KeyMapping;
+-import com.mojang.blaze3d.platform.InputConstants;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Accessor;
+ import org.spongepowered.asm.mixin.gen.Invoker;
+ 
+-import java.util.Map;
+-
+-@Mixin(KeyMapping.class)
++@Mixin(value={KeyMapping.class})
+ public interface KeyMappingAccessor {
+-    @Accessor("ALL")
+-    static Map<String, KeyMapping> getKeysById() {
++    @Accessor(value="ALL")
++    public static Map<String, KeyMapping> getKeysById() {
+         return null;
+     }
+ 
+-    @Accessor("key")
+-    InputConstants.Key meteor$getKey();
++    @Accessor(value="key")
++    public InputConstants.Key meteor$getKey();
+ 
+-    @Accessor("clickCount")
+-    int meteor$getClickCount();
++    @Accessor(value="clickCount")
++    public int meteor$getClickCount();
+ 
+-    @Accessor("clickCount")
+-    void meteor$setClickCount(int timesPressed);
++    @Accessor(value="clickCount")
++    public void meteor$setClickCount(int var1);
+ 
+-    @Invoker("release")
+-    void meteor$invokeRelease();
++    @Invoker(value="release")
++    public void meteor$invokeRelease();
+ }
++

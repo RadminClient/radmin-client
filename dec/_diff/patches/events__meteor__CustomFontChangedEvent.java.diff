@@ -1,0 +1,21 @@
+--- upstream261/events/meteor/CustomFontChangedEvent.java
++++ v1decompiled/events/meteor/CustomFontChangedEvent.java
+@@ -1,11 +1,8 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.events.meteor;
+ 
+-package meteordevelopment.meteorclient.events.meteor;
+-
+-@SuppressWarnings("InstantiationOfUtilityClass")
+ public class CustomFontChangedEvent {
+     private static final CustomFontChangedEvent INSTANCE = new CustomFontChangedEvent();
+ 
+@@ -13,3 +10,4 @@
+         return INSTANCE;
+     }
+ }
++

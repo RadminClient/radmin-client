@@ -1,0 +1,38 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.llamalad7.mixinextras.expression.Definition
+ *  com.llamalad7.mixinextras.expression.Expression
+ *  com.llamalad7.mixinextras.sugar.Local
+ *  net.caffeinemc.mods.sodium.client.render.chunk.vertex.format.ChunkVertexEncoder$Vertex
+ *  org.joml.Vector3fc
+ *  org.spongepowered.asm.mixin.Mixin
+ *  org.spongepowered.asm.mixin.injection.At
+ *  org.spongepowered.asm.mixin.injection.Inject
+ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+ */
+package radmin.client.mixin.sodium;
+
+import com.llamalad7.mixinextras.expression.Definition;
+import com.llamalad7.mixinextras.expression.Expression;
+import com.llamalad7.mixinextras.sugar.Local;
+import net.caffeinemc.mods.sodium.client.render.chunk.vertex.format.ChunkVertexEncoder;
+import org.joml.Vector3fc;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(targets={"net.caffeinemc.mods.sodium.client.render.chunk.translucent_sorting.bsp_tree.InnerPartitionBSPNode"}, remap=false)
+public abstract class SodiumInnerPartitionBSPNodeMixin {
+    @Inject(method={"interpolateAttributes(FLorg/joml/Vector3fc;Lnet/caffeinemc/mods/sodium/client/render/chunk/vertex/format/ChunkVertexEncoder$Vertex;Lnet/caffeinemc/mods/sodium/client/render/chunk/vertex/format/ChunkVertexEncoder$Vertex;Lnet/caffeinemc/mods/sodium/client/render/chunk/vertex/format/ChunkVertexEncoder$Vertex;Lnet/caffeinemc/mods/sodium/client/render/chunk/vertex/format/ChunkVertexEncoder$Vertex;Lnet/caffeinemc/mods/sodium/client/render/chunk/vertex/format/ChunkVertexEncoder$Vertex;)V"}, at={@At(value="MIXINEXTRAS:EXPRESSION")}, cancellable=true)
+    @Definition(id="splitPlaneEdgeDot", local={@Local(type=float.class, name={"splitPlaneEdgeDot"})})
+    @Expression(value={"splitPlaneEdgeDot == 0.0"})
+    private static void onInterpolateAttributes(float splitDistance, Vector3fc splitPlane, ChunkVertexEncoder.Vertex inside, ChunkVertexEncoder.Vertex outside, ChunkVertexEncoder.Vertex targetA, ChunkVertexEncoder.Vertex targetB, ChunkVertexEncoder.Vertex targetC, CallbackInfo ci, @Local(name={"splitPlaneEdgeDot"}) float splitPlaneEdgeDot) {
+        if (splitPlaneEdgeDot == 0.0f) {
+            ci.cancel();
+        }
+    }
+}
+

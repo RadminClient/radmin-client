@@ -1,0 +1,72 @@
+--- upstream261/commands/arguments/ComponentMapArgumentType.java
++++ v1decompiled/commands/arguments/ComponentMapArgumentType.java
+@@ -1,9 +1,18 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.brigadier.StringReader
++ *  com.mojang.brigadier.arguments.ArgumentType
++ *  com.mojang.brigadier.context.CommandContext
++ *  com.mojang.brigadier.exceptions.CommandSyntaxException
++ *  com.mojang.brigadier.suggestion.Suggestions
++ *  com.mojang.brigadier.suggestion.SuggestionsBuilder
++ *  net.minecraft.commands.CommandBuildContext
++ *  net.minecraft.commands.SharedSuggestionProvider
++ *  net.minecraft.core.component.DataComponentMap
+  */
+-
+-package meteordevelopment.meteorclient.commands.arguments;
++package radmin.client.commands.arguments;
+ 
+ import com.mojang.brigadier.StringReader;
+ import com.mojang.brigadier.arguments.ArgumentType;
+@@ -11,16 +20,16 @@
+ import com.mojang.brigadier.exceptions.CommandSyntaxException;
+ import com.mojang.brigadier.suggestion.Suggestions;
+ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+-import meteordevelopment.meteorclient.utils.misc.ComponentMapReader;
++import java.util.Collection;
++import java.util.List;
++import java.util.concurrent.CompletableFuture;
+ import net.minecraft.commands.CommandBuildContext;
+ import net.minecraft.commands.SharedSuggestionProvider;
+ import net.minecraft.core.component.DataComponentMap;
++import radmin.client.utils.misc.ComponentMapReader;
+ 
+-import java.util.Collection;
+-import java.util.List;
+-import java.util.concurrent.CompletableFuture;
+-
+-public class ComponentMapArgumentType implements ArgumentType<DataComponentMap> {
++public class ComponentMapArgumentType
++implements ArgumentType<DataComponentMap> {
+     private static final Collection<String> EXAMPLES = List.of("{foo=bar}");
+     private final ComponentMapReader reader;
+ 
+@@ -33,21 +42,19 @@
+     }
+ 
+     public static <S extends SharedSuggestionProvider> DataComponentMap getComponentMap(CommandContext<S> context, String name) {
+-        return context.getArgument(name, DataComponentMap.class);
++        return (DataComponentMap)context.getArgument(name, DataComponentMap.class);
+     }
+ 
+-    @Override
+     public DataComponentMap parse(StringReader reader) throws CommandSyntaxException {
+         return this.reader.consume(reader);
+     }
+ 
+-    @Override
+     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+         return this.reader.getSuggestions(builder);
+     }
+ 
+-    @Override
+     public Collection<String> getExamples() {
+         return EXAMPLES;
+     }
+ }
++

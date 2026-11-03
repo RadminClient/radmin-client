@@ -1,0 +1,129 @@
+--- upstream261/gui/screens/accounts/AccountsScreen.java
++++ v1decompiled/gui/screens/accounts/AccountsScreen.java
+@@ -1,76 +1,81 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.screens.Screen
++ *  org.jetbrains.annotations.Nullable
+  */
++package radmin.client.gui.screens.accounts;
+ 
+-package meteordevelopment.meteorclient.gui.screens.accounts;
++import net.minecraft.client.gui.screens.Screen;
++import org.jetbrains.annotations.Nullable;
++import radmin.client.MeteorClient;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WindowScreen;
++import radmin.client.gui.screens.accounts.AddAccountScreen;
++import radmin.client.gui.screens.accounts.AddAlteningAccountScreen;
++import radmin.client.gui.screens.accounts.AddCrackedAccountScreen;
++import radmin.client.gui.screens.accounts.AddMicrosoftAccountScreen;
++import radmin.client.gui.screens.accounts.AddSessionAccountScreen;
++import radmin.client.gui.widgets.WAccount;
++import radmin.client.gui.widgets.containers.WContainer;
++import radmin.client.gui.widgets.containers.WHorizontalList;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.systems.accounts.Account;
++import radmin.client.systems.accounts.AccountType;
++import radmin.client.systems.accounts.Accounts;
++import radmin.client.utils.misc.NbtUtils;
++import radmin.client.utils.network.MeteorExecutor;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WindowScreen;
+-import meteordevelopment.meteorclient.gui.widgets.WAccount;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WContainer;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import meteordevelopment.meteorclient.systems.accounts.Account;
+-import meteordevelopment.meteorclient.systems.accounts.AccountType;
+-import meteordevelopment.meteorclient.systems.accounts.Accounts;
+-import meteordevelopment.meteorclient.utils.misc.NbtUtils;
+-import meteordevelopment.meteorclient.utils.network.MeteorExecutor;
+-import org.jetbrains.annotations.Nullable;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class AccountsScreen extends WindowScreen {
++public class AccountsScreen
++extends WindowScreen {
+     public AccountsScreen(GuiTheme theme) {
+         super(theme, "Accounts");
+     }
+ 
+     @Override
+     public void initWidgets() {
+-        // Accounts
+         for (Account<?> account : Accounts.get()) {
+-            WAccount wAccount = add(theme.account(this, account)).expandX().widget();
++            WAccount wAccount = this.add(this.theme.account(this, account)).expandX().widget();
+             wAccount.refreshScreenAction = this::reload;
+         }
+-
+-        // Add account
+-        WHorizontalList l = add(theme.horizontalList()).expandX().widget();
+-
+-        addButton(l, "Cracked", () -> mc.setScreen(new AddCrackedAccountScreen(theme, this)));
+-        addButton(l, "Altening", () -> mc.setScreen(new AddAlteningAccountScreen(theme, this)));
+-        addButton(l, "Session", () -> mc.setScreen(new AddSessionAccountScreen(theme, this)));
+-        addButton(l, "Microsoft", () -> mc.setScreen(new AddMicrosoftAccountScreen(theme, this)));
++        WHorizontalList l = this.add(this.theme.horizontalList()).expandX().widget();
++        this.addButton(l, "Cracked", () -> MeteorClient.mc.setScreen((Screen)new AddCrackedAccountScreen(this.theme, this)));
++        this.addButton(l, "Altening", () -> MeteorClient.mc.setScreen((Screen)new AddAlteningAccountScreen(this.theme, this)));
++        this.addButton(l, "Session", () -> MeteorClient.mc.setScreen((Screen)new AddSessionAccountScreen(this.theme, this)));
++        this.addButton(l, "Microsoft", () -> MeteorClient.mc.setScreen((Screen)new AddMicrosoftAccountScreen(this.theme, this)));
+     }
+ 
+     private void addButton(WContainer c, String text, Runnable action) {
+-        WButton button = c.add(theme.button(text)).expandX().widget();
++        WButton button = c.add(this.theme.button(text)).expandX().widget();
+         button.action = action;
+     }
+ 
+     public static void addAccount(@Nullable AddAccountScreen screen, AccountsScreen parent, Account<?> account) {
+-        if (screen != null) screen.locked = true;
+-
++        if (screen != null) {
++            screen.locked = true;
++        }
+         MeteorExecutor.execute(() -> {
+             if (!account.fetchInfo()) {
+-                mc.execute(() -> {
+-                    if (screen != null) screen.locked = false;
++                MeteorClient.mc.execute(() -> {
++                    if (screen != null) {
++                        screen.locked = false;
++                    }
+                 });
+                 return;
+             }
+-
+             Accounts.get().add(account);
+-
+             if (account.login()) {
+-                if (account.getType() != AccountType.Cracked) account.getCache().loadHead(parent::reload);
++                if (account.getType() != AccountType.Cracked) {
++                    account.getCache().loadHead(parent::reload);
++                }
+                 Accounts.get().save();
+             }
+-
+-            mc.execute(() -> {
++            MeteorClient.mc.execute(() -> {
+                 if (screen != null) {
+                     screen.locked = false;
+                     screen.onClose();
+                 }
+-
+                 parent.reload();
+             });
+         });
+@@ -86,3 +91,4 @@
+         return NbtUtils.fromClipboard(Accounts.get());
+     }
+ }
++

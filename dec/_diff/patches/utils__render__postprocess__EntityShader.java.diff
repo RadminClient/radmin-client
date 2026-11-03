@@ -1,0 +1,56 @@
+--- upstream261/utils/render/postprocess/EntityShader.java
++++ v1decompiled/utils/render/postprocess/EntityShader.java
+@@ -1,33 +1,41 @@
+-package meteordevelopment.meteorclient.utils.render.postprocess;
++/*
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.pipeline.RenderPipeline
++ *  net.minecraft.world.entity.Entity
++ */
++package radmin.client.utils.render.postprocess;
+ 
+ import com.mojang.blaze3d.pipeline.RenderPipeline;
+-import meteordevelopment.meteorclient.mixininterface.ILevelRenderer;
+-import meteordevelopment.meteorclient.utils.render.CustomOutlineVertexConsumerProvider;
+ import net.minecraft.world.entity.Entity;
++import radmin.client.MeteorClient;
++import radmin.client.mixininterface.ILevelRenderer;
++import radmin.client.utils.render.CustomOutlineVertexConsumerProvider;
++import radmin.client.utils.render.postprocess.PostProcessShader;
+ 
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public abstract class EntityShader extends PostProcessShader {
+-    public final CustomOutlineVertexConsumerProvider vertexConsumerProvider;
++public abstract class EntityShader
++extends PostProcessShader {
++    public final CustomOutlineVertexConsumerProvider vertexConsumerProvider = new CustomOutlineVertexConsumerProvider();
+ 
+     protected EntityShader(RenderPipeline pipeline) {
+         super(pipeline);
+-        this.vertexConsumerProvider = new CustomOutlineVertexConsumerProvider();
+     }
+ 
+-    public abstract boolean shouldDraw(Entity entity);
++    public abstract boolean shouldDraw(Entity var1);
+ 
+     @Override
+     protected void preDraw() {
+-        ((ILevelRenderer) mc.levelRenderer).meteor$pushEntityOutlineFramebuffer(framebuffer);
++        ((ILevelRenderer)MeteorClient.mc.levelRenderer).meteor$pushEntityOutlineFramebuffer(this.framebuffer);
+     }
+ 
+     @Override
+     protected void postDraw() {
+-        ((ILevelRenderer) mc.levelRenderer).meteor$popEntityOutlineFramebuffer();
++        ((ILevelRenderer)MeteorClient.mc.levelRenderer).meteor$popEntityOutlineFramebuffer();
+     }
+ 
+     public void submitVertices() {
+-        submitVertices(vertexConsumerProvider::draw);
++        this.submitVertices(this.vertexConsumerProvider::draw);
+     }
+ }
++

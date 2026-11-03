@@ -1,0 +1,167 @@
+--- upstream261/settings/KeybindSetting.java
++++ v1decompiled/settings/KeybindSetting.java
+@@ -1,75 +1,88 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.nbt.CompoundTag
++ *  net.minecraft.nbt.Tag
+  */
+-
+-package meteordevelopment.meteorclient.settings;
+-
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.events.meteor.KeyInputEvent;
+-import meteordevelopment.meteorclient.events.meteor.MouseClickEvent;
+-import meteordevelopment.meteorclient.gui.widgets.WKeybind;
+-import meteordevelopment.meteorclient.utils.misc.Keybind;
+-import meteordevelopment.meteorclient.utils.misc.input.KeyAction;
+-import meteordevelopment.orbit.EventHandler;
+-import meteordevelopment.orbit.EventPriority;
+-import net.minecraft.nbt.CompoundTag;
+-import org.lwjgl.glfw.GLFW;
++package radmin.client.settings;
+ 
+ import java.util.function.Consumer;
++import meteordevelopment.orbit.EventHandler;
++import net.minecraft.nbt.CompoundTag;
++import net.minecraft.nbt.Tag;
++import radmin.client.MeteorClient;
++import radmin.client.events.meteor.KeyInputEvent;
++import radmin.client.events.meteor.MouseClickEvent;
++import radmin.client.gui.widgets.WKeybind;
++import radmin.client.settings.IVisible;
++import radmin.client.settings.Setting;
++import radmin.client.utils.misc.Keybind;
++import radmin.client.utils.misc.input.KeyAction;
+ 
+-public class KeybindSetting extends Setting<Keybind> {
++public class KeybindSetting
++extends Setting<Keybind> {
+     private final Runnable action;
+     public WKeybind widget;
+ 
+     public KeybindSetting(String name, String description, Keybind defaultValue, Consumer<Keybind> onChanged, Consumer<Setting<Keybind>> onModuleActivated, IVisible visible, Runnable action) {
+         super(name, description, defaultValue, onChanged, onModuleActivated, visible);
+-
+         this.action = action;
+-        MeteorClient.EVENT_BUS.subscribe(this);
++        MeteorClient.EVENT_BUS.subscribe((Object)this);
+     }
+ 
+-    @EventHandler(priority = EventPriority.HIGHEST)
++    @EventHandler(priority=200)
+     private void onKeyBinding(KeyInputEvent event) {
+-        if (widget == null) return;
+-        if (event.action == KeyAction.Press && event.key() == GLFW.GLFW_KEY_ESCAPE && widget.onClear()) event.cancel();
+-        else if (event.action == KeyAction.Release && widget.onAction(true, event.key(), event.modifiers()))
++        if (this.widget == null) {
++            return;
++        }
++        if (event.action == KeyAction.Press && event.key() == 256 && this.widget.onClear()) {
+             event.cancel();
+-    }
+-
+-    @EventHandler(priority = EventPriority.HIGHEST)
+-    private void onMouseClickBinding(MouseClickEvent event) {
+-        if (event.action == KeyAction.Press && widget != null && widget.onAction(false, event.button(), 0))
++        } else if (event.action == KeyAction.Release && this.widget.onAction(true, event.key(), event.modifiers())) {
+             event.cancel();
+-    }
+-
+-    @EventHandler(priority = EventPriority.HIGH)
+-    private void onKey(KeyInputEvent event) {
+-        if (event.action == KeyAction.Release && get().matches(event.input) && (module == null || module.isActive()) && action != null) {
+-            action.run();
+         }
+     }
+ 
+-    @EventHandler(priority = EventPriority.HIGH)
++    @EventHandler(priority=200)
++    private void onMouseClickBinding(MouseClickEvent event) {
++        if (event.action == KeyAction.Press && this.widget != null && this.widget.onAction(false, event.button(), 0)) {
++            event.cancel();
++        }
++    }
++
++    @EventHandler(priority=100)
++    private void onKey(KeyInputEvent event) {
++        if (event.action == KeyAction.Release && ((Keybind)this.get()).matches(event.input) && (this.module == null || this.module.isActive()) && this.action != null) {
++            this.action.run();
++        }
++    }
++
++    @EventHandler(priority=100)
+     private void onMouseClick(MouseClickEvent event) {
+-        if (event.action == KeyAction.Release && get().matches(event.input) && (module == null || module.isActive()) && action != null) {
+-            action.run();
++        if (event.action == KeyAction.Release && ((Keybind)this.get()).matches(event.input) && (this.module == null || this.module.isActive()) && this.action != null) {
++            this.action.run();
+         }
+     }
+ 
+     @Override
+     public void resetImpl() {
+-        if (value == null) value = defaultValue.copy();
+-        else value.set(defaultValue);
+-
+-        if (widget != null) widget.reset();
++        if (this.value == null) {
++            this.value = ((Keybind)this.defaultValue).copy();
++        } else {
++            ((Keybind)this.value).set((Keybind)this.defaultValue);
++        }
++        if (this.widget != null) {
++            this.widget.reset();
++        }
+     }
+ 
+     @Override
+     protected Keybind parseImpl(String str) {
+         try {
+             return Keybind.fromKey(Integer.parseInt(str.trim()));
+-        } catch (NumberFormatException _) {
++        }
++        catch (NumberFormatException numberFormatException) {
+             return null;
+         }
+     }
+@@ -81,19 +94,18 @@
+ 
+     @Override
+     public CompoundTag save(CompoundTag tag) {
+-        tag.put("value", get().toTag());
+-
++        tag.put("value", (Tag)((Keybind)this.get()).toTag());
+         return tag;
+     }
+ 
+     @Override
+     public Keybind load(CompoundTag tag) {
+-        get().fromTag(tag.getCompoundOrEmpty("value"));
+-
+-        return get();
++        ((Keybind)this.get()).fromTag(tag.getCompoundOrEmpty("value"));
++        return (Keybind)this.get();
+     }
+ 
+-    public static class Builder extends SettingBuilder<Builder, Keybind, KeybindSetting> {
++    public static class Builder
++    extends Setting.SettingBuilder<Builder, Keybind, KeybindSetting> {
+         private Runnable action;
+ 
+         public Builder() {
+@@ -107,7 +119,8 @@
+ 
+         @Override
+         public KeybindSetting build() {
+-            return new KeybindSetting(name, description, defaultValue, onChanged, onModuleActivated, visible, action);
++            return new KeybindSetting(this.name, this.description, (Keybind)this.defaultValue, this.onChanged, this.onModuleActivated, this.visible, this.action);
+         }
+     }
+ }
++

@@ -1,0 +1,74 @@
+--- upstream261/mixin/SoundEngineMixin.java
++++ v1decompiled/mixin/SoundEngineMixin.java
+@@ -1,15 +1,24 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.llamalad7.mixinextras.sugar.Local
++ *  meteordevelopment.orbit.ICancellable
++ *  net.minecraft.client.resources.sounds.SoundInstance
++ *  net.minecraft.client.resources.sounds.TickableSoundInstance
++ *  net.minecraft.client.sounds.SoundEngine
++ *  net.minecraft.client.sounds.SoundEngine$PlayResult
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Shadow
++ *  org.spongepowered.asm.mixin.injection.At
++ *  org.spongepowered.asm.mixin.injection.Inject
++ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
++ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import com.llamalad7.mixinextras.sugar.Local;
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.events.world.PlaySoundEvent;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.misc.SoundBlocker;
++import meteordevelopment.orbit.ICancellable;
+ import net.minecraft.client.resources.sounds.SoundInstance;
+ import net.minecraft.client.resources.sounds.TickableSoundInstance;
+ import net.minecraft.client.sounds.SoundEngine;
+@@ -19,21 +28,29 @@
+ import org.spongepowered.asm.mixin.injection.Inject;
+ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
++import radmin.client.MeteorClient;
++import radmin.client.events.world.PlaySoundEvent;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.misc.SoundBlocker;
+ 
+-@Mixin(SoundEngine.class)
++@Mixin(value={SoundEngine.class})
+ public abstract class SoundEngineMixin {
+     @Shadow
+-    public abstract void stop(SoundInstance soundInstance);
++    public abstract void stop(SoundInstance var1);
+ 
+-    @Inject(method = "play(Lnet/minecraft/client/resources/sounds/SoundInstance;)Lnet/minecraft/client/sounds/SoundEngine$PlayResult;", at = @At("HEAD"), cancellable = true)
++    @Inject(method={"play(Lnet/minecraft/client/resources/sounds/SoundInstance;)Lnet/minecraft/client/sounds/SoundEngine$PlayResult;"}, at={@At(value="HEAD")}, cancellable=true)
+     private void onPlay(SoundInstance instance, CallbackInfoReturnable<SoundEngine.PlayResult> cir) {
+-        PlaySoundEvent event = MeteorClient.EVENT_BUS.post(PlaySoundEvent.get(instance));
+-
+-        if (event.isCancelled()) cir.cancel();
++        PlaySoundEvent event = (PlaySoundEvent)MeteorClient.EVENT_BUS.post((ICancellable)PlaySoundEvent.get(instance));
++        if (event.isCancelled()) {
++            cir.cancel();
++        }
+     }
+ 
+-    @Inject(method = "tickInGameSound()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/sounds/TickableSoundInstance;tick()V", ordinal = 0))
+-    private void onTick(CallbackInfo ci, @Local(name = "instance") TickableSoundInstance instance) {
+-        if (Modules.get().get(SoundBlocker.class).shouldBlock(instance)) stop(instance);
++    @Inject(method={"tickInGameSound()V"}, at={@At(value="INVOKE", target="Lnet/minecraft/client/resources/sounds/TickableSoundInstance;tick()V", ordinal=0)})
++    private void onTick(CallbackInfo ci, @Local(name={"instance"}) TickableSoundInstance instance) {
++        if (Modules.get().get(SoundBlocker.class).shouldBlock((SoundInstance)instance)) {
++            this.stop((SoundInstance)instance);
++        }
+     }
+ }
++

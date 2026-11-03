@@ -1,0 +1,67 @@
+--- upstream261/gui/screens/accounts/AccountInfoScreen.java
++++ v1decompiled/gui/screens/accounts/AccountInfoScreen.java
+@@ -1,22 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.screens.accounts;
+ 
+-package meteordevelopment.meteorclient.gui.screens.accounts;
++import radmin.client.MeteorClient;
++import radmin.client.gui.GuiTheme;
++import radmin.client.gui.WindowScreen;
++import radmin.client.gui.widgets.containers.WHorizontalList;
++import radmin.client.gui.widgets.pressable.WButton;
++import radmin.client.systems.accounts.Account;
++import radmin.client.systems.accounts.AccountType;
++import radmin.client.systems.accounts.TokenAccount;
++import radmin.client.utils.render.color.Color;
+ 
+-import meteordevelopment.meteorclient.gui.GuiTheme;
+-import meteordevelopment.meteorclient.gui.WindowScreen;
+-import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
+-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
+-import meteordevelopment.meteorclient.systems.accounts.Account;
+-import meteordevelopment.meteorclient.systems.accounts.AccountType;
+-import meteordevelopment.meteorclient.systems.accounts.TokenAccount;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
+-
+-import static meteordevelopment.meteorclient.MeteorClient.mc;
+-
+-public class AccountInfoScreen extends WindowScreen {
++public class AccountInfoScreen
++extends WindowScreen {
+     private final Account<?> account;
+ 
+     public AccountInfoScreen(GuiTheme theme, Account<?> account) {
+@@ -26,17 +24,17 @@
+ 
+     @Override
+     public void initWidgets() {
+-        TokenAccount e = (TokenAccount) account;
+-        WHorizontalList l = add(theme.horizontalList()).expandX().widget();
+-
+-        String tokenLabel = account.getType() + " token:";
+-        if (account.getType() == AccountType.Session) tokenLabel = "";
+-
+-        WButton copy = theme.button("Copy");
+-        copy.action = () -> mc.keyboardHandler.setClipboard(e.getToken());
+-
+-        l.add(theme.label(tokenLabel));
+-        l.add(theme.label(account.getType() == AccountType.Session ? "Click to copy Token" : e.getToken()).color(Color.GRAY)).pad(5);
++        TokenAccount e = (TokenAccount)((Object)this.account);
++        WHorizontalList l = this.add(this.theme.horizontalList()).expandX().widget();
++        Object tokenLabel = String.valueOf((Object)this.account.getType()) + " token:";
++        if (this.account.getType() == AccountType.Session) {
++            tokenLabel = "";
++        }
++        WButton copy = this.theme.button("Copy");
++        copy.action = () -> MeteorClient.mc.keyboardHandler.setClipboard(e.getToken());
++        l.add(this.theme.label((String)tokenLabel));
++        l.add(this.theme.label(this.account.getType() == AccountType.Session ? "Click to copy Token" : e.getToken()).color(Color.GRAY)).pad(5.0);
+         l.add(copy);
+     }
+ }
++

@@ -1,0 +1,59 @@
+--- upstream261/gui/widgets/pressable/WFavorite.java
++++ v1decompiled/gui/widgets/pressable/WFavorite.java
+@@ -1,14 +1,14 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
++package radmin.client.gui.widgets.pressable;
+ 
+-package meteordevelopment.meteorclient.gui.widgets.pressable;
++import radmin.client.gui.renderer.GuiRenderer;
++import radmin.client.gui.widgets.pressable.WPressable;
++import radmin.client.utils.render.color.Color;
+ 
+-import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
+-import meteordevelopment.meteorclient.utils.render.color.Color;
+-
+-public abstract class WFavorite extends WPressable {
++public abstract class WFavorite
++extends WPressable {
+     public boolean checked;
+ 
+     public WFavorite(boolean checked) {
+@@ -17,25 +17,24 @@
+ 
+     @Override
+     protected void onCalculateSize() {
+-        double pad = pad();
+-        double s = theme.textHeight();
+-
+-        width = pad + s + pad;
+-        height = pad + s + pad;
++        double pad = this.pad();
++        double s = this.theme.textHeight();
++        this.width = pad + s + pad;
++        this.height = pad + s + pad;
+     }
+ 
+     @Override
+     protected void onPressed(int button) {
+-        checked = !checked;
++        this.checked = !this.checked;
+     }
+ 
+     @Override
+     protected void onRender(GuiRenderer renderer, double mouseX, double mouseY, double delta) {
+-        double pad = pad();
+-        double s = theme.textHeight();
+-
+-        renderer.quad(x + pad, y + pad, s, s, checked ? GuiRenderer.FAVORITE_YES : GuiRenderer.FAVORITE_NO, getColor());
++        double pad = this.pad();
++        double s = this.theme.textHeight();
++        renderer.quad(this.x + pad, this.y + pad, s, s, this.checked ? GuiRenderer.FAVORITE_YES : GuiRenderer.FAVORITE_NO, this.getColor());
+     }
+ 
+     protected abstract Color getColor();
+ }
++

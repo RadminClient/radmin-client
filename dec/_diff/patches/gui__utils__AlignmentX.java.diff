@@ -1,0 +1,20 @@
+--- upstream261/gui/utils/AlignmentX.java
++++ v1decompiled/gui/utils/AlignmentX.java
+@@ -1,10 +1,12 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.gui.utils;
++package radmin.client.gui.utils;
+ 
+ public enum AlignmentX {
+-    Left, Center, Right
++    Left,
++    Center,
++    Right;
++
+ }
++

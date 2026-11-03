@@ -1,0 +1,24 @@
+--- upstream261/utils/render/IVertexConsumerProvider.java
++++ v1decompiled/utils/render/IVertexConsumerProvider.java
+@@ -1,12 +1,15 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.renderer.MultiBufferSource
+  */
+-
+-package meteordevelopment.meteorclient.utils.render;
++package radmin.client.utils.render;
+ 
+ import net.minecraft.client.renderer.MultiBufferSource;
+ 
+-public interface IVertexConsumerProvider extends MultiBufferSource {
+-    void setOffset(int offsetX, int offsetY, int offsetZ);
++public interface IVertexConsumerProvider
++extends MultiBufferSource {
++    public void setOffset(int var1, int var2, int var3);
+ }
++

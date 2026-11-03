@@ -1,0 +1,20 @@
+--- upstream261/utils/misc/ICopyable.java
++++ v1decompiled/utils/misc/ICopyable.java
+@@ -1,12 +1,11 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
+  */
+-
+-package meteordevelopment.meteorclient.utils.misc;
++package radmin.client.utils.misc;
+ 
+ public interface ICopyable<T extends ICopyable<T>> {
+-    T set(T value);
++    public T set(T var1);
+ 
+-    T copy();
++    public T copy();
+ }
++

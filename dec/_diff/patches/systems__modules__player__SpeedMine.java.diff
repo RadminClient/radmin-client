@@ -1,0 +1,247 @@
+--- upstream261/systems/modules/player/SpeedMine.java
++++ v1decompiled/systems/modules/player/SpeedMine.java
+@@ -1,152 +1,139 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  meteordevelopment.orbit.EventHandler
++ *  net.minecraft.core.BlockPos
++ *  net.minecraft.network.protocol.Packet
++ *  net.minecraft.network.protocol.game.ServerboundPlayerActionPacket
++ *  net.minecraft.network.protocol.game.ServerboundPlayerActionPacket$Action
++ *  net.minecraft.world.effect.MobEffectInstance
++ *  net.minecraft.world.effect.MobEffects
++ *  net.minecraft.world.entity.player.Player
++ *  net.minecraft.world.level.BlockGetter
++ *  net.minecraft.world.level.block.Block
+  */
++package radmin.client.systems.modules.player;
+ 
+-package meteordevelopment.meteorclient.systems.modules.player;
+-
+-import meteordevelopment.meteorclient.events.packets.PacketEvent;
+-import meteordevelopment.meteorclient.events.world.TickEvent;
+-import meteordevelopment.meteorclient.mixin.MultiPlayerGameModeAccessor;
+-import meteordevelopment.meteorclient.settings.*;
+-import meteordevelopment.meteorclient.systems.modules.Categories;
+-import meteordevelopment.meteorclient.systems.modules.Module;
+-import meteordevelopment.meteorclient.utils.Utils;
++import java.util.List;
+ import meteordevelopment.orbit.EventHandler;
+ import net.minecraft.core.BlockPos;
++import net.minecraft.network.protocol.Packet;
+ import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+ import net.minecraft.world.effect.MobEffectInstance;
++import net.minecraft.world.effect.MobEffects;
++import net.minecraft.world.entity.player.Player;
++import net.minecraft.world.level.BlockGetter;
+ import net.minecraft.world.level.block.Block;
++import radmin.client.events.packets.PacketEvent;
++import radmin.client.events.world.TickEvent;
++import radmin.client.mixin.MultiPlayerGameModeAccessor;
++import radmin.client.settings.BlockListSetting;
++import radmin.client.settings.BoolSetting;
++import radmin.client.settings.DoubleSetting;
++import radmin.client.settings.EnumSetting;
++import radmin.client.settings.IntSetting;
++import radmin.client.settings.Setting;
++import radmin.client.settings.SettingGroup;
++import radmin.client.systems.modules.Categories;
++import radmin.client.systems.modules.Module;
++import radmin.client.utils.Utils;
+ 
+-import java.util.List;
+-
+-import static net.minecraft.world.effect.MobEffects.HASTE;
+-
+-public class SpeedMine extends Module {
+-    private final SettingGroup sgGeneral = settings.getDefaultGroup();
+-
+-    public final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
+-        .name("mode")
+-        .defaultValue(Mode.Damage)
+-        .onChanged(_ -> removeHaste())
+-        .build()
+-    );
+-
+-    private final Setting<List<Block>> blocks = sgGeneral.add(new BlockListSetting.Builder()
+-        .name("blocks")
+-        .description("Selected blocks.")
+-        .filter(block -> block.defaultDestroyTime() > 0)
+-        .visible(() -> mode.get() != Mode.Haste)
+-        .build()
+-    );
+-
+-    private final Setting<ListMode> blocksFilter = sgGeneral.add(new EnumSetting.Builder<ListMode>()
+-        .name("blocks-filter")
+-        .description("How to use the blocks setting.")
+-        .defaultValue(ListMode.Blacklist)
+-        .visible(() -> mode.get() != Mode.Haste)
+-        .build()
+-    );
+-
+-    public final Setting<Double> modifier = sgGeneral.add(new DoubleSetting.Builder()
+-        .name("modifier")
+-        .description("Mining speed modifier. An additional value of 0.2 is equivalent to one haste level (1.2 = haste 1).")
+-        .defaultValue(1.4)
+-        .visible(() -> mode.get() == Mode.Normal)
+-        .min(0)
+-        .build()
+-    );
+-
+-    private final Setting<Integer> hasteAmplifier = sgGeneral.add(new IntSetting.Builder()
+-        .name("haste-amplifier")
+-        .description("What value of haste to give you. Above 2 not recommended.")
+-        .defaultValue(2)
+-        .min(1)
+-        .visible(() -> mode.get() == Mode.Haste)
+-        .onChanged(_ -> removeHaste())
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> instamine = sgGeneral.add(new BoolSetting.Builder()
+-        .name("instamine")
+-        .description("Whether or not to instantly mine blocks under certain conditions.")
+-        .defaultValue(true)
+-        .visible(() -> mode.get() == Mode.Damage)
+-        .build()
+-    );
+-
+-    private final Setting<Boolean> grimBypass = sgGeneral.add(new BoolSetting.Builder()
+-        .name("grim-bypass")
+-        .description("Bypasses Grim's fastbreak check, working as of 2.3.58")
+-        .defaultValue(false)
+-        .visible(() -> mode.get() == Mode.Damage)
+-        .build()
+-    );
++public class SpeedMine
++extends Module {
++    private final SettingGroup sgGeneral;
++    public final Setting<Mode> mode;
++    private final Setting<List<Block>> blocks;
++    private final Setting<ListMode> blocksFilter;
++    public final Setting<Double> modifier;
++    private final Setting<Integer> hasteAmplifier;
++    private final Setting<Boolean> instamine;
++    private final Setting<Boolean> grimBypass;
+ 
+     public SpeedMine() {
+         super(Categories.Player, "speed-mine", "Allows you to quickly mine blocks.");
++        this.sgGeneral = this.settings.getDefaultGroup();
++        this.mode = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("mode")).defaultValue(Mode.Damage)).onChanged(mode -> this.removeHaste())).build());
++        this.blocks = this.sgGeneral.add(((BlockListSetting.Builder)((BlockListSetting.Builder)((BlockListSetting.Builder)new BlockListSetting.Builder().name("blocks")).description("Selected blocks.")).filter((Block block) -> block.defaultDestroyTime() > 0.0f).visible(() -> this.mode.get() != Mode.Haste)).build());
++        this.blocksFilter = this.sgGeneral.add(((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)((EnumSetting.Builder)new EnumSetting.Builder().name("blocks-filter")).description("How to use the blocks setting.")).defaultValue(ListMode.Blacklist)).visible(() -> this.mode.get() != Mode.Haste)).build());
++        this.modifier = this.sgGeneral.add(((DoubleSetting.Builder)((DoubleSetting.Builder)((DoubleSetting.Builder)new DoubleSetting.Builder().name("modifier")).description("Mining speed modifier. An additional value of 0.2 is equivalent to one haste level (1.2 = haste 1).")).defaultValue(1.4).visible(() -> this.mode.get() == Mode.Normal)).min(0.0).build());
++        this.hasteAmplifier = this.sgGeneral.add(((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)((IntSetting.Builder)new IntSetting.Builder().name("haste-amplifier")).description("What value of haste to give you. Above 2 not recommended.")).defaultValue(2)).min(1).visible(() -> this.mode.get() == Mode.Haste)).onChanged(n -> this.removeHaste())).build());
++        this.instamine = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("instamine")).description("Whether or not to instantly mine blocks under certain conditions.")).defaultValue(true)).visible(() -> this.mode.get() == Mode.Damage)).build());
++        this.grimBypass = this.sgGeneral.add(((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)((BoolSetting.Builder)new BoolSetting.Builder().name("grim-bypass")).description("Bypasses Grim's fastbreak check, working as of 2.3.58")).defaultValue(false)).visible(() -> this.mode.get() == Mode.Damage)).build());
+     }
+ 
+     @Override
+     public void onDeactivate() {
+-        removeHaste();
++        this.removeHaste();
+     }
+ 
+     @EventHandler
+     private void onTick(TickEvent.Pre event) {
+-        if (!Utils.canUpdate()) return;
+-
+-        if (mode.get() == Mode.Haste) {
+-            MobEffectInstance haste = mc.player.getEffect(HASTE);
+-
+-            if (haste == null || haste.getAmplifier() <= hasteAmplifier.get() - 1) {
+-                mc.player.addEffect(new MobEffectInstance(HASTE, -1, hasteAmplifier.get() - 1, false, false, false), null);
++        if (!Utils.canUpdate()) {
++            return;
++        }
++        if (this.mode.get() == Mode.Haste) {
++            MobEffectInstance haste = this.mc.player.getEffect(MobEffects.HASTE);
++            if (haste == null || haste.getAmplifier() <= this.hasteAmplifier.get() - 1) {
++                this.mc.player.addEffect(new MobEffectInstance(MobEffects.HASTE, -1, this.hasteAmplifier.get() - 1, false, false, false), null);
+             }
+-        } else if (mode.get() == Mode.Damage) {
+-            MultiPlayerGameModeAccessor im = (MultiPlayerGameModeAccessor) mc.gameMode;
++        } else if (this.mode.get() == Mode.Damage) {
++            MultiPlayerGameModeAccessor im = (MultiPlayerGameModeAccessor)this.mc.gameMode;
+             float progress = im.meteor$getBreakingProgress();
+             BlockPos pos = im.meteor$getCurrentBreakingBlockPos();
+-
+-            if (pos == null || progress <= 0) return;
+-            if (progress + mc.level.getBlockState(pos).getDestroyProgress(mc.player, mc.level, pos) >= 0.7f)
+-                im.meteor$setDestroyProgress(1f);
++            if (pos == null || progress <= 0.0f) {
++                return;
++            }
++            if (progress + this.mc.level.getBlockState(pos).getDestroyProgress((Player)this.mc.player, (BlockGetter)this.mc.level, pos) >= 0.7f) {
++                im.meteor$setDestroyProgress(1.0f);
++            }
+         }
+     }
+ 
+     @EventHandler
+     private void onPacket(PacketEvent.Send event) {
+-        if (mode.get() != Mode.Damage || !grimBypass.get()) return;
+-
+-        // https://github.com/GrimAnticheat/Grim/issues/1296
+-        if (event.packet instanceof ServerboundPlayerActionPacket packet && packet.getAction() == ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK) {
+-            mc.getConnection().send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.ABORT_DESTROY_BLOCK, packet.getPos().above(), packet.getDirection()));
++        ServerboundPlayerActionPacket packet;
++        if (this.mode.get() != Mode.Damage || !this.grimBypass.get().booleanValue()) {
++            return;
++        }
++        Packet<?> packet2 = event.packet;
++        if (packet2 instanceof ServerboundPlayerActionPacket && (packet = (ServerboundPlayerActionPacket)packet2).getAction() == ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK) {
++            this.mc.getConnection().send((Packet)new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.ABORT_DESTROY_BLOCK, packet.getPos().above(), packet.getDirection()));
+         }
+     }
+ 
+     private void removeHaste() {
+-        if (!Utils.canUpdate()) return;
+-
+-        MobEffectInstance haste = mc.player.getEffect(HASTE);
+-        if (haste != null && !haste.showIcon()) mc.player.removeEffect(HASTE);
++        if (!Utils.canUpdate()) {
++            return;
++        }
++        MobEffectInstance haste = this.mc.player.getEffect(MobEffects.HASTE);
++        if (haste != null && !haste.showIcon()) {
++            this.mc.player.removeEffect(MobEffects.HASTE);
++        }
+     }
+ 
+     public boolean filter(Block block) {
+-        if (blocksFilter.get() == ListMode.Blacklist && !blocks.get().contains(block)) return true;
+-        return blocksFilter.get() == ListMode.Whitelist && blocks.get().contains(block);
++        if (this.blocksFilter.get() == ListMode.Blacklist && !this.blocks.get().contains(block)) {
++            return true;
++        }
++        return this.blocksFilter.get() == ListMode.Whitelist && this.blocks.get().contains(block);
+     }
+ 
+     public boolean instamine() {
+-        return isActive() && mode.get() == Mode.Damage && instamine.get();
++        return this.isActive() && this.mode.get() == Mode.Damage && this.instamine.get() != false;
+     }
+ 
+-    public enum Mode {
++    public static enum Mode {
+         Normal,
+         Haste,
+-        Damage
++        Damage;
++
+     }
+ 
+-    public enum ListMode {
++    public static enum ListMode {
+         Whitelist,
+-        Blacklist
++        Blacklist;
++
+     }
+ }
++

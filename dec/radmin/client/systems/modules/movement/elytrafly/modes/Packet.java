@@ -1,0 +1,77 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.network.protocol.Packet
+ *  net.minecraft.network.protocol.game.ServerboundMovePlayerPacket
+ *  net.minecraft.network.protocol.game.ServerboundMovePlayerPacket$StatusOnly
+ *  net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket
+ *  net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket$Action
+ *  net.minecraft.world.entity.Entity
+ *  net.minecraft.world.entity.EquipmentSlot
+ *  net.minecraft.world.item.Items
+ *  net.minecraft.world.phys.Vec3
+ */
+package radmin.client.systems.modules.movement.elytrafly.modes;
+
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.Vec3;
+import radmin.client.events.packets.PacketEvent;
+import radmin.client.systems.modules.movement.elytrafly.ElytraFlightMode;
+import radmin.client.systems.modules.movement.elytrafly.ElytraFlightModes;
+
+public class Packet
+extends ElytraFlightMode {
+    private final Vec3 vec3d = new Vec3(0.0, 0.0, 0.0);
+
+    public Packet() {
+        super(ElytraFlightModes.Packet);
+    }
+
+    @Override
+    public void onDeactivate() {
+        this.mc.player.getAbilities().flying = false;
+        this.mc.player.getAbilities().mayfly = false;
+    }
+
+    @Override
+    public void onTick() {
+        super.onTick();
+        if (this.mc.player.getItemBySlot(EquipmentSlot.CHEST).getItem() != Items.ELYTRA || this.mc.player.fallDistance <= 0.2 || this.mc.options.keyShift.isDown()) {
+            return;
+        }
+        if (this.mc.options.keyUp.isDown()) {
+            this.vec3d.add(0.0, 0.0, this.elytraFly.horizontalSpeed.get().doubleValue());
+            this.vec3d.yRot(-((float)Math.toRadians(this.mc.player.getYRot())));
+        } else if (this.mc.options.keyDown.isDown()) {
+            this.vec3d.add(0.0, 0.0, this.elytraFly.horizontalSpeed.get().doubleValue());
+            this.vec3d.yRot((float)Math.toRadians(this.mc.player.getYRot()));
+        }
+        if (this.mc.options.keyJump.isDown()) {
+            this.vec3d.add(0.0, this.elytraFly.verticalSpeed.get().doubleValue(), 0.0);
+        } else if (!this.mc.options.keyJump.isDown()) {
+            this.vec3d.add(0.0, -this.elytraFly.verticalSpeed.get().doubleValue(), 0.0);
+        }
+        this.mc.player.setDeltaMovement(this.vec3d);
+        this.mc.player.connection.send((net.minecraft.network.protocol.Packet)new ServerboundPlayerCommandPacket((Entity)this.mc.player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
+        this.mc.player.connection.send((net.minecraft.network.protocol.Packet)new ServerboundMovePlayerPacket.StatusOnly(true, this.mc.player.horizontalCollision));
+    }
+
+    @Override
+    public void onPacketSend(PacketEvent.Send event) {
+        if (event.packet instanceof ServerboundMovePlayerPacket) {
+            this.mc.player.connection.send((net.minecraft.network.protocol.Packet)new ServerboundPlayerCommandPacket((Entity)this.mc.player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
+        }
+    }
+
+    @Override
+    public void onPlayerMove() {
+        this.mc.player.getAbilities().flying = true;
+        this.mc.player.getAbilities().setFlyingSpeed(this.elytraFly.horizontalSpeed.get().floatValue() / 20.0f);
+    }
+}
+

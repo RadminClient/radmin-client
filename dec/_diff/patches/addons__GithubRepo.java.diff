@@ -1,0 +1,36 @@
+--- upstream261/addons/GithubRepo.java
++++ v1decompiled/addons/GithubRepo.java
+@@ -1,13 +1,13 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  javax.annotation.Nullable
+  */
+-
+-package meteordevelopment.meteorclient.addons;
+-
+-import meteordevelopment.meteorclient.utils.network.Http;
++package radmin.client.addons;
+ 
+ import javax.annotation.Nullable;
++import radmin.client.utils.network.Http;
+ 
+ public record GithubRepo(String owner, String name, String branch, @Nullable String accessToken) {
+     public GithubRepo(String owner, String name, @Nullable String accessToken) {
+@@ -19,7 +19,7 @@
+     }
+ 
+     public String getOwnerName() {
+-        return owner + "/" + name;
++        return this.owner + "/" + this.name;
+     }
+ 
+     public void authenticate(Http.Request request) {
+@@ -33,3 +33,4 @@
+         }
+     }
+ }
++

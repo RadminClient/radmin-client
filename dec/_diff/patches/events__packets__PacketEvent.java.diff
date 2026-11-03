@@ -1,0 +1,101 @@
+--- upstream261/events/packets/PacketEvent.java
++++ v1decompiled/events/packets/PacketEvent.java
+@@ -1,46 +1,17 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.network.Connection
++ *  net.minecraft.network.protocol.Packet
+  */
++package radmin.client.events.packets;
+ 
+-package meteordevelopment.meteorclient.events.packets;
+-
+-import meteordevelopment.meteorclient.events.Cancellable;
+ import net.minecraft.network.Connection;
+ import net.minecraft.network.protocol.Packet;
++import radmin.client.events.Cancellable;
+ 
+ public class PacketEvent {
+-    public static class Receive extends Cancellable {
+-        public Packet<?> packet;
+-        public Connection connection;
+-
+-        public Receive(Packet<?> packet, Connection connection) {
+-            this.setCancelled(false);
+-            this.packet = packet;
+-            this.connection = connection;
+-        }
+-    }
+-
+-    public static class Send extends Cancellable {
+-        public Packet<?> packet;
+-        public Connection connection;
+-
+-        public Send(Packet<?> packet, Connection connection) {
+-            this.setCancelled(false);
+-            this.packet = packet;
+-            this.connection = connection;
+-        }
+-
+-        /**
+-         * Sends a packet without triggering an event. Use when you want to send a packet inside the event
+-         * listener, without causing a StackOverflowError
+-         *
+-         * @param packet The packet to silently send
+-         */
+-        public void sendSilently(Packet<?> packet) {
+-            connection.send(packet, null, true);
+-        }
+-    }
+ 
+     public static class Sent {
+         public Packet<?> packet;
+@@ -51,14 +22,37 @@
+             this.connection = connection;
+         }
+ 
+-        /**
+-         * Sends a packet without triggering an event. Use when you want to send a packet inside the event
+-         * listener, without causing a StackOverflowError
+-         *
+-         * @param packet The packet to silently send
+-         */
+         public void sendSilently(Packet<?> packet) {
+-            connection.send(packet, null, true);
++            this.connection.send(packet, null, true);
++        }
++    }
++
++    public static class Send
++    extends Cancellable {
++        public Packet<?> packet;
++        public Connection connection;
++
++        public Send(Packet<?> packet, Connection connection) {
++            this.setCancelled(false);
++            this.packet = packet;
++            this.connection = connection;
++        }
++
++        public void sendSilently(Packet<?> packet) {
++            this.connection.send(packet, null, true);
++        }
++    }
++
++    public static class Receive
++    extends Cancellable {
++        public Packet<?> packet;
++        public Connection connection;
++
++        public Receive(Packet<?> packet, Connection connection) {
++            this.setCancelled(false);
++            this.packet = packet;
++            this.connection = connection;
+         }
+     }
+ }
++

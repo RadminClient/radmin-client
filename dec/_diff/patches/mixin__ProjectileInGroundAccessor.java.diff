@@ -1,0 +1,30 @@
+--- upstream261/mixin/ProjectileInGroundAccessor.java
++++ v1decompiled/mixin/ProjectileInGroundAccessor.java
+@@ -1,16 +1,20 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.world.entity.projectile.arrow.AbstractArrow
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.gen.Invoker
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.gen.Invoker;
+ 
+-@Mixin(AbstractArrow.class)
++@Mixin(value={AbstractArrow.class})
+ public interface ProjectileInGroundAccessor {
+-    @Invoker("isInGround")
+-    boolean meteor$invokeIsInGround();
++    @Invoker(value="isInGround")
++    public boolean meteor$invokeIsInGround();
+ }
++

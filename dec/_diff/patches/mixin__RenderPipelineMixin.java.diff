@@ -1,0 +1,40 @@
+--- upstream261/mixin/RenderPipelineMixin.java
++++ v1decompiled/mixin/RenderPipelineMixin.java
+@@ -1,17 +1,21 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.mojang.blaze3d.pipeline.RenderPipeline
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Unique
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import com.mojang.blaze3d.pipeline.RenderPipeline;
+-import meteordevelopment.meteorclient.mixininterface.IRenderPipeline;
+ import org.spongepowered.asm.mixin.Mixin;
+ import org.spongepowered.asm.mixin.Unique;
++import radmin.client.mixininterface.IRenderPipeline;
+ 
+-@Mixin(RenderPipeline.class)
+-public abstract class RenderPipelineMixin implements IRenderPipeline {
++@Mixin(value={RenderPipeline.class})
++public abstract class RenderPipelineMixin
++implements IRenderPipeline {
+     @Unique
+     private boolean lineSmooth;
+ 
+@@ -22,6 +26,7 @@
+ 
+     @Override
+     public boolean meteor$getLineSmooth() {
+-        return lineSmooth;
++        return this.lineSmooth;
+     }
+ }
++

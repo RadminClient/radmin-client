@@ -1,0 +1,26 @@
+--- upstream261/utils/tooltip/MeteorTooltipData.java
++++ v1decompiled/utils/tooltip/MeteorTooltipData.java
+@@ -1,13 +1,17 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
++ *  net.minecraft.world.inventory.tooltip.TooltipComponent
+  */
+-
+-package meteordevelopment.meteorclient.utils.tooltip;
++package radmin.client.utils.tooltip;
+ 
+ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+ import net.minecraft.world.inventory.tooltip.TooltipComponent;
+ 
+-public interface MeteorTooltipData extends TooltipComponent {
+-    ClientTooltipComponent getComponent();
++public interface MeteorTooltipData
++extends TooltipComponent {
++    public ClientTooltipComponent getComponent();
+ }
++

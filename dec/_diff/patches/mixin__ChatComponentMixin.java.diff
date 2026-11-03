@@ -1,0 +1,283 @@
+--- upstream261/mixin/ChatComponentMixin.java
++++ v1decompiled/mixin/ChatComponentMixin.java
+@@ -1,21 +1,36 @@
+ /*
+- * This file is part of the Meteor Client distribution (https://github.com/MeteorDevelopment/meteor-client).
+- * Copyright (c) Meteor Development.
++ * Decompiled with CFR 0.152.
++ * 
++ * Could not load the following classes:
++ *  com.llamalad7.mixinextras.injector.ModifyExpressionValue
++ *  com.llamalad7.mixinextras.sugar.Local
++ *  com.llamalad7.mixinextras.sugar.ref.LocalRef
++ *  meteordevelopment.orbit.ICancellable
++ *  net.minecraft.client.Minecraft
++ *  net.minecraft.client.gui.components.ChatComponent
++ *  net.minecraft.client.multiplayer.chat.GuiMessage
++ *  net.minecraft.client.multiplayer.chat.GuiMessage$Line
++ *  net.minecraft.client.multiplayer.chat.GuiMessageSource
++ *  net.minecraft.client.multiplayer.chat.GuiMessageTag
++ *  net.minecraft.network.chat.Component
++ *  net.minecraft.network.chat.MessageSignature
++ *  net.minecraft.util.FormattedCharSequence
++ *  org.spongepowered.asm.mixin.Final
++ *  org.spongepowered.asm.mixin.Mixin
++ *  org.spongepowered.asm.mixin.Shadow
++ *  org.spongepowered.asm.mixin.Unique
++ *  org.spongepowered.asm.mixin.injection.At
++ *  org.spongepowered.asm.mixin.injection.At$Shift
++ *  org.spongepowered.asm.mixin.injection.Inject
++ *  org.spongepowered.asm.mixin.injection.callback.CallbackInfo
+  */
+-
+-package meteordevelopment.meteorclient.mixin;
++package radmin.client.mixin;
+ 
+ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+ import com.llamalad7.mixinextras.sugar.Local;
+ import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+-import meteordevelopment.meteorclient.MeteorClient;
+-import meteordevelopment.meteorclient.events.game.ReceiveMessageEvent;
+-import meteordevelopment.meteorclient.mixininterface.IChatHud;
+-import meteordevelopment.meteorclient.mixininterface.IChatListener;
+-import meteordevelopment.meteorclient.mixininterface.IGuiMessage;
+-import meteordevelopment.meteorclient.mixininterface.IGuiMessageVisible;
+-import meteordevelopment.meteorclient.systems.modules.Modules;
+-import meteordevelopment.meteorclient.systems.modules.misc.BetterChat;
++import java.util.List;
++import meteordevelopment.orbit.ICancellable;
+ import net.minecraft.client.Minecraft;
+ import net.minecraft.client.gui.components.ChatComponent;
+ import net.minecraft.client.multiplayer.chat.GuiMessage;
+@@ -31,153 +46,149 @@
+ import org.spongepowered.asm.mixin.injection.At;
+ import org.spongepowered.asm.mixin.injection.Inject;
+ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
++import radmin.client.MeteorClient;
++import radmin.client.events.game.ReceiveMessageEvent;
++import radmin.client.mixininterface.IChatHud;
++import radmin.client.mixininterface.IChatListener;
++import radmin.client.mixininterface.IGuiMessage;
++import radmin.client.mixininterface.IGuiMessageVisible;
++import radmin.client.systems.modules.Modules;
++import radmin.client.systems.modules.misc.BetterChat;
+ 
+-import java.util.List;
+-
+-@Mixin(ChatComponent.class)
+-public abstract class ChatComponentMixin implements IChatHud {
++@Mixin(value={ChatComponent.class})
++public abstract class ChatComponentMixin
++implements IChatHud {
+     @Shadow
+     @Final
+     private Minecraft minecraft;
+-
+     @Shadow
+     @Final
+     private List<GuiMessage.Line> trimmedMessages;
+     @Shadow
+     @Final
+     private List<GuiMessage> allMessages;
+-
+     @Unique
+     private BetterChat betterChat;
+     @Unique
+     private int nextId;
+ 
+     @Shadow
+-    public abstract void addClientSystemMessage(Component message);
++    public abstract void addClientSystemMessage(Component var1);
+ 
+     @Override
+     public void meteor$add(Component message, int id) {
+-        nextId = id;
+-        addClientSystemMessage(message);
+-        nextId = 0;
++        this.nextId = id;
++        this.addClientSystemMessage(message);
++        this.nextId = 0;
+     }
+ 
+-    @Inject(method = "addMessageToDisplayQueue", at = @At(value = "INVOKE", target = "Ljava/util/List;addFirst(Ljava/lang/Object;)V", shift = At.Shift.AFTER))
++    @Inject(method={"addMessageToDisplayQueue"}, at={@At(value="INVOKE", target="Ljava/util/List;addFirst(Ljava/lang/Object;)V", shift=At.Shift.AFTER)})
+     private void onAddMessageAfterNewGuiMessageVisible(GuiMessage message, CallbackInfo ci) {
+-        ((IGuiMessage) (Object) trimmedMessages.getFirst()).meteor$setId(nextId);
++        ((IGuiMessage)this.trimmedMessages.getFirst()).meteor$setId(this.nextId);
+     }
+ 
+-    @Inject(method = "addMessageToQueue", at = @At(value = "INVOKE", target = "Ljava/util/List;addFirst(Ljava/lang/Object;)V", shift = At.Shift.AFTER))
++    @Inject(method={"addMessageToQueue"}, at={@At(value="INVOKE", target="Ljava/util/List;addFirst(Ljava/lang/Object;)V", shift=At.Shift.AFTER)})
+     private void onAddMessageAfterNewGuiMessage(GuiMessage message, CallbackInfo ci) {
+-        ((IGuiMessage) (Object) allMessages.getFirst()).meteor$setId(nextId);
++        ((IGuiMessage)this.allMessages.getFirst()).meteor$setId(this.nextId);
+     }
+ 
+-    @SuppressWarnings("DataFlowIssue")
+-    @ModifyExpressionValue(method = "addMessageToDisplayQueue", at = @At(value = "NEW", target = "(Lnet/minecraft/client/multiplayer/chat/GuiMessage;Lnet/minecraft/util/FormattedCharSequence;Z)Lnet/minecraft/client/multiplayer/chat/GuiMessage$Line;"))
+-    private GuiMessage.Line onAddMessage_modifyGuiMessageLine(GuiMessage.Line line, @Local(name = "i") int i) {
+-        IChatListener handler = (IChatListener) minecraft.getChatListener();
+-        if (handler == null) return line;
+-
+-        IGuiMessageVisible meteorLine = (IGuiMessageVisible) (Object) line;
+-
++    @ModifyExpressionValue(method={"addMessageToDisplayQueue"}, at={@At(value="NEW", target="(Lnet/minecraft/client/multiplayer/chat/GuiMessage;Lnet/minecraft/util/FormattedCharSequence;Z)Lnet/minecraft/client/multiplayer/chat/GuiMessage$Line;")})
++    private GuiMessage.Line onAddMessage_modifyGuiMessageLine(GuiMessage.Line line, @Local(name={"i"}) int i) {
++        IChatListener handler = (IChatListener)this.minecraft.getChatListener();
++        if (handler == null) {
++            return line;
++        }
++        IGuiMessageVisible meteorLine = (IGuiMessageVisible)line;
+         meteorLine.meteor$setSender(handler.meteor$getSender());
+         meteorLine.meteor$setStartOfEntry(i == 0);
+-
+         return line;
+     }
+ 
+-    @ModifyExpressionValue(method = "addMessage", at = @At(value = "NEW", target = "(ILnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)Lnet/minecraft/client/multiplayer/chat/GuiMessage;"))
++    @ModifyExpressionValue(method={"addMessage"}, at={@At(value="NEW", target="(ILnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)Lnet/minecraft/client/multiplayer/chat/GuiMessage;")})
+     private GuiMessage onAddMessage_modifyGuiMessage(GuiMessage line) {
+-        IChatListener handler = (IChatListener) minecraft.getChatListener();
+-        if (handler == null) return line;
+-
+-        ((IGuiMessage) (Object) line).meteor$setSender(handler.meteor$getSender());
++        IChatListener handler = (IChatListener)this.minecraft.getChatListener();
++        if (handler == null) {
++            return line;
++        }
++        ((IGuiMessage)line).meteor$setSender(handler.meteor$getSender());
+         return line;
+     }
+ 
+-    @Inject(at = @At("HEAD"), method = "addMessage", cancellable = true)
+-    private void onAddMessage(Component message, MessageSignature signature, GuiMessageSource source, GuiMessageTag indicator, CallbackInfo ci, @Local(argsOnly = true, name = "contents") LocalRef<Component> contents, @Local(argsOnly = true, name = "tag") LocalRef<GuiMessageTag> tag) {
+-        ReceiveMessageEvent event = MeteorClient.EVENT_BUS.post(ReceiveMessageEvent.get(message, indicator, nextId));
+-
+-        if (event.isCancelled()) ci.cancel();
+-        else {
+-            trimmedMessages.removeIf(msg -> ((IGuiMessage) (Object) msg).meteor$getId() == nextId && nextId != 0);
+-
+-            for (int i = allMessages.size() - 1; i > -1; i--) {
+-                if (((IGuiMessage) (Object) allMessages.get(i)).meteor$getId() == nextId && nextId != 0) {
+-                    allMessages.remove(i);
+-                    getBetterChat().removeLine(i);
+-                }
++    @Inject(at={@At(value="HEAD")}, method={"addMessage"}, cancellable=true)
++    private void onAddMessage(Component message, MessageSignature signature, GuiMessageSource source, GuiMessageTag indicator, CallbackInfo ci, @Local(argsOnly=true, name={"contents"}) LocalRef<Component> contents, @Local(argsOnly=true, name={"tag"}) LocalRef<GuiMessageTag> tag) {
++        ReceiveMessageEvent event = (ReceiveMessageEvent)MeteorClient.EVENT_BUS.post((ICancellable)ReceiveMessageEvent.get(message, indicator, this.nextId));
++        if (event.isCancelled()) {
++            ci.cancel();
++        } else {
++            this.trimmedMessages.removeIf(msg -> ((IGuiMessage)msg).meteor$getId() == this.nextId && this.nextId != 0);
++            for (int i = this.allMessages.size() - 1; i > -1; --i) {
++                if (((IGuiMessage)this.allMessages.get(i)).meteor$getId() != this.nextId || this.nextId == 0) continue;
++                this.allMessages.remove(i);
++                this.getBetterChat().removeLine(i);
+             }
+-
+             if (event.isModified()) {
+-                contents.set(event.getMessage());
+-                tag.set(event.getIndicator());
++                contents.set((Object)event.getMessage());
++                tag.set((Object)event.getIndicator());
+             }
+         }
+     }
+ 
+-    //modify max lengths for messages and visible messages
+-    @ModifyExpressionValue(method = "addMessageToQueue", at = @At(value = "CONSTANT", args = "intValue=100"))
++    @ModifyExpressionValue(method={"addMessageToQueue"}, at={@At(value="CONSTANT", args={"intValue=100"})})
+     private int maxLength(int size) {
+-        if (Modules.get() == null || !getBetterChat().isLongerChat()) return size;
+-
+-        return size + betterChat.getExtraChatLines();
++        if (Modules.get() == null || !this.getBetterChat().isLongerChat()) {
++            return size;
++        }
++        return size + this.betterChat.getExtraChatLines();
+     }
+ 
+-    @ModifyExpressionValue(method = "addMessageToDisplayQueue", at = @At(value = "CONSTANT", args = "intValue=100"))
++    @ModifyExpressionValue(method={"addMessageToDisplayQueue"}, at={@At(value="CONSTANT", args={"intValue=100"})})
+     private int maxLengthVisible(int size) {
+-        if (Modules.get() == null || !getBetterChat().isLongerChat()) return size;
+-
+-        return size + betterChat.getExtraChatLines();
++        if (Modules.get() == null || !this.getBetterChat().isLongerChat()) {
++            return size;
++        }
++        return size + this.betterChat.getExtraChatLines();
+     }
+ 
+-    // Player Heads
+-
+-    @ModifyExpressionValue(method = "extractRenderState(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;ceil(F)I"))
++    @ModifyExpressionValue(method={"extractRenderState(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V"}, at={@At(value="INVOKE", target="Lnet/minecraft/util/Mth;ceil(F)I")})
+     private int onRender_modifyWidth(int width) {
+-        return getBetterChat().modifyChatWidth(width);
++        return this.getBetterChat().modifyChatWidth(width);
+     }
+ 
+-    // Anti spam
+-
+-    @Inject(method = "addMessageToDisplayQueue", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;isChatFocused()Z"))
+-    private void onBreakChatMessageLines(GuiMessage message, CallbackInfo ci, @Local(name = "lines") List<FormattedCharSequence> lines) {
+-        if (Modules.get() == null) return; // baritone calls addMessage before we initialise
+-
+-        getBetterChat().lines.addFirst(lines.size());
++    @Inject(method={"addMessageToDisplayQueue"}, at={@At(value="INVOKE", target="Lnet/minecraft/client/gui/components/ChatComponent;isChatFocused()Z")})
++    private void onBreakChatMessageLines(GuiMessage message, CallbackInfo ci, @Local(name={"lines"}) List<FormattedCharSequence> lines) {
++        if (Modules.get() == null) {
++            return;
++        }
++        this.getBetterChat().lines.addFirst((Object)lines.size());
+     }
+ 
+-    @Inject(method = "addMessageToQueue", at = @At(value = "INVOKE", target = "Ljava/util/List;removeLast()Ljava/lang/Object;"))
++    @Inject(method={"addMessageToQueue"}, at={@At(value="INVOKE", target="Ljava/util/List;removeLast()Ljava/lang/Object;")})
+     private void onRemoveMessage(GuiMessage message, CallbackInfo ci) {
+-        if (Modules.get() == null) return;
+-
+-        int extra = getBetterChat().isLongerChat() ? getBetterChat().getExtraChatLines() : 0;
+-        int size = betterChat.lines.size();
+-
+-        while (size > 100 + extra) {
+-            betterChat.lines.removeLast();
+-            size--;
++        if (Modules.get() == null) {
++            return;
++        }
++        int extra = this.getBetterChat().isLongerChat() ? this.getBetterChat().getExtraChatLines() : 0;
++        for (int size = this.betterChat.lines.size(); size > 100 + extra; --size) {
++            this.betterChat.lines.removeLast();
+         }
+     }
+ 
+-    @Inject(method = "clearMessages", at = @At("HEAD"))
++    @Inject(method={"clearMessages"}, at={@At(value="HEAD")})
+     private void onClearMessages(boolean history, CallbackInfo ci) {
+-        getBetterChat().lines.clear();
++        this.getBetterChat().lines.clear();
+     }
+ 
+-    @Inject(method = "refreshTrimmedMessages", at = @At("HEAD"))
++    @Inject(method={"refreshTrimmedMessages"}, at={@At(value="HEAD")})
+     private void onRefreshTrimmedMessages(CallbackInfo ci) {
+-        getBetterChat().lines.clear();
++        this.getBetterChat().lines.clear();
+     }
+ 
+-    // Other
+     @Unique
+     private BetterChat getBetterChat() {
+-        if (betterChat == null) {
+-            betterChat = Modules.get().get(BetterChat.class);
++        if (this.betterChat == null) {
++            this.betterChat = Modules.get().get(BetterChat.class);
+         }
+-
+-        return betterChat;
++        return this.betterChat;
+     }
+ }
++
