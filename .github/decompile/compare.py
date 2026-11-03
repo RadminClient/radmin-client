@@ -10,8 +10,27 @@ import re
 import difflib
 
 DEC = os.path.join("dec", "radmin", "client")
-UP = os.path.join("w261", "src", "main", "java", "meteordevelopment", "meteorclient")
+UP_MAIN = os.path.join("w261", "src", "main", "java", "meteordevelopment", "meteorclient")
+UP_LAUNCHER = os.path.join("w261", "src", "launcher", "java", "meteordevelopment", "meteorclient")
 OUT = os.path.join("dec", "_diff")
+
+
+def apply_renames(t):
+    t = t.replace("meteordevelopment.meteorclient", "\x01")
+    t = t.replace("radmin.client", "\x01")
+    t = t.replace("\x01", "__PKG__")
+    t = t.replace("meteor-client", "\x02")
+    t = t.replace("radmin-client", "\x02")
+    t = t.replace("\x02", "__MODID__")
+    return t
+
+
+def find_up(rel):
+    for base in (UP_MAIN, UP_LAUNCHER):
+        p = os.path.join(base, rel.replace("/", os.sep))
+        if os.path.isfile(p):
+            return p
+    return None
 
 
 def norm(path):
@@ -23,7 +42,7 @@ def norm(path):
     text = re.sub(r"//.*", "", text)
     text = re.sub(r"/\*.*?\*/", "", text, flags=re.S)
     text = re.sub(r"\s+", "", text)
-    return text
+    return apply_renames(text)
 
 
 def main():
@@ -36,7 +55,7 @@ def main():
                 continue
             dpath = os.path.join(root, fn)
             rel = os.path.relpath(dpath, DEC).replace(os.sep, "/")
-            upath = os.path.join(UP, rel.replace("/", os.sep))
+            upath = find_up(rel)
             if not os.path.isfile(upath):
                 new_count += 1
                 report.append("NEW " + rel)

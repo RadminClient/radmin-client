@@ -44,4 +44,4 @@ jobs:
           git checkout -B temp/decomp
           git add dec
           git commit -m "chore(decompile): v1 jar sources vs upstream 26.1 [skip ci]"
-          git push origin temp/decomp
+          git push -f origin temp/decomp
