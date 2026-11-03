@@ -1,0 +1,47 @@
+name: Decompile old jar
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  decompile:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[decompile]')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Download CFR decompiler
+        run: curl -sSLo cfr.jar https://repo1.maven.org/maven2/org/benf/cfr/0.152/cfr-0.152.jar
+
+      - name: Decompile old jar
+        run: java -jar cfr.jar tools/oldjar/radmin-client-26.1.2-local.jar --outputdir dec --caseinsensitivefs true --silent true
+
+      - name: Compare against upstream 26.1 base
+        run: |
+          git worktree add --detach w261 d148d8d08
+          python3 .github/decompile/compare.py
+
+      - name: Publish results to temp/decomp branch
+        run: |
+          git config user.name "RadminClient"
+          git config user.email "RadminClient@users.noreply.github.com"
+          git checkout -B temp/decomp
+          git add dec
+          git commit -m "chore(decompile): v1 jar sources vs upstream 26.1 [skip ci]"
+          git push origin temp/decomp
